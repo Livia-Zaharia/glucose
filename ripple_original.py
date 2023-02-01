@@ -24,6 +24,7 @@ class ripple:
 
 
 def trend_setting():
+    
     for k in range(0,len(glucose)-1):
         a_n=int(glucose.iloc[k,1].astype(int))
         a_n_1=int(glucose.iloc[k+1,1].astype(int))
@@ -34,7 +35,6 @@ def trend_setting():
         else:
             trend_list.append((a_n_1-a_n)/a_n)
         
-
     trend_list.append(0.0)
 
 
@@ -44,7 +44,7 @@ def parting():
     count_negative=0
     k=0
 
-    print (len(glucose))
+    #print (len(glucose))
 
 
     while k<len(glucose):
@@ -52,38 +52,39 @@ def parting():
         a_n=trend_list[k]
     
         if a_n>=0 and k<len(glucose):
-            print("am dat de pozitive")
+            #print("am dat de pozitive")
             while a_n>=0 and k<len(glucose)-1:
                 count_positive+=1
                 k+=1
-                print(a_n,"++++")
+                #print(a_n,"++++")
                 a_n=trend_list[k]
                 count+=1
-                print(a_n,"CCCC++++")
+                #print(a_n,"CCCC++++")
             
         elif a_n<0 and k<len(glucose):
-            print("am dat de negative")
+            #print("am dat de negative")
             while a_n<0 and k<len(glucose)-1:
                 count_negative+=1
                 k+=1
-                print(a_n,"BBBB++++")
+                #print(a_n,"BBBB++++")
                 a_n=trend_list[k]
                 count+=1
-                print(a_n,"DDDDD++++")
+               # print(a_n,"DDDDD++++")
 
-        if count_positive>5 and count_negative>5:
+        if count_positive>threshold and count_negative>threshold:
             trend_list_count.append(count)
             trend_list_index.append(k)
             count=0
             count_positive=0
             count_negative=0
-	if k==len(glucose) - 1:
-	    k+=1
+
+        if k==len(glucose) - 1:
+                k+=1
 
 
 
 
-# the pandas region processing
+# the PANDAS region processing
 
 df=pd.read_csv('titlu_test - Copy.csv', index_col=0)
 glucose=df[['Timestamp (YYYY-MM-DDThh:mm:ss)','Glucose Value (mg/dL)']]
@@ -102,7 +103,7 @@ glucose.dropna(inplace=True)
 
 glucose['Glucose Value (mg/dL)']=glucose['Glucose Value (mg/dL)'].astype(float)
 glucose= glucose.rename(columns={'Timestamp (YYYY-MM-DDThh:mm:ss)':'Timestamp'})
-# converse to float that column and renames timestamp to a less mouthfull name
+# converse to float that column and renames timestamp to a less mouthful name
 #all of these come from pandas- to be kept in mind
 
 
@@ -112,18 +113,23 @@ trend_list =[]
 # then when we go to sort we are going to add until we reach 0
 
 trend_setting()
-# print(trend_list)
+#print(len(trend_list))
+#print(len(glucose))
 
 #doing some counting- manually
 
 trend_list_index= []
 trend_list_count=[]
 
+threshold=15
+
 parting()
     
-print(trend_list)
-# print(len(trend_list_count))
-# #print(trend_list_index)
+print(len(trend_list))
+print(len(trend_list_count))
+print(trend_list_count)
+
+print(len(trend_list_index))
 
 # r_list = []
 
@@ -154,29 +160,29 @@ print(trend_list)
 # # ##########################################
 # # ##########################################
 
-# ending_text="{}c.png"
-# i=0
-# j=0
-# for x in trend_list_count:
-#     # the syntax x in ....basically will start with first value in gluc_counts- that is 200 something
-#     #so iloc will start from row 0 to 288 because we are still on the row attribute
-#     #iloc comes from pandas btw and pandas apparently is built on numpy- who would have thought
-#     g=glucose.iloc[j:j+x-1]
+ending_text="{}c.png"
+i=0
+j=0
+for x in trend_list_count:
+    # the syntax x in ....basically will start with first value in gluc_counts- that is 200 something
+    #so iloc will start from row 0 to 288 because we are still on the row attribute
+    #iloc comes from pandas btw and pandas apparently is built on numpy- who would have thought
+    g=glucose.iloc[j:j+x-1]
 
 
-#     fig= px.line(g, x=g['Timestamp'], y=g['Glucose Value (mg/dL)'],range_y=[40,400])
+    fig= px.line(g, x=g['Timestamp'], y=g['Glucose Value (mg/dL)'],range_y=[40,400])
    
-#     #px here is from plotly express- just to be known- that guy which is recomened to have kaleido installed for
-#     #kaleido 0.1.*
+    #px here is from plotly express- just to be known- that guy which is recomened to have kaleido installed for
+    #kaleido 0.1.*
 
-#     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0),xaxis=dict(title=None, visible=False, showgrid=False),yaxis=dict(title=None,ticks="",showticklabels=False,showgrid=False))
-#    # fig.show()
-#     fig.write_image(ending_text.format(i))
-#     #update layout does exactly what it says it does
+    fig.update_layout(margin=dict(l=0,r=0,b=0,t=0),xaxis=dict(title=None, visible=False, showgrid=False),yaxis=dict(title=None,ticks="",showticklabels=False,showgrid=False))
+   # fig.show()
+    fig.write_image(ending_text.format(i))
+    #update layout does exactly what it says it does
 
-#     j=j+x
-#     i=i+1
-#     #only the j moves here, the i is just a counter to write the image
+    j=j+x
+    i=i+1
+    #only the j moves here, the i is just a counter to write the image
 
 # # ##########################################
 # # ##########################################
