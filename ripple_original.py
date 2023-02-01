@@ -77,7 +77,8 @@ def parting():
             count=0
             count_positive=0
             count_negative=0
-
+	if k==len(glucose) - 1:
+	    k+=1
 
 
 
