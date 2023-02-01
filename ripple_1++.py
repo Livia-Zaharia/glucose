@@ -51,19 +51,25 @@ def parting():
     
         a_n=trend_list[k]
     
-        if a_n>0:
-            while a_n>0:
+        if a_n>=0 and k<len(glucose):
+            print("am dat de pozitive")
+            while a_n>=0 and k<len(glucose)-1:
                 count_positive+=1
                 k+=1
+                print(a_n,"++++")
                 a_n=trend_list[k]
                 count+=1
+                print(a_n,"CCCC++++")
             
-        elif a_n<0:
-            while a_n<0:
+        elif a_n<0 and k<len(glucose):
+            print("am dat de negative")
+            while a_n<0 and k<len(glucose)-1:
                 count_negative+=1
                 k+=1
+                print(a_n,"BBBB++++")
                 a_n=trend_list[k]
                 count+=1
+                print(a_n,"DDDDD++++")
 
         if count_positive>5 and count_negative>5:
             trend_list_count.append(count)
