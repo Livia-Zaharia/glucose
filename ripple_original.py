@@ -121,7 +121,7 @@ trend_setting()
 trend_list_index= []
 trend_list_count=[]
 
-threshold=15
+threshold=0
 
 parting()
     
