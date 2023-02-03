@@ -33,7 +33,7 @@ def trend_setting():
         if a_n==a_n_1:
             trend_list.append(0.0)
         else:
-            trend_list.append((a_n_1-a_n)/a_n)
+            trend_list.append(a_n_1-a_n)
         
     trend_list.append(0.0)
 
@@ -66,7 +66,7 @@ def parting():
                 #print(a_n,"CCCC++++")
             
             positive_trend=positive_trend/count_positive
-            # print(positive_trend,"+++++++++++")
+            print(positive_trend,"+++++++++++")
 
         elif a_n<0 and k<len(glucose):
             #print("am dat de negative")
@@ -81,7 +81,7 @@ def parting():
             
             negative_trend=negative_trend/count_negative
             negative_trend=negative_trend*(-1)
-            # print(negative_trend,"-----------------")
+            print(negative_trend,"-----------------")
 
         if count_positive>threshold and count_negative>threshold:
             
@@ -89,13 +89,16 @@ def parting():
             count_negative=0
 
             # if (positive_trend>0.1 or negative_trend>0.1) and(positive_trend_prev/positive_trend>0.3 or negative_trend_prev/negative_trend>0.3) and( positive_trend_prev/positive_trend>1.3 or negative_trend_prev/negative_trend>1.3):
-            if math.isclose(positive_trend,negative_trend,abs_tol=0.01):
-                trend_list_count.append(count)
-                trend_list_index.append(k)
-                count=0
+            # if math.isclose(positive_trend,negative_trend,abs_tol=0.01):
+            trend_list_count.append(count)
+            trend_list_index.append(k)
+            count=0
             
             positive_trend_prev=positive_trend
             negative_trend_prev=negative_trend
+
+            positive_trend=0
+            negative_trend=0
             
         if k==len(glucose) - 1:
                 k+=1
