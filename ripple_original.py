@@ -147,7 +147,7 @@ trend_setting()
 trend_list_index= []
 trend_list_count=[]
 
-threshold=3
+threshold=5
 
 
 parting()
@@ -187,28 +187,28 @@ print(len(trend_list_index))
 # # ##########################################
 # # ##########################################
 
-# ending_text="{}c.png"
-# i=0
-# j=0
-# for x in trend_list_count:
-#     # the syntax x in ....basically will start with first value in gluc_counts- that is 200 something
-#     #so iloc will start from row 0 to 288 because we are still on the row attribute
-#     #iloc comes from pandas btw and pandas apparently is built on numpy- who would have thought
-#     g=glucose.iloc[j:j+x-1]
+ending_text="{}c.png"
+i=0
+j=0
+for x in trend_list_count:
+    # the syntax x in ....basically will start with first value in gluc_counts- that is 200 something
+    #so iloc will start from row 0 to 288 because we are still on the row attribute
+    #iloc comes from pandas btw and pandas apparently is built on numpy- who would have thought
+    g=glucose.iloc[j:j+x-1]
 
 
-#     fig= px.line(g, x=g['Timestamp'], y=g['Glucose Value (mg/dL)'],range_y=[40,400])
+    fig= px.line(g, x=g['Timestamp'], y=g['Glucose Value (mg/dL)'],range_y=[40,400])
    
-#     #px here is from plotly express- just to be known- that guy which is recomened to have kaleido installed for
-#     #kaleido 0.1.*
+    #px here is from plotly express- just to be known- that guy which is recomened to have kaleido installed for
+    #kaleido 0.1.*
 
-#     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0),xaxis=dict(title=None, visible=False, showgrid=False),yaxis=dict(title=None,ticks="",showticklabels=False,showgrid=False))
-#    # fig.show()
-#     fig.write_image(ending_text.format(i))
-#     #update layout does exactly what it says it does
+    fig.update_layout(margin=dict(l=0,r=0,b=0,t=0),xaxis=dict(title=None, visible=False, showgrid=False),yaxis=dict(title=None,ticks="",showticklabels=False,showgrid=False))
+   # fig.show()
+    fig.write_image(ending_text.format(i))
+    #update layout does exactly what it says it does
 
-#     j=j+x
-#     i=i+1
+    j=j+x
+    i=i+1
     #only the j moves here, the i is just a counter to write the image
 
 # # ##########################################
