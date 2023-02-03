@@ -43,6 +43,9 @@ def parting():
     count_positive=0
     count_negative=0
     k=0
+
+    switch=0
+
     positive_trend=0
     negative_trend=0
 
@@ -59,46 +62,47 @@ def parting():
             while a_n>=0 and k<len(glucose)-1:
                 count_positive+=1
                 k+=1
-                #print(a_n,"++++")
+                
                 positive_trend+=a_n
                 a_n=trend_list[k]
                 count+=1
-                #print(a_n,"CCCC++++")
+               
             
             positive_trend=positive_trend/count_positive
-            print(positive_trend,"+++++++++++")
+            switch+=1
 
         elif a_n<0 and k<len(glucose):
             #print("am dat de negative")
             while a_n<0 and k<len(glucose)-1:
                 count_negative+=1
                 k+=1
-                #print(a_n,"BBBB++++")
+                
                 negative_trend+=a_n
                 a_n=trend_list[k]
                 count+=1
-               # print(a_n,"DDDDD++++")
+               
             
             negative_trend=negative_trend/count_negative
             negative_trend=negative_trend*(-1)
-            print(negative_trend,"-----------------")
+            switch+=1
 
-        if count_positive>threshold and count_negative>threshold:
+        if switch>=2 and count >50:
             
             count_positive=0
             count_negative=0
 
-            # if (positive_trend>0.1 or negative_trend>0.1) and(positive_trend_prev/positive_trend>0.3 or negative_trend_prev/negative_trend>0.3) and( positive_trend_prev/positive_trend>1.3 or negative_trend_prev/negative_trend>1.3):
-            # if math.isclose(positive_trend,negative_trend,abs_tol=0.01):
-            trend_list_count.append(count)
-            trend_list_index.append(k)
-            count=0
+            if (positive_trend>=threshold and negative_trend>=threshold) or (positive_trend_prev>=threshold and negative_trend>=threshold) or (positive_trend>=threshold and negative_trend_prev>=threshold):
+                trend_list_count.append(count)
+                trend_list_index.append(k)
+                count=0
+                switch=0
             
             positive_trend_prev=positive_trend
             negative_trend_prev=negative_trend
 
             positive_trend=0
             negative_trend=0
+        
             
         if k==len(glucose) - 1:
                 k+=1
@@ -143,7 +147,7 @@ trend_setting()
 trend_list_index= []
 trend_list_count=[]
 
-threshold=0
+threshold=3
 
 
 parting()
