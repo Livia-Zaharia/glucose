@@ -1,4 +1,5 @@
 
+import math
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
@@ -22,7 +23,6 @@ class ripple:
         self.trend_v.append(trend_value)
 
 
-
 def trend_setting():
     
     for k in range(0,len(glucose)-1):
@@ -43,10 +43,13 @@ def parting():
     count_positive=0
     count_negative=0
     k=0
+    positive_trend=0
+    negative_trend=0
 
-    #print (len(glucose))
+    positive_trend_prev=0
+    negative_trend_prev=0
 
-
+    
     while k<len(glucose):
     
         a_n=trend_list[k]
@@ -57,27 +60,43 @@ def parting():
                 count_positive+=1
                 k+=1
                 #print(a_n,"++++")
+                positive_trend+=a_n
                 a_n=trend_list[k]
                 count+=1
                 #print(a_n,"CCCC++++")
             
+            positive_trend=positive_trend/count_positive
+            # print(positive_trend,"+++++++++++")
+
         elif a_n<0 and k<len(glucose):
             #print("am dat de negative")
             while a_n<0 and k<len(glucose)-1:
                 count_negative+=1
                 k+=1
                 #print(a_n,"BBBB++++")
+                negative_trend+=a_n
                 a_n=trend_list[k]
                 count+=1
                # print(a_n,"DDDDD++++")
+            
+            negative_trend=negative_trend/count_negative
+            negative_trend=negative_trend*(-1)
+            # print(negative_trend,"-----------------")
 
         if count_positive>threshold and count_negative>threshold:
-            trend_list_count.append(count)
-            trend_list_index.append(k)
-            count=0
+            
             count_positive=0
             count_negative=0
 
+            # if (positive_trend>0.1 or negative_trend>0.1) and(positive_trend_prev/positive_trend>0.3 or negative_trend_prev/negative_trend>0.3) and( positive_trend_prev/positive_trend>1.3 or negative_trend_prev/negative_trend>1.3):
+            if math.isclose(positive_trend,negative_trend,abs_tol=0.01):
+                trend_list_count.append(count)
+                trend_list_index.append(k)
+                count=0
+            
+            positive_trend_prev=positive_trend
+            negative_trend_prev=negative_trend
+            
         if k==len(glucose) - 1:
                 k+=1
 
@@ -123,6 +142,7 @@ trend_list_count=[]
 
 threshold=0
 
+
 parting()
     
 print(len(trend_list))
@@ -160,28 +180,28 @@ print(len(trend_list_index))
 # # ##########################################
 # # ##########################################
 
-ending_text="{}c.png"
-i=0
-j=0
-for x in trend_list_count:
-    # the syntax x in ....basically will start with first value in gluc_counts- that is 200 something
-    #so iloc will start from row 0 to 288 because we are still on the row attribute
-    #iloc comes from pandas btw and pandas apparently is built on numpy- who would have thought
-    g=glucose.iloc[j:j+x-1]
+# ending_text="{}c.png"
+# i=0
+# j=0
+# for x in trend_list_count:
+#     # the syntax x in ....basically will start with first value in gluc_counts- that is 200 something
+#     #so iloc will start from row 0 to 288 because we are still on the row attribute
+#     #iloc comes from pandas btw and pandas apparently is built on numpy- who would have thought
+#     g=glucose.iloc[j:j+x-1]
 
 
-    fig= px.line(g, x=g['Timestamp'], y=g['Glucose Value (mg/dL)'],range_y=[40,400])
+#     fig= px.line(g, x=g['Timestamp'], y=g['Glucose Value (mg/dL)'],range_y=[40,400])
    
-    #px here is from plotly express- just to be known- that guy which is recomened to have kaleido installed for
-    #kaleido 0.1.*
+#     #px here is from plotly express- just to be known- that guy which is recomened to have kaleido installed for
+#     #kaleido 0.1.*
 
-    fig.update_layout(margin=dict(l=0,r=0,b=0,t=0),xaxis=dict(title=None, visible=False, showgrid=False),yaxis=dict(title=None,ticks="",showticklabels=False,showgrid=False))
-   # fig.show()
-    fig.write_image(ending_text.format(i))
-    #update layout does exactly what it says it does
+#     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0),xaxis=dict(title=None, visible=False, showgrid=False),yaxis=dict(title=None,ticks="",showticklabels=False,showgrid=False))
+#    # fig.show()
+#     fig.write_image(ending_text.format(i))
+#     #update layout does exactly what it says it does
 
-    j=j+x
-    i=i+1
+#     j=j+x
+#     i=i+1
     #only the j moves here, the i is just a counter to write the image
 
 # # ##########################################
