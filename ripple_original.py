@@ -16,26 +16,56 @@ class ripple:
     bg= []
     time_v= []
     trend_v= []
+    mean=0.0
 
     def add_values(self,bg_value,time_value, trend_value):
         self.bg.append(bg_value)
         self.time_v.append(time_value)
         self.trend_v.append(trend_value)
 
+    def average_glucose(self):
+        x=0
+        count=0
 
-def trend_setting():
-    
+        for elements in self.bg:
+            x+=elements
+            count+=1
+        self.mean=x/count
+
+    def print(self,i:int):
+        ending_text="{}c.png"
+        #so iloc will start from row 0 to 288 because we are still on the row attribute
+        #iloc comes from pandas btw and pandas apparently is built on numpy- who would have thought
+        
+        g=self.bg
+        fig= px.line(g, x=self.time_v, y=self.bg,range_y=[40,400])
+
+        #px here is from plotly express- just to be known- that guy which is recomened to have kaleido installed for
+        #kaleido 0.1.*
+
+        fig.update_layout(margin=dict(l=0,r=0,b=0,t=0),xaxis=dict(title=None, visible=False, showgrid=False),yaxis=dict(title=None,ticks="",showticklabels=False,showgrid=False))
+        fig.show()
+        fig.write_image(ending_text.format(i))
+        # update layout does exactly what it says it does
+
+
+
+def trend_setting(glucose):
+
+    temp_trend_list= []
+
     for k in range(0,len(glucose)-1):
         a_n=int(glucose.iloc[k,1].astype(int))
         a_n_1=int(glucose.iloc[k+1,1].astype(int))
         
         #iloc[row, column]
         if a_n==a_n_1:
-            trend_list.append(0.0)
+            temp_trend_list.append(0.0)
         else:
-            trend_list.append(a_n_1-a_n)
+            temp_trend_list.append(a_n_1-a_n)
         
-    trend_list.append(0.0)
+    temp_trend_list.append(0.0)
+    return temp_trend_list
 
 
 def parting():
@@ -93,7 +123,6 @@ def parting():
 
             if (positive_trend>=threshold and negative_trend>=threshold) or (positive_trend_prev>=threshold and negative_trend>=threshold) or (positive_trend>=threshold and negative_trend_prev>=threshold):
                 trend_list_count.append(count)
-                trend_list_index.append(k)
                 count=0
                 switch=0
             
@@ -138,78 +167,45 @@ trend_list =[]
 # we are going to give a positive or negative percentage comparing only two values
 # then when we go to sort we are going to add until we reach 0
 
-trend_setting()
+trend_list=trend_setting(glucose)
 #print(len(trend_list))
 #print(len(glucose))
 
 #doing some counting- manually
 
-trend_list_index= []
 trend_list_count=[]
 
-threshold=5
+threshold=1
 
 
 parting()
     
-print(len(trend_list))
-print(len(trend_list_count))
-print(trend_list_count)
+# print(len(trend_list))
+# print(len(trend_list_count))
+# print(trend_list_count)
 
-print(len(trend_list_index))
-
-# r_list = []
+r_list = []
 
 # #r_list is a list ready to be filled with ripples
-# #r_temp is atemporary ripple class object to be added at the end in the previous list
+# #r_temp is a temporary ripple class object to be added at the end in the previous list
 
-# j=0
-
-# for x in trend_list_count:
-    
-#     r_temp=ripple ()
-
-#     for i in range (j,j+x):
-
-#         bg=glucose.iloc[i,1]
-#         time=glucose.iloc[i,0]
-#         trend=trend_list[i]
-#         r_temp.add_values(bg,time,trend)
-#     r_list.append(r_temp)
-#     j=x+j
-
-
-# ##########################################
-# ##########################################
-# #the following part just prints out png of the graphs/day-while it is good as script that is not the final intention so 
-# #we are going to leave it under quotes-if you want to run it before just unquote from the double comments line
-
-# # ##########################################
-# # ##########################################
-
-ending_text="{}c.png"
-i=0
 j=0
+
 for x in trend_list_count:
-    # the syntax x in ....basically will start with first value in gluc_counts- that is 200 something
-    #so iloc will start from row 0 to 288 because we are still on the row attribute
-    #iloc comes from pandas btw and pandas apparently is built on numpy- who would have thought
-    g=glucose.iloc[j:j+x-1]
+    
+    r_temp=ripple ()
+
+    for i in range (j,j+x):
+
+        bg=glucose.iloc[i,1]
+        time=glucose.iloc[i,0]
+        trend=trend_list[i]
+        r_temp.add_values(bg,time,trend)
+        r_temp.average_glucose()
+    r_list.append(r_temp)
+    j=x+j
 
 
-    fig= px.line(g, x=g['Timestamp'], y=g['Glucose Value (mg/dL)'],range_y=[40,400])
-   
-    #px here is from plotly express- just to be known- that guy which is recomened to have kaleido installed for
-    #kaleido 0.1.*
-
-    fig.update_layout(margin=dict(l=0,r=0,b=0,t=0),xaxis=dict(title=None, visible=False, showgrid=False),yaxis=dict(title=None,ticks="",showticklabels=False,showgrid=False))
-   # fig.show()
-    fig.write_image(ending_text.format(i))
-    #update layout does exactly what it says it does
-
-    j=j+x
-    i=i+1
-    #only the j moves here, the i is just a counter to write the image
-
-# # ##########################################
-# # ##########################################
+for x in range(len(r_list)):
+    y=r_list[x]
+    y.print(x)
