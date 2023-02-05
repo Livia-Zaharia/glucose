@@ -19,9 +19,9 @@ class ripple:
     mean=0.0
 
     def add_values(self,bg_value,time_value, trend_value):
-        self.bg.append(bg_value)
-        self.time_v.append(time_value)
-        self.trend_v.append(trend_value)
+        self.bg=bg_value
+        self.time_v=time_value
+        self.trend_v=trend_value
 
     def average_glucose(self):
         x=0
@@ -31,6 +31,8 @@ class ripple:
             x+=elements
             count+=1
         self.mean=x/count
+    
+
 
     def print(self,i:int):
         ending_text="{}c.png"
@@ -44,7 +46,7 @@ class ripple:
         #kaleido 0.1.*
 
         fig.update_layout(margin=dict(l=0,r=0,b=0,t=0),xaxis=dict(title=None, visible=False, showgrid=False),yaxis=dict(title=None,ticks="",showticklabels=False,showgrid=False))
-        fig.show()
+        # fig.show()
         fig.write_image(ending_text.format(i))
         # update layout does exactly what it says it does
 
@@ -191,21 +193,20 @@ r_list = []
 
 j=0
 
+
 for x in trend_list_count:
     
     r_temp=ripple ()
 
-    for i in range (j,j+x):
-
-        bg=glucose.iloc[i,1]
-        time=glucose.iloc[i,0]
-        trend=trend_list[i]
-        r_temp.add_values(bg,time,trend)
-        r_temp.average_glucose()
+    bg=glucose.iloc[j:j+x,1]
+    time=glucose.iloc[j:j+x,0]
+    trend=trend_list[j:j+x]
+    r_temp.add_values(bg,time,trend)
+    r_temp.average_glucose()
+    
     r_list.append(r_temp)
+    
     j=x+j
 
-
 for x in range(len(r_list)):
-    y=r_list[x]
-    y.print(x)
+    y=r_list[x].print(x)
