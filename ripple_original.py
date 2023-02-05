@@ -23,6 +23,7 @@ class ripple:
         self.time_v=time_value
         self.trend_v=trend_value
 
+
     def average_glucose(self):
         x=0
         count=0
@@ -33,20 +34,15 @@ class ripple:
         self.mean=x/count
     
 
-
     def print(self,i:int):
         ending_text="{}c.png"
-        #so iloc will start from row 0 to 288 because we are still on the row attribute
-        #iloc comes from pandas btw and pandas apparently is built on numpy- who would have thought
         
         g=self.bg
         fig= px.line(g, x=self.time_v, y=self.bg,range_y=[40,400])
-
         #px here is from plotly express- just to be known- that guy which is recomened to have kaleido installed for
         #kaleido 0.1.*
-
-        fig.update_layout(margin=dict(l=0,r=0,b=0,t=0),xaxis=dict(title=None, visible=False, showgrid=False),yaxis=dict(title=None,ticks="",showticklabels=False,showgrid=False))
-        # fig.show()
+        
+        fig.update_layout(margin=dict(l=0,r=0,b=0,t=0),xaxis=dict(title="Time", visible=True, showgrid=True),yaxis=dict(title="Glucose",ticks="",showticklabels=True,showgrid=True))
         fig.write_image(ending_text.format(i))
         # update layout does exactly what it says it does
 
@@ -176,7 +172,6 @@ trend_list=trend_setting(glucose)
 #doing some counting- manually
 
 trend_list_count=[]
-
 threshold=1
 
 
