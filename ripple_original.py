@@ -17,12 +17,16 @@ class ripple:
     time_v= []
     trend_v= []
     mean=0.0
+    duration_v=0.0
 
     def add_values(self,bg_value,time_value, trend_value):
         self.bg=copy.deepcopy(bg_value)
         self.time_v=copy.deepcopy(time_value)
         self.trend_v=copy.deepcopy(trend_value)
 
+    def duration(self):
+        self.duration_v=self.time_v.iat[len(self.time_v-1)]-self.time_v.iat[0]
+        
 
     def average_glucose(self):
         x=0
@@ -36,28 +40,29 @@ class ripple:
 
     def print_to_image(self,i:int):
         ending_text="{}c.png"
-        
         g=self.bg
         #it is not copied because it is rewritten every time
+        t_max=list(self.bg).index(max(self.bg))
+        t_min=list(self.bg).index(min(self.bg))
+
 
         fig= px.line(g, x=self.time_v, y=self.bg,range_y=[40,400])
+
+        fig.add_hline(max(self.bg), line_width=1, line_dash="dash")
+        fig.add_hline(min(self.bg), line_width=1, line_dash="dash")
+        fig.add_annotation(text="MIN", x=self.time_v.iat[t_min],y=min(self.bg))
+        fig.add_annotation(text="MAX", x=self.time_v.iat[t_max],y=max(self.bg))
+
         #px here is from plotly express- just to be known- that guy which is recomened to have kaleido installed for
         #kaleido 0.1.*
-        t=list(self.bg).index(max(self.bg))
-        print(max(self.bg),"+++++++++++++++++",type(self.bg),"---",len(self.bg) )
-        print(self.time_v.iat[t])
-        # fig.update_layout(margin=dict(l=0,r=0,b=0,t=0),xaxis=dict(title="Time", visible=True, showgrid=True),yaxis=dict(title="Glucose",ticks="",showticklabels=True,showgrid=True))
-        # fig.write_image(ending_text.format(i))
+        
 
-        fig.update_layout(margin=dict(l=0,r=0,b=0,t=0), annotations=[dict(text="MAX", x=self.time_v.iat[t],y=max(self.bg))], xaxis=dict(title="Time", visible=True, showgrid=True),yaxis=dict(title="Glucose",ticks="",showticklabels=True,showgrid=True))
+        # fig.add_shape is used to add any other shape to an initial shape
+        # shape=[dict(type="line", line_color="red", line_width=3, opacity=1, line_dash="dot",x0=0, x1=len(self.time_v), y0=max(self.bg), y1=max(self.bg))],
+        fig.update_layout(margin=dict(l=0,r=0,b=0,t=0), xaxis=dict(title="Time", visible=True, showgrid=True),yaxis=dict(title="Glucose",ticks="",showticklabels=True,showgrid=True))
         fig.write_image(ending_text.format(i))
-        # fig.add_shape( # add a horizontal "target" line
-        # type="line", line_color="salmon", line_width=3, opacity=1, line_dash="dot",x0=0, x1=len(self.time_v), y0=max(self.bg), y1=max(self.bg))
 
-        # fig.add_annotation( # add a text callout with arrow
-        # text="below target!", x="Fri", y=400, arrowhead=1, showarrow=True)
 
-        # update layout does exactly what it says it does
 
 
 
