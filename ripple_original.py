@@ -61,7 +61,34 @@ class ripple:
 
 
 
-def trend_setting(glucose):
+def cvs_insert():
+     # the PANDAS region processing
+
+    df=pd.read_csv('titlu_test - Copy.csv', index_col=0)
+    
+    global glucose
+    glucose=df[['Timestamp (YYYY-MM-DDThh:mm:ss)','Glucose Value (mg/dL)']]
+    #df is from data frame- it extracts a part of a data structure from pandas
+    #also uses titles to know which column to extract
+
+    glucose['Timestamp (YYYY-MM-DDThh:mm:ss)']=pd.to_datetime(glucose['Timestamp (YYYY-MM-DDThh:mm:ss)'])
+    #convert to format date time from string read by pandas
+
+    glucose['Glucose Value (mg/dL)']=pd.to_numeric(glucose['Glucose Value (mg/dL)'],errors='coerce')
+    #converts from string to numeric...makes you wonder why they later converted into float
+    #basically here we have glucose which is a list with headers- like a list of points on a 2D plane
+
+    glucose.dropna(inplace=True)  
+    #dropna= remove nulls
+
+    glucose['Glucose Value (mg/dL)']=glucose['Glucose Value (mg/dL)'].astype(float)
+    glucose= glucose.rename(columns={'Timestamp (YYYY-MM-DDThh:mm:ss)':'Timestamp'})
+    # converse to float that column and renames timestamp to a less mouthful name
+    #all of these come from pandas- to be kept in mind
+
+
+
+def trend_setting():
 
     temp_trend_list= []
 
@@ -147,53 +174,7 @@ def parting():
         if k==len(glucose) - 1:
                 k+=1
 
-
-
-def main():
-    # the PANDAS region processing
-
-    df=pd.read_csv('titlu_test - Copy.csv', index_col=0)
-    
-    global glucose
-    glucose=df[['Timestamp (YYYY-MM-DDThh:mm:ss)','Glucose Value (mg/dL)']]
-    #df is from data frame- it extracts a part of a data structure from pandas
-    #also uses titles to know which column to extract
-
-    glucose['Timestamp (YYYY-MM-DDThh:mm:ss)']=pd.to_datetime(glucose['Timestamp (YYYY-MM-DDThh:mm:ss)'])
-    #convert to format date time from string read by pandas
-
-    glucose['Glucose Value (mg/dL)']=pd.to_numeric(glucose['Glucose Value (mg/dL)'],errors='coerce')
-    #converts from string to numeric...makes you wonder why they later converted into float
-    #basically here we have glucose which is a list with headers- like a list of points on a 2D plane
-
-    glucose.dropna(inplace=True)  
-    #dropna= remove nulls
-
-    glucose['Glucose Value (mg/dL)']=glucose['Glucose Value (mg/dL)'].astype(float)
-    glucose= glucose.rename(columns={'Timestamp (YYYY-MM-DDThh:mm:ss)':'Timestamp'})
-    # converse to float that column and renames timestamp to a less mouthful name
-    #all of these come from pandas- to be kept in mind
-
-
-    global trend_list, trend_list_count, threshold
-    trend_list =[]
-    # we are going to give a positive or negative percentage comparing only two values
-    # then when we go to sort we are going to add until we reach 0
-
-    trend_list=trend_setting(glucose)
-    #print(len(trend_list))
-    #print(len(glucose))
-
-    trend_list_count=[]
-    threshold=1
-
-
-    parting()
-
-    # print(len(trend_list))
-    # print(len(trend_list_count))
-    # print(trend_list_count)
-    
+def ripple_doing():
     global r_list
     r_list = []
 
@@ -212,6 +193,24 @@ def main():
         r_list.append(r_temp)
 
         j=x+j
+
+def main():
+
+    cvs_insert()  
+
+    global trend_list, trend_list_count, threshold
+    trend_list =[]
+    # we are going to give a positive or negative percentage comparing only two values
+    # then when we go to sort we are going to add until we reach 0
+
+    trend_list=trend_setting()
+    trend_list_count=[]
+    threshold=1
+
+
+    parting()
+    
+    ripple_doing()
 
     for x in range(len(r_list)):
         y=r_list[x].print_to_image(x)
