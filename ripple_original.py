@@ -18,16 +18,26 @@ class ripple:
     trend_v= []
     mean=0.0
     duration_v=0.0
+    min_v=0.0
+    min_t=0.0
+    min_index=0
+    max_v=0.0
+    max_t=0.0
+    max_index=0
 
     def add_values(self,bg_value,time_value, trend_value):
         self.bg=copy.deepcopy(bg_value)
         self.time_v=copy.deepcopy(time_value)
         self.trend_v=copy.deepcopy(trend_value)
 
-    def duration(self):
-        self.duration_v=self.time_v.iat[len(self.time_v-1)]-self.time_v.iat[0]
-        
+        self.duration()
+        self.average_glucose()
+        self.min_max_value_time()
 
+
+    def duration(self):
+        self.duration_v=self.time_v.iat[len(self.time_v)-1]-self.time_v.iat[0]
+ 
     def average_glucose(self):
         x=0
         count=0
@@ -36,22 +46,32 @@ class ripple:
             x+=elements
             count+=1
         self.mean=x/count
+
+    def min_max_value_time(self):
+        self.min_v=min(self.bg)
+        self.max_v=max(self.bg)
+
+        self.max_index=list(self.bg).index(self.max_v)
+        self.min_index=list(self.bg).index(self.min_v)
+
+        self.max_t=self.time_v.iat[self.max_index]
+        self.min_t=self.time_v.iat[self.min_index]
+
+
     
 
     def print_to_image(self,i:int):
         ending_text="{}c.png"
         g=self.bg
         #it is not copied because it is rewritten every time
-        t_max=list(self.bg).index(max(self.bg))
-        t_min=list(self.bg).index(min(self.bg))
 
 
         fig= px.line(g, x=self.time_v, y=self.bg,range_y=[40,400])
 
         fig.add_hline(max(self.bg), line_width=1, line_dash="dash")
         fig.add_hline(min(self.bg), line_width=1, line_dash="dash")
-        fig.add_annotation(text="MIN", x=self.time_v.iat[t_min],y=min(self.bg))
-        fig.add_annotation(text="MAX", x=self.time_v.iat[t_max],y=max(self.bg))
+        fig.add_annotation(text="MIN", x=self.min_t,y=self.min_v)
+        fig.add_annotation(text="MAX", x=self.max_t,y=self.max_v)
 
         #px here is from plotly express- just to be known- that guy which is recomened to have kaleido installed for
         #kaleido 0.1.*
