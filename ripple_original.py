@@ -45,7 +45,7 @@ class ripple:
         for elements in self.bg:
             x+=elements
             count+=1
-        self.mean=x/count
+        self.mean=(x/count,2)
 
     def min_max_value_time(self):
         self.min_v=min(self.bg)
@@ -73,6 +73,9 @@ class ripple:
         fig.add_annotation(text="MIN", x=self.min_t,y=self.min_v)
         fig.add_annotation(text="MAX", x=self.max_t,y=self.max_v)
 
+        # fig.add_annotation(text="average={mean}mg/dL, duration={duration_v}, min={min_v}mg/dL, max={max_v}mg/dL".format(mean=self.mean,duration_v=self.duration_v,min_v=self.min_v,max_v=self.max_v), x=self.min_t,y=350)
+    
+
         #px here is from plotly express- just to be known- that guy which is recomened to have kaleido installed for
         #kaleido 0.1.*
         
@@ -89,8 +92,9 @@ class ripple:
 def cvs_insert():
      # the PANDAS region processing
 
+    # df=pd.read_csv(r'C:\Users\liv\Desktop\IT_school\OTHERS\glucose\titlu_test - Copy.csv', index_col=0)
     df=pd.read_csv('titlu_test - Copy.csv', index_col=0)
-    
+
     global glucose
     glucose=df[['Timestamp (YYYY-MM-DDThh:mm:ss)','Glucose Value (mg/dL)']]
     #df is from data frame- it extracts a part of a data structure from pandas
