@@ -73,7 +73,7 @@ class ripple:
         fig.add_annotation(text="MIN", x=self.min_t,y=self.min_v)
         fig.add_annotation(text="MAX", x=self.max_t,y=self.max_v)
 
-        # fig.add_annotation(text="average={mean}mg/dL, duration={duration_v}, min={min_v}mg/dL, max={max_v}mg/dL".format(mean=self.mean,duration_v=self.duration_v,min_v=self.min_v,max_v=self.max_v), x=self.min_t,y=350)
+        fig.add_annotation(text="average={mean}mg/dL, duration={duration_v}, min={min_v}mg/dL, max={max_v}mg/dL".format(mean=self.mean,duration_v=self.duration_v,min_v=self.min_v,max_v=self.max_v), x=self.min_t,y=350)
     
 
         #px here is from plotly express- just to be known- that guy which is recomened to have kaleido installed for
