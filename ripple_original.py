@@ -45,7 +45,7 @@ class ripple:
         for elements in self.bg:
             x+=elements
             count+=1
-        self.mean=(x/count,2)
+        self.mean=round(x/count,2)
 
     def min_max_value_time(self):
         self.min_v=min(self.bg)
@@ -58,12 +58,27 @@ class ripple:
         self.min_t=self.time_v.iat[self.min_index]
 
 
-    
+    def legend_compiling(self):
+        legend_0="amplitude="+str(self.max_v-self.min_v)+'<br>'
+        legend_0+="average value="+str(self.mean)+"mg/dL"+'<br>'
+        legend_0+="duration="+str(self.duration_v)+'<br>'
+
+        legend_0+="start time="+str(self.time_v.iat[0])+'<br>'
+        legend_0+="end time="+str(self.time_v.iat[len(self.time_v)-1])+'<br>'
+        
+        
+        legend_0+="min="+str(self.min_v)+"mg/dL"+'<br>'
+        legend_0+="min_time@="+str(self.min_t)+'<br>'
+        legend_0+="max="+str(self.max_v)+"mg/dL"+'<br>'
+        legend_0+="max_time@="+str(self.max_t)+'<br>'
+        return legend_0
 
     def print_to_image(self,i:int):
         ending_text="{}c.png"
         g=self.bg
         #it is not copied because it is rewritten every time
+
+        legend_values=self.legend_compiling()
 
 
         fig= px.line(g, x=self.time_v, y=self.bg,range_y=[40,400])
@@ -73,7 +88,7 @@ class ripple:
         fig.add_annotation(text="MIN", x=self.min_t,y=self.min_v)
         fig.add_annotation(text="MAX", x=self.max_t,y=self.max_v)
 
-        fig.add_annotation(text="average={mean}mg/dL, duration={duration_v}, min={min_v}mg/dL, max={max_v}mg/dL".format(mean=self.mean,duration_v=self.duration_v,min_v=self.min_v,max_v=self.max_v), x=self.min_t,y=350)
+        fig.add_annotation(text=legend_values, x=self.min_t,y=350)
     
 
         #px here is from plotly express- just to be known- that guy which is recomened to have kaleido installed for
