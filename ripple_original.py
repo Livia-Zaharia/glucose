@@ -71,6 +71,7 @@ class ripple:
         legend_0+="min_time@="+str(self.min_t)+'<br>'
         legend_0+="max="+str(self.max_v)+"mg/dL"+'<br>'
         legend_0+="max_time@="+str(self.max_t)+'<br>'
+       
         return legend_0
 
     def print_to_image(self,i:int):
@@ -88,7 +89,9 @@ class ripple:
         fig.add_annotation(text="MIN", x=self.min_t,y=self.min_v)
         fig.add_annotation(text="MAX", x=self.max_t,y=self.max_v)
 
-        fig.add_annotation(text=legend_values, x=self.min_t,y=350)
+        fig.add_vline(self.time_v.iat[len(self.time_v)-1], line_width=1, line_dash="dash")
+
+        fig.add_annotation(text=legend_values, x=self.time_v.iat[len(self.time_v)-1],y=300, xanchor="left",font=dict(family="Arial", size=11))
     
 
         #px here is from plotly express- just to be known- that guy which is recomened to have kaleido installed for
@@ -96,7 +99,6 @@ class ripple:
         
 
         # fig.add_shape is used to add any other shape to an initial shape
-        # shape=[dict(type="line", line_color="red", line_width=3, opacity=1, line_dash="dot",x0=0, x1=len(self.time_v), y0=max(self.bg), y1=max(self.bg))],
         fig.update_layout(margin=dict(l=0,r=0,b=0,t=0), xaxis=dict(title="Time", visible=True, showgrid=True),yaxis=dict(title="Glucose",ticks="",showticklabels=True,showgrid=True))
         fig.write_image(ending_text.format(i))
 
