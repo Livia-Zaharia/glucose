@@ -57,7 +57,6 @@ class ripple:
         self.max_t=self.time_v.iat[self.max_index]
         self.min_t=self.time_v.iat[self.min_index]
 
-
     def legend_compiling(self):
         legend_0="amplitude="+str(self.max_v-self.min_v)+'<br>'
         legend_0+="average value="+str(self.mean)+"mg/dL"+'<br>'
@@ -103,7 +102,13 @@ class ripple:
         fig.write_image(ending_text.format(i))
 
 
-
+"""
+so now we have duration- we can sort by half hours from greatest to smallest and then list the intervals
+then we will need to write them to a file- a statistic
+also looking at the sequences i think i'll need the normalize trend function- get the biggest trend
+and have a normalized map of trend- going from -1 to 0 to 1- then we will need to know how fast we switch from
+one to another....speed maybe? and maybe divisions in speed?/ripple
+"""
 
 
 def cvs_insert():
@@ -153,6 +158,13 @@ def trend_setting():
 
 
 def parting():
+
+    """"
+    so basically we go like this- we run the trend list- then we check what kind of trend we hve- positive or negative and we run on it 
+    until you can't run no more. we keep track of the previous run - if we changed sign at least once- that is switch is bigger than 2 and we have at
+    least 50 values- to avoid values like+1,-1,+2,-1- and positive and negative trends have at least 1 item - then we can proceed to split
+    we have to build trend list count list- where we find out how many items are per slice
+    """
     count=0
     count_positive=0
     count_negative=0
