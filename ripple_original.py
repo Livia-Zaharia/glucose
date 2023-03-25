@@ -16,6 +16,7 @@ class ripple:
     bg= []
     time_v= []
     trend_v= []
+    normalized_graph=[]
     mean=0.0
     duration_v=0.0
     min_v=0.0
@@ -33,7 +34,7 @@ class ripple:
         self.duration()
         self.average_glucose()
         self.min_max_value_time()
-
+        self.normalizing()
 
     def duration(self):
         self.duration_v=self.time_v.iat[len(self.time_v)-1]-self.time_v.iat[0]
@@ -56,6 +57,12 @@ class ripple:
 
         self.max_t=self.time_v.iat[self.max_index]
         self.min_t=self.time_v.iat[self.min_index]
+
+    def normalizing(self):
+        temp_normalized_graph=[]
+        for item in list(self.bg):
+            temp_normalized_graph.append(item/self.max_v)
+        self.normalized_graph=copy.deepcopy(temp_normalized_graph)
 
     def legend_compiling(self):
         legend_0="amplitude="+str(self.max_v-self.min_v)+'<br>'
@@ -102,13 +109,7 @@ class ripple:
         fig.write_image(ending_text.format(i))
 
 
-"""
-so now we have duration- we can sort by half hours from greatest to smallest and then list the intervals
-then we will need to write them to a file- a statistic
-also looking at the sequences i think i'll need the normalize trend function- get the biggest trend
-and have a normalized map of trend- going from -1 to 0 to 1- then we will need to know how fast we switch from
-one to another....speed maybe? and maybe divisions in speed?/ripple
-"""
+
 
 
 def cvs_insert():
@@ -137,8 +138,6 @@ def cvs_insert():
     # converse to float that column and renames timestamp to a less mouthful name
     #all of these come from pandas- to be kept in mind
 
-
-
 def trend_setting():
 
     temp_trend_list= []
@@ -155,7 +154,6 @@ def trend_setting():
         
     temp_trend_list.append(0.0)
     return temp_trend_list
-
 
 def parting():
 
@@ -246,32 +244,63 @@ def ripple_doing():
         time=glucose.iloc[j:j+x,0]
         trend=trend_list[j:j+x]
         r_temp.add_values(bg,time,trend)
-        r_temp.average_glucose()
 
         r_list.append(r_temp)
 
         j=x+j
 
+def analize():
+    compare_graphs()
+
+def compare_graphs():
+    for x in r_list:
+        # for compare_item in r_list:
+        print(len(x.normalized_graph))
+        print("\n")
+
+
+def printing_batch_images():
+    for x in range(len(r_list)):
+        r_list[x].print_to_image(x)
+
+
 def main():
 
     cvs_insert()  
+    """
+    basically inserts from the cvs , removes nulls and renames some column title
+    """
+
 
     global trend_list, trend_list_count, threshold
     trend_list =[]
-    # we are going to give a positive or negative percentage comparing only two values
-    # then when we go to sort we are going to add until we reach 0
 
     trend_list=trend_setting()
+    """
+    sets the trends- basically takes the values extracted using pandas in cvs_insert and then compares with the one before and after.
+     by storing the difference between those two we have negative and positive values
+    """
+
+
     trend_list_count=[]
     threshold=1
 
-
     parting()
-    
-    ripple_doing()
+    """
+    divides the values based on trend that changes sign- after we have the trend list we can easily break the whole data into sequences
+    trend_list_count is initialezd there
+    """
 
-    for x in range(len(r_list)):
-        y=r_list[x].print_to_image(x)
+
+    ripple_doing()
+    """
+    creates a list of ripple class and loads all the data into each element
+    """
+    
+    analize()
+
+    # printing_batch_images()
+
 
 
 
