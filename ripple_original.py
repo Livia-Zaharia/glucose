@@ -111,6 +111,8 @@ class ripple:
 
 
 
+def round_to_multiple(number,multiple):
+    return multiple*round(number/multiple)
 
 def cvs_insert():
      # the PANDAS region processing
@@ -251,6 +253,7 @@ def ripple_doing():
 
 def analize():
     compare_graphs()
+    compare_duration()
 
 def compare_graphs():
     global ripple_connections
@@ -284,6 +287,19 @@ def compare_graphs():
     
     for item in ripple_connections:
         item.sort()
+
+def compare_duration():
+    time_list=[]
+    for item in r_list:
+        time=item.duration_v.total_seconds()
+        time=round_to_multiple(time,3600)
+        time_list.append(time/3600)
+    
+    time_list.sort()
+    time_list=set(time_list)
+    time_list=list(time_list)
+    
+    
 
 
 def compare_two_graphs(A:ripple, B:ripple)->tuple:
@@ -358,8 +374,6 @@ def compare_two_graphs(A:ripple, B:ripple)->tuple:
     return (len(compare_A),sum)
 
 
-
-
 def printing_batch_images():
     for x in range(len(r_list)):
         r_list[x].print_to_image(x)
@@ -399,12 +413,10 @@ def main():
     """
     
     analize()
-
-    print(len(ripple_connections))
     
     for item in ripple_connections:
         percent,position_from, position_to=item[-1]
-        print(f"from {position_from} to {position_to} there is a {(percent)*100}% match")
+        print(f"from {position_from} to {position_to} there is a {round((percent)*100)}% match")
         
     
 
