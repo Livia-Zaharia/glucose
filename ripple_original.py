@@ -253,16 +253,41 @@ def analize():
     compare_graphs()
 
 def compare_graphs():
+    global ripple_connections
+    ripple_connections=[]
+
+    for item in r_list:
+        ripple_connections.append([])
+
+    """
+    create the empty list with lists/item in which we are going to load tuples
+    """    
+    
     for search_item in r_list:
         for compare_item in r_list[r_list.index(search_item)+1:]:
-            # print(r_list.index(search_item),"this is the search_item vs",r_list.index(compare_item))
-            compare_two_graphs(search_item, compare_item)
-            "here should be the is close method- we update the graph connection both ways that is why we search only going fwd"
-        
-def compare_two_graphs(A:ripple, B:ripple):
-    
-    comparison= True
+            
+            percent_search_value=0
+            percent_compare_value=0
 
+            common_interval,isclose_values=compare_two_graphs(search_item, compare_item)
+            
+            if isclose_values!=0:
+                percent_search_value=round(isclose_values/len(search_item.normalized_graph),2)
+                percent_compare_value=round(isclose_values/len(compare_item.normalized_graph),2)
+                ripple_connections[r_list.index(search_item)].append((percent_search_value,r_list.index(search_item),r_list.index(compare_item)))
+                ripple_connections[r_list.index(compare_item)].append((percent_compare_value,r_list.index(compare_item),r_list.index(search_item)))
+            
+
+            """here should be the is close method- we update the graph connection both ways that is why we search only going fwd"
+            also we recieve lenght of overlapping and how many are coresponding"""
+        
+    
+    for item in ripple_connections:
+        item.sort()
+
+
+def compare_two_graphs(A:ripple, B:ripple)->tuple:
+    
     start_A_index=0
     start_B_index=0
     
@@ -273,11 +298,6 @@ def compare_two_graphs(A:ripple, B:ripple):
 
     end_A_index=len(A.normalized_graph)-1
     end_B_index=len(B.normalized_graph)-1
-
-    # print("START")
-    # print(end_A_index,"OR",end_B_index)
-    # print(max_A_index,"OR",max_B_index)
-
 
 
     if(end_A_index>end_B_index):
@@ -323,25 +343,19 @@ def compare_two_graphs(A:ripple, B:ripple):
 
         
     else:
-        comparison=False
+        return(0,0)
     
 
     sum=0
-
-
-    if comparison==True:
-        compare_A=A.normalized_graph[start_A_index:end_A_index]
-        compare_B=B.normalized_graph[start_B_index:end_B_index]
-        # print(len(compare_A),"vs",len(compare_B))
+    compare_A=A.normalized_graph[start_A_index:end_A_index]
+    compare_B=B.normalized_graph[start_B_index:end_B_index]
+    # print(len(compare_A),"vs",len(compare_B))
         
-        for x in range(len(compare_A)):
-            sum+=int(math.isclose(compare_A[x], compare_B[x],rel_tol=0.05))
+    for x in range(len(compare_A)):
+        sum+=int(math.isclose(compare_A[x], compare_B[x],rel_tol=0.05))
 
-        if sum>len(compare_A)*0.8:
-            print(sum, "value of closeness")
-            print(compare_A)
-            print("\n")
-            print(compare_B)
+       
+    return (len(compare_A),sum)
 
 
 
@@ -385,6 +399,14 @@ def main():
     """
     
     analize()
+
+    print(len(ripple_connections))
+    
+    for item in ripple_connections:
+        percent,position_from, position_to=item[-1]
+        print(f"from {position_from} to {position_to} there is a {(percent)*100}% match")
+        
+    
 
     # printing_batch_images()
 
