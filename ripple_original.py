@@ -253,10 +253,11 @@ def analize():
     compare_graphs()
 
 def compare_graphs():
-    for x in r_list:
-        # for compare_item in r_list:
-        print(len(x.normalized_graph))
-        print("\n")
+    for search_item in r_list:
+        for compare_item in r_list:
+            print(len(search_item.normalized_graph))
+            "here should be the is close method"
+        
 
 
 def printing_batch_images():
