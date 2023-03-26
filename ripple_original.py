@@ -335,7 +335,7 @@ def compare_two_graphs(A:ripple, B:ripple):
         # print(len(compare_A),"vs",len(compare_B))
         
         for x in range(len(compare_A)):
-            sum+=int(math.isclose(compare_A[x], compare_B[x]))
+            sum+=int(math.isclose(compare_A[x], compare_B[x],rel_tol=0.05))
 
         if sum>len(compare_A)*0.8:
             print(sum, "value of closeness")
