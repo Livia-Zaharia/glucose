@@ -61,7 +61,7 @@ class ripple:
     def normalizing(self):
         temp_normalized_graph=[]
         for item in list(self.bg):
-            temp_normalized_graph.append(item/self.max_v)
+            temp_normalized_graph.append(round(item/self.max_v,4))
         self.normalized_graph=copy.deepcopy(temp_normalized_graph)
 
     def legend_compiling(self):
@@ -254,10 +254,84 @@ def analize():
 
 def compare_graphs():
     for search_item in r_list:
-        for compare_item in r_list:
-            print(len(search_item.normalized_graph))
-            "here should be the is close method"
+        for compare_item in r_list[r_list.index(search_item)-1:]:
+            compare_two_graphs(search_item, compare_item)
+            "here should be the is close method- we update the graph connection both ways that is why we search only going fwd"
         
+def compare_two_graphs(A:ripple, B:ripple):
+    
+    comparison= True
+
+    start_A_index=0
+    start_B_index=0
+    
+    flag=0
+
+    max_A_index=A.max_index
+    max_B_index=B.max_index
+
+    end_A_index=len(A.normalized_graph)-1
+    end_B_index=len(B.normalized_graph)-1
+
+    print("START")
+    print(end_A_index,"OR",end_B_index)
+    print(max_A_index,"OR",max_B_index)
+
+
+
+    if(end_A_index>end_B_index):
+        flag=1
+    elif end_A_index<end_B_index:
+        flag=2
+
+    
+    if max_A_index==0 and max_B_index==0:
+        if flag==1:
+            end_A_index=end_B_index
+        elif flag==2:
+            end_B_index=end_A_index
+
+    elif max_A_index==end_A_index and max_B_index==end_B_index:
+        if flag==1:
+            start_A_index=end_A_index-end_B_index
+        elif flag==2:
+            start_B_index=end_B_index-end_A_index
+    
+    elif max_A_index!=0 and max_B_index!=0 and max_A_index!=end_A_index and max_B_index!=end_B_index:
+        if max_A_index-max_B_index<0:
+
+            start_B_index=max_B_index-max_A_index
+            if flag==0 or flag==1:
+                end_A_index=end_B_index-max_B_index+max_A_index
+            elif flag==2:
+                end_B_index=end_A_index-max_A_index+max_B_index
+
+        
+
+        elif max_A_index-max_B_index>0:
+
+            start_A_index=max_A_index-max_B_index
+            if flag==0 or flag==2:
+                end_B_index=end_A_index-max_A_index+max_B_index
+            elif flag==1:
+                end_A_index=end_B_index-max_B_index+max_A_index
+        
+        else:
+            if flag==1:
+                end_A_index=end_B_index
+            elif flag==2:
+                end_B_index=end_A_index
+    
+    else:
+        comparison=False
+
+
+    if comparison==True:
+        compare_A=A.normalized_graph[start_A_index:end_A_index]
+        compare_B=B.normalized_graph[start_B_index:end_B_index]
+        print(len(compare_A),"vs",len(compare_B))
+
+
 
 
 def printing_batch_images():
