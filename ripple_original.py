@@ -5,10 +5,9 @@ import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
 import plotly.express as px
-
-
 from datetime import datetime
 from matplotlib.dates import date2num
+from pathlib import Path
 
 
 class ripple:
@@ -81,7 +80,7 @@ class ripple:
         return legend_0
 
     def print_to_image(self,i:int):
-        ending_text="{}c.png"
+        ending_text="{}.png"
         g=self.bg
         #it is not copied because it is rewritten every time
 
@@ -100,11 +99,6 @@ class ripple:
         fig.add_annotation(text=legend_values, x=self.time_v.iat[len(self.time_v)-1],y=300, xanchor="left",font=dict(family="Arial", size=11))
     
 
-        #px here is from plotly express- just to be known- that guy which is recomened to have kaleido installed for
-        #kaleido 0.1.*
-        
-
-        # fig.add_shape is used to add any other shape to an initial shape
         fig.update_layout(margin=dict(l=0,r=0,b=0,t=0), xaxis=dict(title="Time", visible=True, showgrid=True),yaxis=dict(title="Glucose",ticks="",showticklabels=True,showgrid=True))
         fig.write_image(ending_text.format(i))
 
@@ -115,10 +109,12 @@ def round_to_multiple(number,multiple):
     return multiple*round(number/multiple)
 
 def cvs_insert():
-     # the PANDAS region processing
+    # the PANDAS region processing
+    p=Path.cwd()
+    file_name='titlu_test - Copy.csv'
+    p=p/file_name
 
-    # df=pd.read_csv(r'C:\Users\liv\Desktop\IT_school\OTHERS\glucose\titlu_test - Copy.csv', index_col=0)
-    df=pd.read_csv('titlu_test - Copy.csv', index_col=0)
+    df=pd.read_csv(p, index_col=0)
 
     global glucose
     glucose=df[['Timestamp (YYYY-MM-DDThh:mm:ss)','Glucose Value (mg/dL)']]
@@ -299,8 +295,6 @@ def compare_duration():
     time_list=set(time_list)
     time_list=list(time_list)
     
-    
-
 
 def compare_two_graphs(A:ripple, B:ripple)->tuple:
     
@@ -373,6 +367,47 @@ def compare_two_graphs(A:ripple, B:ripple)->tuple:
        
     return (len(compare_A),sum)
 
+def converting_to_dict(A:ripple)->dict:
+    new_dict={}
+    
+    new_dict["00.duration"]=A.duration_v
+    
+    new_dict["01.start date"]=A.time_v.iat[0]
+    new_dict["02.end date"]=A.time_v.iat[-1]
+    new_dict["03.mean value/interval"]=A.mean
+    
+    new_dict["04.min val"]=A.min_v
+    new_dict["05.min val time"]=A.min_t
+    new_dict["06.min val index"]=A.min_index
+
+    new_dict["07.max val"]=A.max_v
+    new_dict["08.max val time"]=A.max_t
+    new_dict["09.max val index"]=A.max_index
+
+    # new_dict["10.time"]=A.time_v
+    # new_dict["11.bg value"]=A.bg
+    # new_dict["12.trend"]=A.trend_v
+
+    return new_dict
+
+    
+
+
+def writing_to_xls():
+
+    file_name="summary.xlsx"
+
+    p=Path.cwd()
+    p=p/file_name
+   
+    with pd.ExcelWriter(p) as writer:
+        for x in range(len(r_list)):
+            data=r_list[x]
+            sheet_name=f"{x} summary"
+            data=converting_to_dict(data)
+            df=pd.DataFrame(data)
+            df.to_excel(writer,sheet_name=sheet_name, index=False,header=True,engine="openpyxl")
+
 
 def printing_batch_images():
     for x in range(len(r_list)):
@@ -414,11 +449,12 @@ def main():
     
     analize()
     
-    for item in ripple_connections:
-        percent,position_from, position_to=item[-1]
-        print(f"from {position_from} to {position_to} there is a {round((percent)*100)}% match")
+    # for item in ripple_connections:
+    #     percent,position_from, position_to=item[-1]
+    #     print(f"from {position_from} to {position_to} there is a {round((percent)*100)}% match")
         
-    
+    writing_to_xls()
+
 
     # printing_batch_images()
 
