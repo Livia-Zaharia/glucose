@@ -367,41 +367,7 @@ def compare_two_graphs(A:ripple, B:ripple)->tuple:
        
     return (len(compare_A),sum)
 
-def converting_to_dict_summary(A:ripple)->dict:
-    new_dict={}
-    
-    new_dict["00.duration"]=A.duration_v
-    
-    new_dict["01.start date"]=A.time_v.iat[0]
-    new_dict["02.end date"]=A.time_v.iat[-1]
-    new_dict["03.mean value/interval"]=A.mean
-    
-    new_dict["04.min val"]=A.min_v
-    new_dict["05.min val time"]=A.min_t
-    new_dict["06.min val index"]=A.min_index
-
-    new_dict["07.max val"]=A.max_v
-    new_dict["08.max val time"]=A.max_t
-    new_dict["09.max val index"]=A.max_index
-
-    # new_dict["10.time"]=A.time_v
-    # new_dict["11.bg value"]=A.bg
-    # new_dict["12.trend"]=A.trend_v
-
-    return new_dict
-
-def converting_to_dict_values(A:ripple)->dict:
-    new_dict={}
-    
-    new_dict["10.time"]=A.time_v
-    new_dict["11.bg value"]=A.bg
-    new_dict["12.trend"]=A.trend_v
-
-    return new_dict
-    
-
-
-def writing_to_xls():
+def writing_to_xls_summary():
 
     file_name="summary.xlsx"
 
@@ -413,19 +379,28 @@ def writing_to_xls():
             sheet_name=f"{x} summary"   
             data=r_list[x]
         
-            data1=converting_to_dict_summary(data)
-            df1=pd.DataFrame.from_dict(data1, orient="index")
-
-            data2=converting_to_dict_values(data)
-            df2=pd.DataFrame.from_dict(data2,orient="columns")
             df3=pd.DataFrame.from_dict(vars(data))
-            # print(df3)
-
+            
             df3.to_excel(writer,sheet_name=sheet_name,index=True, header=True,engine="xlsxwriter")
-            # append_df_to_excel()
-            # append_df_to_excel(filename, df, sheet_name='Sheet2', index=False, startrow=25)
 
-        
+def writing_to_xls_analysis():
+
+    file_name="analysis.xlsx"
+
+    p=Path.cwd()
+    p=p/file_name
+   
+    with pd.ExcelWriter(p,engine="xlsxwriter") as writer:
+
+        for x,item in enumerate(ripple_connections):
+            sheet_name=f"{x} matching"   
+            data=item
+            df2=pd.DataFrame(data,columns=["percentage match", "starting from", "compared with"])
+            df2.to_excel(writer,sheet_name=sheet_name,index=True, header=True,engine="xlsxwriter")
+    #     percent,position_from, position_to=item[-1]
+    #     print(f"from {position_from} to {position_to} there is a {round((percent)*100)}% match")
+  
+            
 
 
 def printing_batch_images():
@@ -467,12 +442,9 @@ def main():
     """
     
     analize()
-    
-    # for item in ripple_connections:
-    #     percent,position_from, position_to=item[-1]
-    #     print(f"from {position_from} to {position_to} there is a {round((percent)*100)}% match")
-        
-    writing_to_xls()
+            
+    writing_to_xls_summary()
+    writing_to_xls_analysis()
 
 
     # printing_batch_images()
