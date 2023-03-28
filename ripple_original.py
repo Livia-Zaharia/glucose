@@ -378,10 +378,11 @@ def writing_to_xls_summary():
         for x in range(len(r_list)):
             sheet_name=f"{x} summary"   
             data=r_list[x]
-        
-            df3=pd.DataFrame.from_dict(vars(data))
+                    
+            df=pd.DataFrame.from_dict(vars(data))
+            df['duration_v']=df['duration_v'].astype(str)
             
-            df3.to_excel(writer,sheet_name=sheet_name,index=True, header=True,engine="xlsxwriter")
+            df.to_excel(writer,sheet_name=sheet_name,index=True, header=True,engine="xlsxwriter")
 
 def writing_to_xls_analysis():
 
