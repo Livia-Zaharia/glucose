@@ -400,13 +400,16 @@ def writing_to_xls():
     p=Path.cwd()
     p=p/file_name
    
-    with pd.ExcelWriter(p) as writer:
+    with pd.ExcelWriter(p,engine="xlsxwriter") as writer:
         for x in range(len(r_list)):
+            sheet_name=f"{x} summary"   
             data=r_list[x]
-            sheet_name=f"{x} summary"
+        
             data=converting_to_dict(data)
-            df=pd.DataFrame(data)
-            df.to_excel(writer,sheet_name=sheet_name, index=False,header=True,engine="openpyxl")
+            df1=pd.DataFrame.from_dict(data, orient="index")
+            df1.to_excel(writer,sheet_name=sheet_name,index=True, header=True,engine="xlsxwriter")
+
+        
 
 
 def printing_batch_images():
