@@ -367,7 +367,7 @@ def compare_two_graphs(A:ripple, B:ripple)->tuple:
        
     return (len(compare_A),sum)
 
-def converting_to_dict(A:ripple)->dict:
+def converting_to_dict_summary(A:ripple)->dict:
     new_dict={}
     
     new_dict["00.duration"]=A.duration_v
@@ -390,6 +390,14 @@ def converting_to_dict(A:ripple)->dict:
 
     return new_dict
 
+def converting_to_dict_values(A:ripple)->dict:
+    new_dict={}
+    
+    new_dict["10.time"]=A.time_v
+    new_dict["11.bg value"]=A.bg
+    new_dict["12.trend"]=A.trend_v
+
+    return new_dict
     
 
 
@@ -405,9 +413,17 @@ def writing_to_xls():
             sheet_name=f"{x} summary"   
             data=r_list[x]
         
-            data=converting_to_dict(data)
-            df1=pd.DataFrame.from_dict(data, orient="index")
-            df1.to_excel(writer,sheet_name=sheet_name,index=True, header=True,engine="xlsxwriter")
+            data1=converting_to_dict_summary(data)
+            df1=pd.DataFrame.from_dict(data1, orient="index")
+
+            data2=converting_to_dict_values(data)
+            df2=pd.DataFrame.from_dict(data2,orient="columns")
+            df3=pd.DataFrame.from_dict(vars(data))
+            # print(df3)
+
+            df3.to_excel(writer,sheet_name=sheet_name,index=True, header=True,engine="xlsxwriter")
+            # append_df_to_excel()
+            # append_df_to_excel(filename, df, sheet_name='Sheet2', index=False, startrow=25)
 
         
 
