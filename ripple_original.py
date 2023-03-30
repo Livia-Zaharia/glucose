@@ -390,18 +390,24 @@ def writing_to_xls_analysis():
 
     p=Path.cwd()
     p=p/file_name
+
+    summary_list=[]
    
     with pd.ExcelWriter(p,engine="xlsxwriter") as writer:
+
+        for item in ripple_connections:
+            percent,position_from, position_to=item[-1]
+            summary_list.append(f"from {position_from} to {position_to} there is a {round((percent)*100)}% match")
+        
+        df=pd.DataFrame(summary_list)
+        df.to_excel(writer,sheet_name="pattern comparison summary",index=False, header=True,engine="xlsxwriter")
 
         for x,item in enumerate(ripple_connections):
             sheet_name=f"{x} matching"   
             data=item
             df2=pd.DataFrame(data,columns=["percentage match", "starting from", "compared with"])
             df2.to_excel(writer,sheet_name=sheet_name,index=True, header=True,engine="xlsxwriter")
-    #     percent,position_from, position_to=item[-1]
-    #     print(f"from {position_from} to {position_to} there is a {round((percent)*100)}% match")
-  
-            
+    
 
 
 def printing_batch_images():
