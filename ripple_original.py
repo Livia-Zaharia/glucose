@@ -10,7 +10,7 @@ from matplotlib.dates import date2num
 from pathlib import Path
 
 
-class ripple:
+class Ripple:
 
     bg= []
     time_v= []
@@ -236,7 +236,7 @@ def ripple_doing():
     # #r_temp is a temporary ripple class object to be added at the end in the previous list
     j=0
     for x in trend_list_count:
-        r_temp=ripple ()
+        r_temp=Ripple ()
 
         bg=glucose.iloc[j:j+x,1]
         time=glucose.iloc[j:j+x,0]
@@ -296,7 +296,7 @@ def compare_duration():
     time_list=list(time_list)
     
 
-def compare_two_graphs(A:ripple, B:ripple)->tuple:
+def compare_two_graphs(A:Ripple, B:Ripple)->tuple:
     
     start_A_index=0
     start_B_index=0
@@ -378,9 +378,31 @@ def writing_to_xls_summary():
         for x in range(len(r_list)):
             sheet_name=f"{x} summary"   
             data=r_list[x]
+
+            to_be_processed=copy.deepcopy(dict(vars(data)))
+            data_iter=copy.deepcopy(to_be_processed)
+            data_noniter=copy.deepcopy(to_be_processed)
+
+            for item in list(to_be_processed.keys()):
+                print(type(to_be_processed[item]))
+                try:
+                    iter(to_be_processed[item])
+                except TypeError:
+                    data_noniter.pop(item)
+                else:
+                    data_iter.pop(item)
+
+            
+            # print(data_iter)
+            # print("+"*25)
+            # print(data_noniter)
+            # return
+                        
+               
+
                     
-            df=pd.DataFrame.from_dict(vars(data))
-            df['duration_v']=df['duration_v'].astype(str)
+            df=pd.DataFrame.from_dict(data_noniter)
+            # df['duration_v']=df['duration_v'].astype(str)
             
             df.to_excel(writer,sheet_name=sheet_name,index=True, header=True,engine="xlsxwriter")
 
