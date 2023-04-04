@@ -11,19 +11,19 @@ from pathlib import Path
 
 
 class Ripple:
-
-    bg= []
-    time_v= []
-    trend_v= []
-    normalized_graph=[]
-    mean=0.0
-    duration_v=0.0
-    min_v=0.0
-    min_t=0.0
-    min_index=0
-    max_v=0.0
-    max_t=0.0
-    max_index=0
+    def __init__(self):
+        self.bg= []
+        self.time_v= []
+        self.trend_v= []
+        self.normalized_graph=[]
+        self.mean=0.0
+        self.duration_v=0.0
+        self.min_v=0.0
+        self.min_t=0.0
+        self.min_index=0
+        self.max_v=0.0
+        self.max_t=0.0
+        self.max_index=0
 
     def add_values(self,bg_value,time_value, trend_value):
         self.bg=copy.deepcopy(bg_value)
@@ -376,7 +376,8 @@ def writing_to_xls_summary():
    
     with pd.ExcelWriter(p,engine="xlsxwriter") as writer:
         for x in range(len(r_list)):
-            sheet_name=f"{x} summary"   
+            sheet_name=f"{x} summary"
+            sheet_name_2=f"{x} values"   
             data=r_list[x]
 
             to_be_processed=copy.deepcopy(dict(vars(data)))
@@ -384,27 +385,23 @@ def writing_to_xls_summary():
             data_noniter=copy.deepcopy(to_be_processed)
 
             for item in list(to_be_processed.keys()):
-                print(type(to_be_processed[item]))
+                
                 try:
                     iter(to_be_processed[item])
                 except TypeError:
-                    data_noniter.pop(item)
-                else:
                     data_iter.pop(item)
-
+                else:
+                    data_noniter.pop(item)
+                       
             
-            # print(data_iter)
-            # print("+"*25)
-            # print(data_noniter)
-            # return
-                        
-               
-
-                    
-            df=pd.DataFrame.from_dict(data_noniter)
-            # df['duration_v']=df['duration_v'].astype(str)
+            df=pd.DataFrame(data_noniter, index=[0])
+            df['duration_v']=df['duration_v'].astype(str)
             
-            df.to_excel(writer,sheet_name=sheet_name,index=True, header=True,engine="xlsxwriter")
+            df.to_excel(writer,sheet_name=sheet_name,header=True,engine="xlsxwriter", index=True)
+            
+            df2=pd.DataFrame.from_dict(data_iter)
+            df2.to_excel(writer,sheet_name=sheet_name_2,header=True,engine="xlsxwriter", index=True)
+
 
 def writing_to_xls_analysis():
 
