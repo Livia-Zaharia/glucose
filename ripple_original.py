@@ -7,17 +7,15 @@ and then generates the summary and the analysis
 import math
 import copy
 import pandas as pd
-import numpy as np
-from matplotlib import pyplot as plt
 import plotly.express as px
-from datetime import datetime
-from matplotlib.dates import date2num
 from pathlib import Path
 
 
 class Ripple:
     """
     Object Ripple is a class that stores the blood glucose values from the csv, together with additional info.
+    The way it is defined, a Ripple object will contain only ONE  change of sign of the graph-simply put one change from an ascending part to descending part
+    or vice versa. 
     For more information see definition of add_values method.(bg=numpy int list type| time_v= timedate list type| trend_v=float list type|
     normalized_graph=float list type| mean= single float value| duration_v= timedelta type| min_v=int type| min_t= timedate type|
     min_index= int type| max_v=int type| max_t= timedate type| max_index= int type)
@@ -37,10 +35,13 @@ class Ripple:
         self.max_t=0.0
         self.max_index=0
 
-    def add_values(self,bg_value,time_value, trend_value):
+    def add_values(self,bg_value:list,time_value:list, trend_value:list):
         """
-        Method for initializing the class.
-
+        Method for initializing the class. Runs the methods (duration()| average_glucose()| min_max_value_time()| normalizing())
+        bg_value: is a slice from a DataFrame- it extracts only the column with blood glucose values|
+        time_value: slice from DataFrame- it extracts the timedate for the previous extracted blood glucose|
+        trend_value: standard list containing the differences in values between the current number (the one that gives the index value)
+        and the previous one
 
         """
         self.bg=copy.deepcopy(bg_value)
@@ -53,9 +54,19 @@ class Ripple:
         self.normalizing()
 
     def duration(self):
+        """
+        Method for extracting the total time duration of a ripple object. As both start and end date are timedate objects the result is timedelta.
+        self.duration=timedelta type
+
+        """
         self.duration_v=self.time_v.iat[len(self.time_v)-1]-self.time_v.iat[0]
  
     def average_glucose(self):
+        """
+        Method for obtaining the mean value of all the bloodglucose values in this period of time.
+        self.mean=float type
+        
+        """
         x=0
         count=0
 
@@ -65,6 +76,13 @@ class Ripple:
         self.mean=round(x/count,2)
 
     def min_max_value_time(self):
+        """
+        Method for obtaining the min and max value, time and index in the DataFrame slice.
+        (self.min_v=int type| self.min_t= timedate type| self.min_index= int type|
+         self.max_v=int type| self.max_t= timedate type| self.max_index= int type)
+
+        """
+
         self.min_v=min(self.bg)
         self.max_v=max(self.bg)
 
@@ -75,12 +93,22 @@ class Ripple:
         self.min_t=self.time_v.iat[self.min_index]
 
     def normalizing(self):
+        """
+        Method for normalizing the graph. Basically it defines a list as long as the DataFrame slice with float values going from (0,1].
+        self.normalized_graph= float list type
+
+        """
         temp_normalized_graph=[]
         for item in list(self.bg):
             temp_normalized_graph.append(round(item/self.max_v,2))
         self.normalized_graph=copy.deepcopy(temp_normalized_graph)
 
-    def legend_compiling(self):
+    def legend_compiling(self)->str:
+        """
+        Method for compiling a basic str for legend display.
+        
+        """
+
         legend_0="amplitude="+str(self.max_v-self.min_v)+'<br>'
         legend_0+="average value="+str(self.mean)+"mg/dL"+'<br>'
         legend_0+="duration="+str(self.duration_v)+'<br>'
@@ -97,10 +125,14 @@ class Ripple:
         return legend_0
 
     def print_to_image(self,i:int):
+        """
+        Method to produce a png of the ripple with the legend. Made using plotly express
+        
+        """
+        
         ending_text="{}.png"
         g=self.bg
-        #it is not copied because it is rewritten every time
-
+        
         legend_values=self.legend_compiling()
 
 
