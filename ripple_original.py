@@ -1,3 +1,8 @@
+"""
+The main program where everything happens-it obtains the data from a csv imported by the user
+and then generates the summary and the analysis
+
+"""
 
 import math
 import copy
@@ -11,6 +16,13 @@ from pathlib import Path
 
 
 class Ripple:
+    """
+    Object Ripple is a class that stores the blood glucose values from the csv, together with additional info.
+    For more information see definition of add_values method.(bg=numpy int list type| time_v= timedate list type| trend_v=float list type|
+    normalized_graph=float list type| mean= single float value| duration_v= timedelta type| min_v=int type| min_t= timedate type|
+    min_index= int type| max_v=int type| max_t= timedate type| max_index= int type)
+
+    """
     def __init__(self):
         self.bg= []
         self.time_v= []
@@ -26,6 +38,11 @@ class Ripple:
         self.max_index=0
 
     def add_values(self,bg_value,time_value, trend_value):
+        """
+        Method for initializing the class.
+
+
+        """
         self.bg=copy.deepcopy(bg_value)
         self.time_v=copy.deepcopy(time_value)
         self.trend_v=copy.deepcopy(trend_value)
@@ -108,6 +125,7 @@ class Ripple:
 def round_to_multiple(number,multiple):
     return multiple*round(number/multiple)
 
+
 def cvs_insert():
     # the PANDAS region processing
     p=Path.cwd()
@@ -136,6 +154,7 @@ def cvs_insert():
     # converse to float that column and renames timestamp to a less mouthful name
     #all of these come from pandas- to be kept in mind
 
+
 def trend_setting():
 
     temp_trend_list= []
@@ -152,6 +171,7 @@ def trend_setting():
         
     temp_trend_list.append(0.0)
     return temp_trend_list
+
 
 def parting():
 
@@ -228,6 +248,7 @@ def parting():
         if k==len(glucose) - 1:
                 k+=1
 
+
 def ripple_doing():
     global r_list
     r_list = []
@@ -247,9 +268,11 @@ def ripple_doing():
 
         j=x+j
 
+
 def analize():
     compare_graphs()
     compare_duration()
+
 
 def compare_graphs():
     global ripple_connections
@@ -283,6 +306,7 @@ def compare_graphs():
     
     for item in ripple_connections:
         item.sort()
+
 
 def compare_duration():
     time_list=[]
@@ -366,6 +390,7 @@ def compare_two_graphs(A:Ripple, B:Ripple)->tuple:
 
        
     return (len(compare_A),sum)
+
 
 def writing_to_xls_summary():
 
