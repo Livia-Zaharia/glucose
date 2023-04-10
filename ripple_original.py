@@ -153,13 +153,27 @@ class Ripple:
 
 
 
+# GENERAL FUNCTIONS
 
-def round_to_multiple(number,multiple):
+def round_to_multiple(number:float,multiple:float)->float:
+    """
+    Simple function of rounding up to a set value
+    
+    """
     return multiple*round(number/multiple)
 
 
+
+# DATA AQUISITION
+
 def cvs_insert():
-    # the PANDAS region processing
+    """
+    Function that inserts from the cvs , removes nulls and renames some column title.
+    It needs the Pandas import to work and also the Path library.
+    It works on a global value- glucose- the name of the import from csv. So that is why it does not have a return
+   
+    """
+
     p=Path.cwd()
     file_name='titlu_test - Copy.csv'
     p=p/file_name
@@ -168,26 +182,26 @@ def cvs_insert():
 
     global glucose
     glucose=df[['Timestamp (YYYY-MM-DDThh:mm:ss)','Glucose Value (mg/dL)']]
-    #df is from data frame- it extracts a part of a data structure from pandas
-    #also uses titles to know which column to extract
 
     glucose['Timestamp (YYYY-MM-DDThh:mm:ss)']=pd.to_datetime(glucose['Timestamp (YYYY-MM-DDThh:mm:ss)'])
-    #convert to format date time from string read by pandas
-
+    
     glucose['Glucose Value (mg/dL)']=pd.to_numeric(glucose['Glucose Value (mg/dL)'],errors='coerce')
-    #converts from string to numeric...makes you wonder why they later converted into float
-    #basically here we have glucose which is a list with headers- like a list of points on a 2D plane
-
+    
     glucose.dropna(inplace=True)  
-    #dropna= remove nulls
 
     glucose['Glucose Value (mg/dL)']=glucose['Glucose Value (mg/dL)'].astype(float)
     glucose= glucose.rename(columns={'Timestamp (YYYY-MM-DDThh:mm:ss)':'Timestamp'})
-    # converse to float that column and renames timestamp to a less mouthful name
-    #all of these come from pandas- to be kept in mind
+    
 
+# DATA DIVISION
 
-def trend_setting():
+def trend_setting()->list:
+    """
+    Function that sets the trends- basically takes the values extracted using pandas in cvs_insert()
+    and then compares with the one before and after.
+    By storing the difference between those two we have negative and positive values which is the trend.
+    
+    """
 
     temp_trend_list= []
 
@@ -204,15 +218,15 @@ def trend_setting():
     temp_trend_list.append(0.0)
     return temp_trend_list
 
-
 def parting():
 
-    """"
-    so basically we go like this- we run the trend list- then we check what kind of trend we hve- positive or negative and we run on it 
-    until you can't run no more. we keep track of the previous run - if we changed sign at least once- that is switch is bigger than 2 and we have at
-    least 50 values- to avoid values like+1,-1,+2,-1- and positive and negative trends have at least 1 item - then we can proceed to split
-    we have to build trend list count list- where we find out how many items are per slice
     """
+    Function that divides the values based on trend that changes sign- 
+    after we have the trend list we can easily break the whole data into sequences.
+    It uses the trend_list[] and threshold global values.
+    trend_list_count is initialezd here as a global
+    """
+
     count=0
     count_positive=0
     count_negative=0
@@ -232,7 +246,7 @@ def parting():
         a_n=trend_list[k]
     
         if a_n>=0 and k<len(glucose):
-            #print("am dat de pozitive")
+            
             while a_n>=0 and k<len(glucose)-1:
                 count_positive+=1
                 k+=1
@@ -246,7 +260,7 @@ def parting():
             switch+=1
 
         elif a_n<0 and k<len(glucose):
-            #print("am dat de negative")
+            
             while a_n<0 and k<len(glucose)-1:
                 count_negative+=1
                 k+=1
@@ -280,13 +294,17 @@ def parting():
         if k==len(glucose) - 1:
                 k+=1
 
-
 def ripple_doing():
+    """
+    Function that creates a list of ripple class and loads all the data into each element.
+    Uses the method add_values() from class Ripple.
+    Creates a global list of Ripple objects to be accessed for display later
+    
+    """
+
     global r_list
     r_list = []
 
-    # #r_list is a list ready to be filled with ripples
-    # #r_temp is a temporary ripple class object to be added at the end in the previous list
     j=0
     for x in trend_list_count:
         r_temp=Ripple ()
@@ -300,6 +318,8 @@ def ripple_doing():
 
         j=x+j
 
+
+# DATA ANALISYS
 
 def analize():
     compare_graphs()
@@ -424,6 +444,8 @@ def compare_two_graphs(A:Ripple, B:Ripple)->tuple:
     return (len(compare_A),sum)
 
 
+# DATA DISPLAY
+
 def writing_to_xls_summary():
 
     file_name="summary.xlsx"
@@ -459,7 +481,6 @@ def writing_to_xls_summary():
             df2=pd.DataFrame.from_dict(data_iter)
             df2.to_excel(writer,sheet_name=sheet_name_2,header=True,engine="xlsxwriter", index=True)
 
-
 def writing_to_xls_analysis():
 
     file_name="analysis.xlsx"
@@ -483,9 +504,7 @@ def writing_to_xls_analysis():
             data=item
             df2=pd.DataFrame(data,columns=["percentage match", "starting from", "compared with"])
             df2.to_excel(writer,sheet_name=sheet_name,index=True, header=True,engine="xlsxwriter")
-    
-
-
+ 
 def printing_batch_images():
     for x in range(len(r_list)):
         r_list[x].print_to_image(x)
@@ -494,35 +513,17 @@ def printing_batch_images():
 def main():
 
     cvs_insert()  
-    """
-    basically inserts from the cvs , removes nulls and renames some column title
-    """
-
 
     global trend_list, trend_list_count, threshold
     trend_list =[]
 
     trend_list=trend_setting()
-    """
-    sets the trends- basically takes the values extracted using pandas in cvs_insert and then compares with the one before and after.
-     by storing the difference between those two we have negative and positive values
-    """
-
 
     trend_list_count=[]
     threshold=1
 
     parting()
-    """
-    divides the values based on trend that changes sign- after we have the trend list we can easily break the whole data into sequences
-    trend_list_count is initialezd there
-    """
-
-
     ripple_doing()
-    """
-    creates a list of ripple class and loads all the data into each element
-    """
     
     analize()
             
