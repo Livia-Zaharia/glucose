@@ -1,0 +1,5 @@
+.venv
+*.db
+*.xlsx
+EXPORT
+__pycache__
