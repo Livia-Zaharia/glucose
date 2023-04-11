@@ -11,25 +11,27 @@ from pathlib import Path
 import pandas as pd
 import plotly.express as px
 
+SUMMARY_XLSX = "summary.xlsx"
+
 
 class Ripple:
     """
-    Object Ripple is a class that stores the blood glucose values from the csv, together with additional info.
-    The way it is defined, a Ripple object will contain only ONE  change of sign of the graph-simply put one change from an ascending part to descending part
-    or vice versa. 
-    For more information see definition of add_values method.(bg=numpy int list type| time_v= timedate list type| trend_v=float list type|
-    normalized_graph=float list type| mean= single float value| duration_v= timedelta type| min_v=int type| min_t= timedate type|
-    min_index= int type| max_v=int type| max_t= timedate type| max_index= int type)
+    Object Ripple is a class that stores the blood glucose values from the csv, together with additional info. The
+    way it is defined, a Ripple object will contain only ONE  change of sign of the graph-simply put one change from
+    an ascending part to descending part or vice versa. For more information see definition of add_values method.(
+    bg=numpy int list type| time_v= timedate list type| trend_v=float list type| normalized_graph=float list type|
+    mean= single float value| duration_v= timedelta type| min_v=int type| min_t= timedate type| min_index= int type|
+    max_v=int type| max_t= timedate type| max_index= int type)
 
     """
 
     def __init__(self):
         self.bg = []
-        self.time_v = []
+        self.time_v: pd.DataFrame = pd.DataFrame()
         self.trend_v = []
         self.normalized_graph = []
         self.mean = 0.0
-        self.duration_v = 0.0
+        self.duration_v: pd.Series = pd.Series()
         self.min_v = 0.0
         self.min_t = 0.0
         self.min_index = 0
@@ -37,7 +39,7 @@ class Ripple:
         self.max_t = 0.0
         self.max_index = 0
 
-    def add_values(self, bg_value: list, time_value: list, trend_value: list):
+    def add_values(self, bg_value: list, time_value: pd.DataFrame, trend_value: list) -> None:
         """
         Method for initializing the class. Runs the methods (duration()| average_glucose()| min_max_value_time()| normalizing())
         bg_value: is a slice from a DataFrame- it extracts only the column with blood glucose values|
@@ -50,12 +52,12 @@ class Ripple:
         self.time_v = copy.deepcopy(time_value)
         self.trend_v = copy.deepcopy(trend_value)
 
-        self.duration()
-        self.average_glucose()
-        self.min_max_value_time()
-        self.normalizing()
+        self.get_duration()
+        self.compute_average_glucose()
+        self.compute_min_max_value_time()
+        self.normalize_graph()
 
-    def duration(self):
+    def get_duration(self) -> None:
         """
         Method for extracting the total time duration of a ripple object. As both start and end date are timedate objects the result is timedelta.
         self.duration=timedelta type
@@ -63,7 +65,7 @@ class Ripple:
         """
         self.duration_v = self.time_v.iat[len(self.time_v) - 1] - self.time_v.iat[0]
 
-    def average_glucose(self):
+    def compute_average_glucose(self):
         """
         Method for obtaining the mean value of all the bloodglucose values in this period of time.
         self.mean=float type
@@ -75,9 +77,10 @@ class Ripple:
         for elements in self.bg:
             x += elements
             count += 1
+
         self.mean = round(x / count, 2)
 
-    def min_max_value_time(self):
+    def compute_min_max_value_time(self):
         """
         Method for obtaining the min and max value, time and index in the DataFrame slice.
         (self.min_v=int type| self.min_t= timedate type| self.min_index= int type|
@@ -94,21 +97,21 @@ class Ripple:
         self.max_t = self.time_v.iat[self.max_index]
         self.min_t = self.time_v.iat[self.min_index]
 
-    def normalizing(self):
+    def normalize_graph(self):
         """
-        Method for normalizing the graph. Basically it defines a list as long as the DataFrame slice with float values going from (0,1].
-        self.normalized_graph= float list type
-
+        Method for normalizing the graph. Basically it defines a list as long as the DataFrame slice with float
+        values going from (0,1]. self.normalized_graph= float list type
         """
         temp_normalized_graph = []
+
         for item in list(self.bg):
             temp_normalized_graph.append(round(item / self.max_v, 2))
+
         self.normalized_graph = copy.deepcopy(temp_normalized_graph)
 
-    def legend_compiling(self) -> str:
+    def make_legend(self) -> str:
         """
         Method for compiling a basic str for legend display.
-        
         """
 
         legend_0 = "amplitude=" + str(self.max_v - self.min_v) + '<br>'
@@ -125,16 +128,15 @@ class Ripple:
 
         return legend_0
 
-    def print_to_image(self, i: int):
+    def write_ripple_to_disk(self, i: int) -> None:
         """
         Method to produce a png of the ripple with the legend. Made using plotly express
-        
         """
 
         ending_text = "{}.png"
         g = self.bg
 
-        legend_values = self.legend_compiling()
+        legend_values = self.make_legend()
 
         fig = px.line(g, x=self.time_v, y=self.bg, range_y=[40, 400])
 
@@ -165,9 +167,9 @@ def round_to_multiple(number: float, multiple: float) -> float:
 
 # DATA AQUISITION
 
-def cvs_insert():
+def csv_insert():
     """
-    Function that inserts from the cvs , removes nulls and renames some column title.
+    Function that inserts from the csv, removes nulls and renames some column title.
     It needs the Pandas import to work and also the Path library.
     It works on a global value- glucose- the name of the import from csv. So that is why it does not have a return
    
@@ -199,7 +201,6 @@ def trend_setting() -> list:
     Function that sets the trends- basically takes the values extracted using pandas in cvs_insert()
     and then compares with the one before and after.
     By storing the difference between those two we have negative and positive values which is the trend.
-    
     """
 
     temp_trend_list = []
@@ -294,12 +295,11 @@ def parting():
 
 def ripple_doing():
     """
-    Function that creates a list of ripple class and loads all the data into each element.
-    Uses the method add_values() from class Ripple.
+    Function that creates a list of ripple class instances and loads all the data into each element.
+    Uses the instance method add_values() from class Ripple.
     Creates a global list of Ripple objects to be accessed for display later
     
     """
-
     global r_list
     r_list = []
 
@@ -328,11 +328,8 @@ def compare_graphs():
     global ripple_connections
     ripple_connections = []
 
-    for item in r_list:
-        ripple_connections.append([])
-
     """
-    create the empty list with lists/item in which we are going to load tuples
+    Create the empty list with lists/item in which we are going to load tuples
     """
 
     for search_item in r_list:
@@ -351,8 +348,8 @@ def compare_graphs():
                 ripple_connections[r_list.index(compare_item)].append(
                     (percent_compare_value, r_list.index(compare_item), r_list.index(search_item)))
 
-            """here should be the is close method- we update the graph connection both ways that is why we search only going fwd"
-            also we recieve lenght of overlapping and how many are coresponding"""
+            """here should be the is close method- we update the graph connection both ways that is why we search 
+            only going fwd" also we receive length of overlapping and how many are corresponding """
 
     for item in ripple_connections:
         item.sort()
@@ -370,74 +367,73 @@ def compare_duration():
     time_list = list(time_list)
 
 
-def compare_two_graphs(A: Ripple, B: Ripple) -> tuple:
-    start_A_index = 0
-    start_B_index = 0
+def compare_two_graphs(a: Ripple, b: Ripple) -> tuple:
+    start_a_index = 0
+    start_b_index = 0
 
     flag = 0
 
-    max_A_index = A.max_index
-    max_B_index = B.max_index
+    max_a_index = a.max_index
+    max_b_index = b.max_index
 
-    end_A_index = len(A.normalized_graph) - 1
-    end_B_index = len(B.normalized_graph) - 1
+    end_a_index = len(a.normalized_graph) - 1
+    end_b_index = len(b.normalized_graph) - 1
 
-    if (end_A_index > end_B_index):
+    if end_a_index > end_b_index:
         flag = 1
-    elif end_A_index < end_B_index:
+    elif end_a_index < end_b_index:
         flag = 2
 
-    if max_A_index == 0 and max_B_index == 0:
+    if max_a_index == 0 and max_b_index == 0:
         if flag == 1:
-            end_A_index = end_B_index
+            end_a_index = end_b_index
         elif flag == 2:
-            end_B_index = end_A_index
+            end_b_index = end_a_index
 
-    elif max_A_index == end_A_index and max_B_index == end_B_index:
+    elif max_a_index == end_a_index and max_b_index == end_b_index:
         if flag == 1:
-            start_A_index = end_A_index - end_B_index
+            start_a_index = end_a_index - end_b_index
         elif flag == 2:
-            start_B_index = end_B_index - end_A_index
+            start_b_index = end_b_index - end_a_index
 
-    elif max_A_index != 0 and max_B_index != 0 and max_A_index != end_A_index and max_B_index != end_B_index:
-        end_part_A = end_A_index - max_A_index
-        end_part_B = end_B_index - max_B_index
+    elif max_a_index != 0 and max_b_index != 0 and max_a_index != end_a_index and max_b_index != end_b_index:
+        end_part_a = end_a_index - max_a_index
+        end_part_b = end_b_index - max_b_index
 
-        if end_part_A <= end_part_B:
-            end_part = end_part_A
+        if end_part_a <= end_part_b:
+            end_part = end_part_a
         else:
-            end_part = end_part_B
+            end_part = end_part_b
 
-        if max_A_index <= max_B_index:
-            start_part = max_A_index
+        if max_a_index <= max_b_index:
+            start_part = max_a_index
         else:
-            start_part = max_B_index
+            start_part = max_b_index
 
-        start_A_index = max_A_index - start_part
-        start_B_index = max_B_index - start_part
+        start_a_index = max_a_index - start_part
+        start_b_index = max_b_index - start_part
 
-        end_A_index = max_A_index + end_part
-        end_B_index = max_B_index + end_part
-
-
+        end_a_index = max_a_index + end_part
+        end_b_index = max_b_index + end_part
     else:
-        return (0, 0)
+        return 0, 0
 
-    sum = 0
-    compare_A = A.normalized_graph[start_A_index:end_A_index]
-    compare_B = B.normalized_graph[start_B_index:end_B_index]
+    summ = 0
+    global compare_a
+    compare_a = a.normalized_graph[start_a_index:end_a_index]
+    compare_b = b.normalized_graph[start_b_index:end_b_index]
     # print(len(compare_A),"vs",len(compare_B))
 
-    for x in range(len(compare_A)):
-        sum += int(math.isclose(compare_A[x], compare_B[x], rel_tol=0.05))
+    for x in range(len(compare_a)):
+        summ += int(math.isclose(compare_a[x], compare_b[x], rel_tol=0.05))
 
-    return (len(compare_A), sum)
+    return len(compare_a), summ
 
 
 # DATA DISPLAY
 
-def writing_to_xls_summary():
-    file_name = "summary.xlsx"
+def write_to_xls_summary():
+    file_name = SUMMARY_XLSX
 
     p = Path.cwd()
     p = p / file_name
@@ -470,7 +466,7 @@ def writing_to_xls_summary():
             df2.to_excel(writer, sheet_name=sheet_name_2, header=True, engine="xlsxwriter", index=True)
 
 
-def writing_to_xls_analysis():
+def write_to_xls_analysis():
     file_name = "analysis.xlsx"
 
     p = Path.cwd()
@@ -480,9 +476,9 @@ def writing_to_xls_analysis():
 
     with pd.ExcelWriter(p, engine="xlsxwriter") as writer:
 
-        for item in ripple_connections:
+        for item in compare_a:
             percent, position_from, position_to = item[-1]
-            summary_list.append(f"from {position_from} to {position_to} there is a {round((percent) * 100)}% match")
+            summary_list.append(f"from {position_from} to {position_to} there is a {round(percent * 100)}% match")
 
         df = pd.DataFrame(summary_list)
         df.to_excel(writer, sheet_name="pattern comparison summary", index=False, header=True, engine="xlsxwriter")
@@ -494,13 +490,13 @@ def writing_to_xls_analysis():
             df2.to_excel(writer, sheet_name=sheet_name, index=True, header=True, engine="xlsxwriter")
 
 
-def printing_batch_images():
+def print_batch_images():
     for x in range(len(r_list)):
-        r_list[x].print_to_image(x)
+        r_list[x].write_ripple_to_disk(x)
 
 
 def main():
-    cvs_insert()
+    csv_insert()
 
     global trend_list, trend_list_count, threshold
     trend_list = []
@@ -515,10 +511,10 @@ def main():
 
     analize()
 
-    writing_to_xls_summary()
-    writing_to_xls_analysis()
+    write_to_xls_summary()
+    write_to_xls_analysis()
 
-    # printing_batch_images()
+    print_batch_images()
 
 
 if __name__ == "__main__":
