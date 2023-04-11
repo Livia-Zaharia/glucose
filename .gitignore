@@ -3,3 +3,4 @@
 *.xlsx
 EXPORT
 __pycache__
+*.csv
