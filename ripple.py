@@ -11,7 +11,7 @@ class Ripple:
     Object Ripple is a class that stores the blood glucose values from the csv, together with additional info.
     The way it is defined, a Ripple object will contain only ONE  change of sign of the graph-simply put one change from an ascending part to descending part
     or vice versa. 
-    For more information see definition of add_values method.(bg=numpy int list type| time_v= timedate list type| trend_v=float list type|
+    For more information see definition of add_values method.(bg=dataframe slice type-int values| time_v= dataframe slice type-datetime values| trend_v=float list type|
     normalized_graph=float list type| mean= single float value| duration_v= timedelta type| min_v=int type| min_t= timedate type|
     min_index= int type| max_v=int type| max_t= timedate type| max_index= int type)
 
@@ -30,7 +30,7 @@ class Ripple:
         self.max_t=0.0
         self.max_index=0
 
-    def add_values(self,bg_value:list,time_value:list, trend_value:list):
+    def add_values(self,bg_value:pd.DataFrame,time_value:pd.DataFrame, trend_value:list):
         """
         Method for initializing the class. Runs the methods (duration()| average_glucose()| min_max_value_time()| normalizing())
         bg_value: is a slice from a DataFrame- it extracts only the column with blood glucose values|

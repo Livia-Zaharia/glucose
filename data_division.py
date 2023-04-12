@@ -1,14 +1,23 @@
+"""
+Data division method- it takes the raw values from the Dataframe and splits it into sequences
+"""
+
 import pandas as pd
 import copy
 from ripple import Ripple
+import typing as t 
 
 class Divide:
-    def __init__(self,glucose):
+    """
+    Class that contains methods for division
+    """
+
+    def __init__(self,glucose:pd.DataFrame=[]):
         self.glucose=glucose
 
-    def trend_setting(self)->list:
+    def trend_setting(self)->t.List[int]:
         """
-        Function that sets the trends- basically takes the values extracted using pandas in cvs_insert()
+        Method that sets the trends- basically takes the values extracted using pandas in csv_insert()
         and then compares with the one before and after.
         By storing the difference between those two we have negative and positive values which is the trend.
         
@@ -29,13 +38,12 @@ class Divide:
         temp_trend_list.append(0.0)
         return temp_trend_list
 
-    def parting(self,trend_list:list,threshold:int)->list:
+    def parting(self,trend_list:t.List[int],threshold:int)->t.List[int]:
 
         """
-        Function that divides the values based on trend that changes sign- 
+        Method that divides the values based on trend that changes sign- 
         after we have the trend list we can easily break the whole data into sequences.
-        It uses the trend_list[] and threshold global values.
-        trend_list_count is initialezd here as a global
+
         """
 
         trend_list_count=[]
@@ -113,9 +121,9 @@ class Divide:
         
         return trend_list_count
 
-    def ripple_doing(self, trend_list:list, trend_list_count:list)->list:
+    def ripple_doing(self, trend_list:t.List[int], trend_list_count:t.List[int])->t.List[Ripple]:
         """
-        Function that creates a list of ripple class and loads all the data into each element.
+        Method that creates a list of ripple class and loads all the data into each element.
         Uses the method add_values() from class Ripple.
         
         """
@@ -137,3 +145,22 @@ class Divide:
         
         return r_list
 
+    def divide_by_iterable(self,data:Ripple)->t.Tuple[dict,dict]:
+        """
+        Method that splits any given ripple into dictionaries of iterable and respectively non iterable elements
+        """
+
+        to_be_processed=copy.deepcopy(dict(vars(data)))
+        data_iter=copy.deepcopy(to_be_processed)
+        data_noniter=copy.deepcopy(to_be_processed)
+
+        for item in list(to_be_processed.keys()):
+                    
+            try:
+                iter(to_be_processed[item])
+            except TypeError:
+                data_iter.pop(item)
+            else:
+                data_noniter.pop(item)
+
+        return (data_iter,data_noniter)

@@ -1,12 +1,25 @@
+"""
+Module for analysis
+"""
+
 import math
 import pandas as pd
 from ripple import Ripple
+import typing as t
 
 class Analyze:
-    def __init__(self,r_list):
+    """
+    Class that contains methods for analysis
+    """
+    def __init__(self,r_list:t.List[Ripple]):
         self.r_list=r_list
 
-    def _compare_two_graphs(self,A:Ripple, B:Ripple)->tuple:
+    def _compare_two_graphs(self,A:Ripple, B:Ripple)->t.Tuple[int,int]:
+        """
+        Method that returns comparison of two graphs going by value.
+        It determines the common interval between the graphs starting from the max in normalized form.
+        Then it returns a tuple having (total length compared, number of items in that comparison that are relatively close in value to each other)
+        """
         
         start_A_index=0
         start_B_index=0
@@ -76,7 +89,11 @@ class Analyze:
         
         return (len(compare_A),sum)
 
-    def compare_graphs(self)->list|tuple:
+    def compare_graphs(self)->t.List[t.List[t.Tuple[float,int,int]]]:
+        """
+        Method that compares two graphs by taking each graph and comparing it to all the other graphs in the r-List.
+        It returns a list [with as many list as there are elements in r_list[each of witch contain a series of tuples(percentage, origin and comparison)]]
+        """
         ripple_connections=[]
 
         for item in self.r_list:
@@ -105,12 +122,15 @@ class Analyze:
 
     def round_to_multiple(self, number:float,multiple:float)->float:
         """
-        Simple function of rounding up to a set value
+        Simple method of rounding up to a set value
         
         """
         return multiple*round(number/multiple)
 
-    def compare_duration(self)->list:
+    def compare_duration(self)->t.List[int]:
+        """
+        Method for comparing duration.It returns a list with all unique duration in hours
+        """
         time_list=[]
         for item in self.r_list:
             time=item.duration_v.total_seconds()

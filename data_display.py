@@ -4,6 +4,7 @@ import pandas as pd
 import plotly.express as px
 from pathlib import Path
 from ripple import Ripple
+from data_division import Divide
 
 class Display:
     def __init__(self,r_list,ripple_connections):
@@ -12,6 +13,7 @@ class Display:
     
     def writing_to_xls_summary(self):
 
+        
         file_name="summary.xlsx"
 
         p=Path.cwd()
@@ -22,20 +24,9 @@ class Display:
                 sheet_name=f"{x} summary"
                 sheet_name_2=f"{x} values"   
                 data=self.r_list[x]
-
-                to_be_processed=copy.deepcopy(dict(vars(data)))
-                data_iter=copy.deepcopy(to_be_processed)
-                data_noniter=copy.deepcopy(to_be_processed)
-
-                for item in list(to_be_processed.keys()):
-                    
-                    try:
-                        iter(to_be_processed[item])
-                    except TypeError:
-                        data_iter.pop(item)
-                    else:
-                        data_noniter.pop(item)
-                        
+                
+                div=Divide()
+                data_iter, data_noniter=div.divide_by_iterable(data)                        
                 
                 df=pd.DataFrame(data_noniter, index=[0])
                 df['duration_v']=df['duration_v'].astype(str)

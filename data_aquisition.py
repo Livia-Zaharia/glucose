@@ -1,12 +1,22 @@
+"""
+Data aquisition module that imports the data from the csv
+
+"""
+
 import pandas as pd
 from pathlib import Path
 
 
 class GetData:
+    """
+    Class of method(s) for inserting data
 
-    def cvs_insert(self, file_name:str):
+    """
+
+
+    def csv_insert(self, file_name:str)->pd.DataFrame:
         """
-        Function that inserts from the cvs , removes nulls and renames some column title.
+        Method that inserts from the cvs , removes nulls and renames some column title.
         It needs the Pandas import to work and also the Path library.
         """
 

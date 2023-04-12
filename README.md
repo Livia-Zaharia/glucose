@@ -1,22 +1,43 @@
-# glucose
+# Glucose
 Analysis of glucose data got from a dexcom device. 
 Basic ideea starts from the pattern recognition that could work on large amount of data in glucose patterns.
 
-Needs import of:
--math
--pathlib
--copy
--numpy
--pandas
--plotly
+As output it has a database containg the values divided according to the inherent logic that a pattern- called ripple- will occur after two changes of graph direction.
 
-Needs pip install of:
--numpy
--pandas
--plotly
--kaleido
-Attention at version of kaleido which on newer system running Windows 11 might need to be installed with - prev
--xlsxwritter
+#
+## Setting up the enviorment
 
-It will output two xls files-one of summary of given data another of analysis of patterns of given data
+`python -m venv .venv`
+
+## Activating the enviorment
+
+`.venv\Scripts\activate`
+
+## Deactivating the enviorment
+`deactivate`
+
+
+## Dependencies
+#
+### 1.Kaleido
+
+`pip install kaleido`
+
+*might require a previous version, especially on Windows 11 systems*
+
+[issue explained here](https://stackoverflow.com/questions/69016568/unable-to-export-plotly-images-to-png-with-kaleido)
+
+#
+### 2. Pandas
+`pip install pandas`
+
+*note it will install as dependencies also numpy on which is based*
+#
+### 3. Plotly
+`pip install plotly`
+
+#
+### 4.Xlswritter
+`pip install xlswritter`
+
 
