@@ -4,11 +4,11 @@ and then generates the summary and the analysis
 
 """
 
-# import database
+from database import DatabaseManager
 from data_aquisition import GetData
 from data_division import Divide
 from data_analysis import Analyze
-from data_display import Display
+#from data_display import Display
 
 
 def main():
@@ -28,10 +28,32 @@ def main():
     ripple_connections=a.compare_graphs()
     time_list=a.compare_duration()
 
-    dis=Display(r_list,ripple_connections)            
-    dis.writing_to_xls_summary()
-    # dis.writing_to_xls_analysis()
-    # dis.printing_batch_images()
+    #dis=Display(r_list,ripple_connections)            
+    #dis.writing_to_xls_summary()
+    #dis.writing_to_xls_analysis()
+    #dis.printing_batch_images()
+
+    db=DatabaseManager("glucose.db")
+
+    data_iter,data_noniter=d.divide_by_iterable(r_list[0])
+    
+    columns=db.type_for_columns(data_noniter)
+    db.create_table("BASIC_DATA_SUMMARY",columns)
+
+    for item in r_list:
+        data_iter,data_noniter=d.divide_by_iterable(item)
+        _id=db.add("BASIC_DATA_SUMMARY", data_noniter)
+
+
+        simplified_data_iter={}
+
+        for elem in list(data_iter.keys()):
+            simplified_data_iter.setdefault(elem,data_iter[elem][0])
+
+        columns=db.type_for_columns(simplified_data_iter)
+        db.create_table(f"{_id}_BASIC_RAW_DATA",columns)
+
+
 
 
 
