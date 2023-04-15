@@ -2,10 +2,13 @@
 Data division method- it takes the raw values from the Dataframe and splits it into sequences
 """
 
-import pandas as pd
 import copy
+from typing import List
+
+import pandas as pd
+
 from ripple import Ripple
-import typing as t 
+
 
 class Divide:
     """
@@ -121,29 +124,29 @@ class Divide:
         
         return trend_list_count
 
-    def ripple_doing(self, trend_list:t.List[int], trend_list_count:t.List[int])->t.List[Ripple]:
+    def generate_ripples(self, trend_list: List[int], trend_list_count: List[int]) -> List[Ripple]:
         """
         Method that creates a list of ripple class and loads all the data into each element.
         Uses the method add_values() from class Ripple.
         
         """
+        ripple_list = []
+        j = 0
 
-        r_list = []
-
-        j=0
         for x in trend_list_count:
-            r_temp=Ripple ()
+            r_temp = Ripple()
 
-            bg=self.glucose.iloc[j:j+x,1]
-            time=self.glucose.iloc[j:j+x,0]
-            trend=trend_list[j:j+x]
-            r_temp.add_values(bg,time,trend)
+            bg: pd.DataFrame = self.glucose.iloc[j:j + x, 1]
+            time: pd.DataFrame = self.glucose.iloc[j:j + x, 0]
+            trend = trend_list[j:j + x]
 
-            r_list.append(r_temp)
+            r_temp.add_values(bg_value=bg, time_value=time, trend_value=trend)
 
-            j=x+j
-        
-        return r_list
+            ripple_list.append(r_temp)
+
+            j += x
+
+        return ripple_list
 
     def divide_by_iterable(self,data:Ripple)->t.Tuple[dict,dict]:
         """
