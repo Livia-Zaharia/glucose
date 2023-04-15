@@ -55,7 +55,7 @@ class DatabaseManager:
         
         return new_columns
 
-    def create_table(self, table_name: str, columns: t.Dict[str, str]) -> None:
+    def create_table_if_not_exists(self, table_name: str, columns: t.Dict[str, str]) -> None:
         """
         Takes in a table name and the columns with names as keys and types as values and then creates
         the CREATE TABLE statement to be executed with SQLite
