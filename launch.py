@@ -28,9 +28,9 @@ def main():
     time_list = a.compare_duration()
 
     # dis=Display(r_list,ripple_connections)
-    # dis.writing_to_xls_summary()
-    # dis.writing_to_xls_analysis()
-    # dis.printing_batch_images()
+    # dis.write_summary_to_xls_file()
+    # dis.write_analysis_to_xls_file()
+    # dis.batch_write_images_to_disk()
 
     db = DatabaseManager("glucose.db")
 
