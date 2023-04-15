@@ -62,5 +62,5 @@ class Display:
     
     def printing_batch_images(self):
         for x in range(len(self.r_list)):
-            self.r_list[x].print_to_image(x)
+            self.r_list[x].write_to_image_file(x)
 
