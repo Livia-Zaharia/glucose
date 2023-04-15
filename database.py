@@ -12,6 +12,7 @@ class DatabaseManager:
         """ Initializes the connection with the SQLite database """
         
         self.connection = sqlite3.connect(database_filename)
+        self.key_conversion_needed=[]
 
     def __del__(self):
         """ Closes the connection when the database manager is no longer used """
@@ -45,12 +46,14 @@ class DatabaseManager:
             current_type=type(value)
             if current_type == str or current_type == chr or current_type == datetime or current_type== datetime.timedelta:
                 new_type="TEXT"
+                self.key_conversion_needed.append(key)
             elif current_type == int:
                 new_type="INTEGER"
             elif current_type == float:
                 new_type="REAL"
             else:
                 new_type = "BLOB"
+                self.key_conversion_needed.append(key)
             new_columns.setdefault(key,new_type)
         
         return new_columns
@@ -91,6 +94,11 @@ class DatabaseManager:
         as keys and values as values.
         It returns the last used id
         """
+
+        for elem in set(self.key_conversion_needed):
+            try:
+                data[elem]=str(data[elem])
+            except: NameError
 
         column_names = ", ".join(data.keys())
         placeholders = ", ".join(["?"] * len(data.keys()))

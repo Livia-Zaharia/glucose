@@ -41,9 +41,9 @@ def main():
 
     for item in ripple_list:
         data_iter,data_noniter = d.divide_by_iterable(item)
-        data_noniter["duration_v"]=str(data_noniter["duration_v"])
-        data_noniter["min_t"]=str(data_noniter["min_t"])
-        data_noniter["max_t"]=str(data_noniter["max_t"])
+        # data_noniter["duration_v"]=str(data_noniter["duration_v"])
+        # data_noniter["min_t"]=str(data_noniter["min_t"])
+        # data_noniter["max_t"]=str(data_noniter["max_t"])
         _id = db.add("BASIC_DATA_SUMMARY", data_noniter)
 
 
@@ -52,7 +52,17 @@ def main():
         for elem in list(data_iter.keys()):
             simplified_data_iter.setdefault(elem, list(data_iter[elem])[0])
 
-        db.create_table_if_not_exists(f"_BASIC_RAW_DATA_{_id}", simplified_data_iter)
+        name_of_individual=f"_BASIC_RAW_DATA_{_id}"
+        db.create_table_if_not_exists(name_of_individual, simplified_data_iter)
+
+        for i in range(len(list(data_iter.values())[0])):
+            
+            simplified_data_iter_row={}
+            
+            for elem in list(data_iter.keys()):
+                simplified_data_iter_row.setdefault(elem, list(data_iter[elem])[i])
+            
+            db.add(name_of_individual,simplified_data_iter_row)
 
 
 if __name__ == "__main__":
