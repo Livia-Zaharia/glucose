@@ -3,7 +3,7 @@ Data division method- it takes the raw values from the Dataframe and splits it i
 """
 
 import copy
-from typing import List
+import typing as t
 
 import pandas as pd
 
@@ -124,7 +124,7 @@ class Divide:
         
         return trend_list_count
 
-    def generate_ripples(self, trend_list: List[int], trend_list_count: List[int]) -> List[Ripple]:
+    def generate_ripples(self, trend_list: t.List[int], trend_list_count: t.List[int]) -> t.List[Ripple]:
         """
         Method that creates a list of ripple class and loads all the data into each element.
         Uses the method add_values() from class Ripple.
