@@ -5,7 +5,7 @@ and then generates the summary and the analysis
 """
 
 from database import DatabaseManager
-from data_aquisition import GetData
+from data_acquisition import GetData
 from data_division import Divide
 from data_analysis import Analyze
 #from data_display import Display
@@ -15,7 +15,7 @@ def main():
 
 
     gd=GetData()
-    glucose=gd.csv_insert('titlu_test - Copy.csv')
+    glucose=gd.get_data('titlu_test - Copy.csv')
 
 
     d=Divide(glucose)
