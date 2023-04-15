@@ -1,66 +1,53 @@
-
-import copy
-import pandas as pd
-import plotly.express as px
 from pathlib import Path
-from ripple import Ripple
+
+import pandas as pd
+
+from constants import SUMMARY_XLSX_FILE_NAME, ANALYSIS_XLSX_FILE_NAME
 from data_division import Divide
 
+CURRENT_PATH_CWD = Path.cwd()
+
+
 class Display:
-    def __init__(self,r_list,ripple_connections):
-        self.r_list=r_list
-        self.ripple_connections=ripple_connections
-    
-    def writing_to_xls_summary(self):
+    def __init__(self, r_list, ripple_connections):
+        self.ripple_list = r_list
+        self.ripple_connections = ripple_connections
 
-        
-        file_name="summary.xlsx"
+    def write_summary_to_xls_file(self):
+        with pd.ExcelWriter(CURRENT_PATH_CWD / SUMMARY_XLSX_FILE_NAME, engine="xlsxwriter") as writer:
+            for index in range(len(self.ripple_list)):
+                sheet_name = f"{index} summary"
+                sheet_name_2 = f"{index} values"
+                ripple_data = self.ripple_list[index]
 
-        p=Path.cwd()
-        p=p/file_name
-    
-        with pd.ExcelWriter(p,engine="xlsxwriter") as writer:
-            for x in range(len(self.r_list)):
-                sheet_name=f"{x} summary"
-                sheet_name_2=f"{x} values"   
-                data=self.r_list[x]
-                
-                div=Divide()
-                data_iter, data_noniter=div.divide_by_iterable(data)                        
-                
-                df=pd.DataFrame(data_noniter, index=[0])
-                df['duration_v']=df['duration_v'].astype(str)
-                
-                df.to_excel(writer,sheet_name=sheet_name,header=True,engine="xlsxwriter", index=True)
-                
-                df2=pd.DataFrame.from_dict(data_iter)
-                df2.to_excel(writer,sheet_name=sheet_name_2,header=True,engine="xlsxwriter", index=True)
+                div = Divide()
+                data_iter, data_noniter = div.divide_by_iterable(ripple_data)
 
-    def writing_to_xls_analysis(self):
+                df = pd.DataFrame(data_noniter, index=[0])
+                df['duration_v'] = df['duration_v'].astype(str)
 
-        file_name="analysis.xlsx"
+                df.to_excel(writer, sheet_name=sheet_name, header=True, engine="xlsxwriter", index=True)
 
-        p=Path.cwd()
-        p=p/file_name
+                df2 = pd.DataFrame.from_dict(data_iter)
+                df2.to_excel(writer, sheet_name=sheet_name_2, header=True, engine="xlsxwriter", index=True)
 
-        summary_list=[]
-    
-        with pd.ExcelWriter(p,engine="xlsxwriter") as writer:
+    def write_analysis_to_xls_file(self):
+        with pd.ExcelWriter(CURRENT_PATH_CWD / ANALYSIS_XLSX_FILE_NAME, engine="xlsxwriter") as writer:
+            summary_list = []
 
             for item in self.ripple_connections:
-                percent,position_from, position_to=item[-1]
-                summary_list.append(f"from {position_from} to {position_to} there is a {round((percent)*100)}% match")
-            
-            df=pd.DataFrame(summary_list)
-            df.to_excel(writer,sheet_name="pattern comparison summary",index=False, header=True,engine="xlsxwriter")
+                percent, position_from, position_to = item[-1]
+                summary_list.append(f"from {position_from} to {position_to} there is a {round((percent) * 100)}% match")
 
-            for x,item in enumerate(self.ripple_connections):
-                sheet_name=f"{x} matching"   
-                data=item
-                df2=pd.DataFrame(data,columns=["percentage match", "starting from", "compared with"])
-                df2.to_excel(writer,sheet_name=sheet_name,index=True, header=True,engine="xlsxwriter")
-    
-    def printing_batch_images(self):
-        for x in range(len(self.r_list)):
-            self.r_list[x].write_to_image_file(x)
+            df = pd.DataFrame(summary_list)
+            df.to_excel(writer, sheet_name="pattern comparison summary", index=False, header=True, engine="xlsxwriter")
 
+            for x, item in enumerate(self.ripple_connections):
+                sheet_name = f"{x} matching"
+                data = item
+                df2 = pd.DataFrame(data, columns=["percentage match", "starting from", "compared with"])
+                df2.to_excel(writer, sheet_name=sheet_name, index=True, header=True, engine="xlsxwriter")
+
+    def batch_write_images_to_disk(self):
+        for x in range(len(self.ripple_list)):
+            self.ripple_list[x].write_to_image_file(x)
