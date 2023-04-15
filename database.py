@@ -34,7 +34,7 @@ class DatabaseManager:
             )
             raise
     
-    def type_for_columns(self,columns_specs:dict)->dict:
+    def _type_for_columns(self,columns_specs:dict)->dict:
         """
         Module that recieves a dict of column names and type of column data in python and returns a dict with the ID key inserted
         plus the same keys as before which have been converted to SQL data types
@@ -43,7 +43,7 @@ class DatabaseManager:
         new_columns.setdefault("ID",'INTEGER PRIMARY KEY AUTOINCREMENT')
         for key, value in list(columns_specs.items()):
             current_type=type(value)
-            if current_type == str or current_type == chr or current_type == datetime:
+            if current_type == str or current_type == chr or current_type == datetime or current_type== datetime.timedelta:
                 new_type="TEXT"
             elif current_type == int:
                 new_type="INTEGER"
@@ -60,6 +60,7 @@ class DatabaseManager:
         Takes in a table name and the columns with names as keys and types as values and then creates
         the CREATE TABLE statement to be executed with SQLite
         """
+        columns=self._type_for_columns(columns)
         columns_with_types = []
 
         for column_name, data_type in columns.items():

@@ -36,15 +36,8 @@ def main():
 
     data_iter, data_noniter = d.divide_by_iterable(ripple_list[0])
 
-    columns = db.type_for_columns(data_noniter)
-    db.create_table_if_not_exists("BASIC_DATA_SUMMARY", columns)
+    db.create_table_if_not_exists("BASIC_DATA_SUMMARY", data_noniter)
 
-    db=DatabaseManager("glucose.db")
-
-    data_iter,data_noniter=d.divide_by_iterable(ripple_list[0])
-    
-    columns = db.type_for_columns(data_noniter)
-    db.create_table_if_not_exists("BASIC_DATA_SUMMARY", columns)
 
     for item in ripple_list:
         data_iter,data_noniter = d.divide_by_iterable(item)
@@ -54,13 +47,12 @@ def main():
         _id = db.add("BASIC_DATA_SUMMARY", data_noniter)
 
 
-        # simplified_data_iter={}
+        simplified_data_iter={}
 
-        # for elem in list(data_iter.keys()):
-        #     simplified_data_iter.setdefault(elem, data_iter[elem][0])
+        for elem in list(data_iter.keys()):
+            simplified_data_iter.setdefault(elem, list(data_iter[elem])[0])
 
-        # columns = db.type_for_columns(simplified_data_iter)
-        # db.create_table_if_not_exists(f"{_id}_BASIC_RAW_DATA", columns)
+        db.create_table_if_not_exists(f"_BASIC_RAW_DATA_{_id}", simplified_data_iter)
 
 
 if __name__ == "__main__":
