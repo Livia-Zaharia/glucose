@@ -3,9 +3,10 @@ Module for analysis
 """
 
 import math
-import pandas as pd
-from ripple import Ripple
 import typing as t
+
+from ripple import Ripple
+
 
 class Analyze:
     """
@@ -20,10 +21,10 @@ class Analyze:
         It determines the common interval between the graphs starting from the max in normalized form.
         Then it returns a tuple having (total length compared, number of items in that comparison that are relatively close in value to each other)
         """
-        
+
         start_A_index=0
         start_B_index=0
-        
+
         flag=0
 
         max_A_index=A.max_index
@@ -38,7 +39,7 @@ class Analyze:
         elif end_A_index<end_B_index:
             flag=2
 
-        
+
         if max_A_index==0 and max_B_index==0:
             if flag==1:
                 end_A_index=end_B_index
@@ -50,7 +51,7 @@ class Analyze:
                 start_A_index=end_A_index-end_B_index
             elif flag==2:
                 start_B_index=end_B_index-end_A_index
-        
+
         elif max_A_index!=0 and max_B_index!=0 and max_A_index!=end_A_index and max_B_index!=end_B_index:
             end_part_A=end_A_index-max_A_index
             end_part_B=end_B_index-max_B_index
@@ -66,7 +67,7 @@ class Analyze:
                 start_part=max_A_index
             else:
                 start_part=max_B_index
-            
+
 
             start_A_index=max_A_index-start_part
             start_B_index=max_B_index-start_part
@@ -74,19 +75,19 @@ class Analyze:
             end_A_index=max_A_index+end_part
             end_B_index=max_B_index+end_part
 
-            
+
         else:
             return(0,0)
-        
+
 
         sum=0
         compare_A=A.normalized_graph[start_A_index:end_A_index]
         compare_B=B.normalized_graph[start_B_index:end_B_index]
-                    
+
         for x in range(len(compare_A)):
             sum+=int(math.isclose(compare_A[x], compare_B[x],rel_tol=0.05))
 
-        
+
         return (len(compare_A),sum)
 
     def compare_graphs(self)->t.List[t.List[t.Tuple[float,int,int]]]:
@@ -99,25 +100,25 @@ class Analyze:
         for item in self.r_list:
             ripple_connections.append([])
 
-        
+
         for search_item in self.r_list:
             for compare_item in self.r_list[self.r_list.index(search_item)+1:]:
-                
+
                 percent_search_value=0
                 percent_compare_value=0
 
                 common_interval,isclose_values=self._compare_two_graphs(search_item, compare_item)
-                
+
                 if isclose_values!=0:
                     percent_search_value=round(isclose_values/len(search_item.normalized_graph),2)
                     percent_compare_value=round(isclose_values/len(compare_item.normalized_graph),2)
                     ripple_connections[self.r_list.index(search_item)].append((percent_search_value,self.r_list.index(search_item),self.r_list.index(compare_item)))
                     ripple_connections[self.r_list.index(compare_item)].append((percent_compare_value,self.r_list.index(compare_item),self.r_list.index(search_item)))
-                
-        
+
+
         for item in ripple_connections:
             item.sort()
-        
+
         return ripple_connections
 
     def round_to_multiple(self, number:float,multiple:float)->float:
@@ -136,11 +137,11 @@ class Analyze:
             time=item.duration_v.total_seconds()
             time=self.round_to_multiple(time,3600)
             time_list.append(time/3600)
-        
+
         time_list.sort()
         time_list=set(time_list)
         time_list=list(time_list)
 
         return time_list
-        
+
 
