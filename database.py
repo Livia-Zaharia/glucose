@@ -1,8 +1,8 @@
 """ A module for the persistence layer """
 
+import datetime
 import sqlite3
 import typing as t
-import datetime
 
 
 class DatabaseManager:
@@ -98,16 +98,13 @@ class DatabaseManager:
 
         for elem in set(self.key_conversion_needed):
             if elem not in keys:
-                print(f"key: {elem} not in data.keys()={keys}, skipping...")
+                # print(f"key: {elem} not in data.keys()={keys}, skipping...")
                 continue
 
-            try:
-                data[elem] = str(data[elem])
-            except Exception:
-                print(f'exception for {elem}')
+            data[elem] = str(data[elem])
 
-        column_names = ", ".join(data.keys())
-        placeholders = ", ".join(["?"] * len(data.keys()))
+        column_names = ", ".join(keys)
+        placeholders = ", ".join(["?"] * len(keys))
         column_values = tuple(data.values())
 
         statement = f"""
@@ -119,7 +116,7 @@ class DatabaseManager:
                 );
         """
 
-        result=self._execute(statement, column_values)
+        result = self._execute(statement, column_values)
         return result.lastrowid
 
     def delete(self, table_name: str, criteria: t.Dict[str, str]) -> None:
