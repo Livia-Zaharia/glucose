@@ -17,12 +17,6 @@ def round_to_multiple(number: float, multiple: float) -> float:
     return multiple * round(number / multiple)
 
 
-class MyFlag(Enum):
-    DefaultEqual = 0,
-    FirstIsGreater = 1,
-    SecondIsGreater = 2
-
-
 class Analyze:
     """
     Class that contains methods for analysis
@@ -33,14 +27,14 @@ class Analyze:
 
     def _compare_two_graphs(self, first_ripple: Ripple, second_ripple: Ripple) -> t.Tuple[int, int]:
         """
-        Method that returns comparison of two graphs going by value.
-        It determines the common interval between the graphs starting from the max in normalized form.
-        Then it returns a tuple having (total length compared, number of items in that comparison that are relatively close in value to each other)
+        Method that returns comparison of two graphs going by value. It determines the common interval between the
+        graphs starting from the max in normalized form. Then it returns a tuple having (total length compared,
+        number of items in that comparison that are relatively close in value to each other)
         """
         start_a_index = 0
         start_b_index = 0
 
-        flag = MyFlag.DefaultEqual
+        flag = 0
 
         max_a_index = first_ripple.max_index
         max_b_index = second_ripple.max_index
@@ -49,16 +43,15 @@ class Analyze:
         end_b_index = len(second_ripple.normalized_graph) - 1
 
         if end_a_index > end_b_index:
-            flag = MyFlag.FirstIsGreater
+            flag = 1
         elif end_a_index < end_b_index:
-            flag = MyFlag.SecondIsGreater
+            flag = 2
 
         if max_a_index == 0 and max_b_index == 0:
-            if flag == MyFlag.FirstIsGreater:
+            if flag == 1:
                 end_a_index = end_b_index
-            elif flag == MyFlag.SecondIsGreater:
+            elif flag == 2:
                 end_b_index = end_a_index
-
         elif max_a_index == end_a_index and max_b_index == end_b_index:
             if flag == 1:
                 start_a_index = end_a_index - end_b_index
@@ -95,6 +88,50 @@ class Analyze:
             sum += int(math.isclose(compare_a[x], compare_b[x], rel_tol=0.05))
 
         return len(compare_a), sum
+
+    def _compare_two_graphs_second(self, first_ripple: Ripple, second_ripple: Ripple) -> t.Tuple[int, int]:
+        """
+        Method that returns comparison of two graphs going by value. It determines the common interval between the
+        graphs starting from the max in normalized form. Then it returns a tuple having (total length compared,
+        number of items in that comparison that are relatively close in value to each other)
+        """
+        start_a_index, start_b_index = 0, 0
+        sum_similar_values = 0
+
+        max_a_index = first_ripple.max_index
+        max_b_index = second_ripple.max_index
+
+        end_a_index = len(first_ripple.normalized_graph)
+        end_b_index = len(second_ripple.normalized_graph)
+
+        if max_a_index == 0 and max_b_index == 0:
+            end_a_index, end_b_index = min(end_a_index, end_b_index), min(end_a_index, end_b_index)
+        elif max_a_index == end_a_index and max_b_index == end_b_index:
+            start_a_index = max(0, end_a_index - min(end_a_index, end_b_index))
+            start_b_index = max(0, end_b_index - min(end_a_index, end_b_index))
+        elif max_a_index != 0 and max_b_index != 0 and max_a_index != end_a_index and max_b_index != end_b_index:
+            end_part_a = end_a_index - max_a_index
+            end_part_b = end_b_index - max_b_index
+
+            end_part = min(end_part_a, end_part_b)
+            start_part = min(max_a_index, max_b_index)
+
+            start_a_index = max(0, max_a_index - start_part)
+            start_b_index = max(0, max_b_index - start_part)
+
+            end_a_index = min(end_a_index, max_a_index + end_part)
+            end_b_index = min(end_b_index, max_b_index + end_part)
+        else:
+            return 0, 0
+
+        for x in range(start_a_index, end_a_index):
+            if x >= len(first_ripple.normalized_graph) or x - start_a_index >= len(second_ripple.normalized_graph):
+                break
+            if math.isclose(first_ripple.normalized_graph[x], second_ripple.normalized_graph[x - start_a_index],
+                            rel_tol=0.05):
+                sum_similar_values += 1
+
+        return min(end_a_index - start_a_index, end_b_index - start_b_index), sum_similar_values
 
     def compare_graphs(self) -> t.List[t.List[t.Tuple[float, int, int]]]:
         """
