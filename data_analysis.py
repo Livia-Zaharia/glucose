@@ -4,7 +4,6 @@ Module for analysis
 
 import math
 import typing as t
-from enum import Enum
 
 from ripple import Ripple
 

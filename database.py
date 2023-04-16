@@ -97,8 +97,11 @@ class DatabaseManager:
 
         for elem in set(self.key_conversion_needed):
             try:
-                data[elem]=str(data[elem])
-            except: NameError
+                data[elem] = str(data[elem])
+            except NameError:
+                print(f"error for elem {elem}")
+            except Exception:
+                print(f'exception for {elem}')
 
         column_names = ", ".join(data.keys())
         placeholders = ", ".join(["?"] * len(data.keys()))

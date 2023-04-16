@@ -1,7 +1,10 @@
 import copy
+from pathlib import Path
 
 import pandas as pd
 import plotly.express as px
+CURRENT_PATH_CWD = Path.cwd()
+IMAGES_PATH = CURRENT_PATH_CWD / "images"
 
 
 class Ripple:
@@ -128,8 +131,8 @@ class Ripple:
         Method to produce a png of the ripple with the legend. Made using plotly express
         
         """
-
-        ending_text = "{}.png"
+        IMAGES_PATH.mkdir(exist_ok=True)
+        ending_text = "images/{}.png"
         g = self.bg
 
         legend_values = self._compile_legend()
