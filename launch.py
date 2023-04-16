@@ -30,7 +30,7 @@ def main():
     _create_database(divide=d, ripple_list=ripple_list)
 
 
-def _write_images_to_disk(ripple_list):
+def _write_images_to_disk(ripple_list) -> None:
     a = Analyze(ripple_list)
 
     ripple_connections = a.compare_graphs()
