@@ -94,11 +94,17 @@ class DatabaseManager:
         as keys and values as values.
         It returns the last used id
         """
+        keys = data.keys()
 
         for elem in set(self.key_conversion_needed):
+            if elem not in keys:
+                print(f"key: {elem} not in data.keys()={keys}, skipping...")
+                continue
+
             try:
-                data[elem]=str(data[elem])
-            except: NameError
+                data[elem] = str(data[elem])
+            except Exception:
+                print(f'exception for {elem}')
 
         column_names = ", ".join(data.keys())
         placeholders = ", ".join(["?"] * len(data.keys()))
