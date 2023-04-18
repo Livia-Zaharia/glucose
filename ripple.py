@@ -126,36 +126,10 @@ class Ripple:
 
         return legend_0
 
-    def write_to_image_file(self, i: int) -> None:
+
+    def create_graphic(self, i: int, flag: bool) -> None:
         """
-        Method to produce a png of the ripple with the legend. Made using plotly express
-        
-        """
-        IMAGES_PATH.mkdir(exist_ok=True)
-        ending_text = "images/{}.png"
-        g = self.bg
-
-        legend_values = self._compile_legend()
-
-        fig = px.line(g, x=self.time_v, y=self.bg, range_y=[40, 400])
-
-        fig.add_hline(max(self.bg), line_width=1, line_dash="dash")
-        fig.add_hline(min(self.bg), line_width=1, line_dash="dash")
-        fig.add_annotation(text="MIN", x=self.min_t, y=self.min_v)
-        fig.add_annotation(text="MAX", x=self.max_t, y=self.max_v)
-
-        fig.add_vline(self.time_v.iat[len(self.time_v) - 1], line_width=1, line_dash="dash")
-
-        fig.add_annotation(text=legend_values, x=self.time_v.iat[len(self.time_v) - 1], y=300, xanchor="left",
-                           font=dict(family="Arial", size=11))
-
-        fig.update_layout(margin=dict(l=0, r=0, b=0, t=0), xaxis=dict(title="Time", visible=True, showgrid=True),
-                          yaxis=dict(title="Glucose", ticks="", showticklabels=True, showgrid=True))
-        fig.write_image(ending_text.format(i))
-
-    def create_graphic(self, i: int) -> None:
-        """
-        Method to produce a graphic in a browser and then save as a html of the 
+        Method to produce a graphic in a browser and then save as a html or png of the 
         ripple with the legend. Made using plotly express
         
         """
@@ -179,4 +153,7 @@ class Ripple:
 
         fig.update_layout(margin=dict(l=0, r=0, b=0, t=0), xaxis=dict(title="Time", visible=True, showgrid=True),
                           yaxis=dict(title="Glucose", ticks="", showticklabels=True, showgrid=True))
-        fig.write_html(ending_text.format(i))
+        if flag == True:
+            fig.write_html(ending_text.format(i))
+        else:
+            fig.write_image(ending_text.format(i))

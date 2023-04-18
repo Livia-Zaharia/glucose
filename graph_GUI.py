@@ -1,14 +1,26 @@
 import PySimpleGUI as sg
-import ripple
+from ripple import Ripple
+from typing import List
 
-# First the window layout in 2 columns
+"""
+Module for a graphical use interface- it allows to generate html files outside the command line
+
+"""
 
 class Gui:
-    def __init__(self, ripple_list):
+    """
+    Class that has the GUI viewer defined
+
+    """
+    def __init__(self, ripple_list:List[Ripple]):
         self.ripple_list=ripple_list
     
-
     def create_viewer(self):
+        """
+        Method of the GUI- at the moment it allows the user to input a 
+        number and then it generates the html file by using the method from the ripple class
+        
+        """
 
         column = [
             [
@@ -37,7 +49,7 @@ class Gui:
             if event == "Go":
                 no=int(values["-IN-"])
                 current_ripple=self.ripple_list[no]
-                window.start_thread(lambda: current_ripple.create_graphic(no)  , '-OPERATION DONE-')
+                window.start_thread(lambda: current_ripple.create_graphic(no,True)  , '-OPERATION DONE-')
             
             elif event == "-OPERATION DONE-":
                 window["-OUT-"].update(f"{no} was written")

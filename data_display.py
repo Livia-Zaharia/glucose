@@ -50,4 +50,4 @@ class Display:
 
     def batch_write_images_to_disk(self):
         for x in range(len(self.ripple_list)):
-            self.ripple_list[x].write_to_image_file(x)
+            self.ripple_list[x].create_graphic(x,False)
