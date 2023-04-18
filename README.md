@@ -40,4 +40,8 @@ As output it has a database containg the values divided according to the inheren
 ### 4.Xlswritter
 `pip install xlswritter`
 
+#
+### 5.PySimpleGui
+`python pip -m install pysimplegui`
+
 

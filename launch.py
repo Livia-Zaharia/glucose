@@ -11,6 +11,7 @@ from data_display import Display
 from data_division import Divide
 from data_reconfig import Modify
 from database import DatabaseManager
+from graph_GUI import Gui
 # from data_display import Display
 from ripple import Ripple
 
@@ -25,9 +26,14 @@ def main():
     trend_list_count = d.parting(trend_list, threshold)
     ripple_list = d.generate_ripples(trend_list, trend_list_count)
 
+
     # _write_images_to_disk(ripple_list=ripple_list)
 
-    _create_database(divide=d, ripple_list=ripple_list)
+    #_create_database(divide=d, ripple_list=ripple_list)
+
+    g= Gui(ripple_list)
+    g.create_viewer()
+
 
 
 def _write_images_to_disk(ripple_list) -> None:
