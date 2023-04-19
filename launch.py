@@ -64,12 +64,8 @@ def _create_database(divide: Divide, ripple_list: List[Ripple]) -> DatabaseManag
     simplified_data_iter.setdefault("ID_ripple",0)
 
     name_of_individual = "_BASIC_RAW_DATA"
-    _check=db.create_table_if_not_exists(name_of_individual, simplified_data_iter)
-
-
-    if not _check:
-        return db
-        
+    db.create_table_if_not_exists(name_of_individual, simplified_data_iter)
+            
     for item in ripple_list:
         data_iter, data_noniter = divide.divide_by_iterable(item)
         _id = db.add("BASIC_DATA_SUMMARY", data_noniter)
