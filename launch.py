@@ -29,9 +29,11 @@ def main():
 
     # _write_images_to_disk(ripple_list=ripple_list)
 
-    #_create_database(divide=d, ripple_list=ripple_list)
+    db=_create_database(divide=d, ripple_list=ripple_list)
 
-    g= Gui(ripple_list)
+
+
+    g= Gui(ripple_list,db)
     g.create_viewer()
 
 
@@ -49,7 +51,7 @@ def _write_images_to_disk(ripple_list) -> None:
     dis.batch_write_images_to_disk()
 
 
-def _create_database(divide: Divide, ripple_list: List[Ripple]) -> None:
+def _create_database(divide: Divide, ripple_list: List[Ripple]) -> DatabaseManager:
     """
     Creates a database of ripples
     """
@@ -57,19 +59,27 @@ def _create_database(divide: Divide, ripple_list: List[Ripple]) -> None:
     data_iter, data_noniter = divide.divide_by_iterable(ripple_list[0])
     db.create_table_if_not_exists("BASIC_DATA_SUMMARY", data_noniter)
 
+    m = Modify()
+    simplified_data_iter = m.get_name_and_type(data_iter)
+    simplified_data_iter.setdefault("ID_ripple",0)
+
+    name_of_individual = "_BASIC_RAW_DATA"
+    _check=db.create_table_if_not_exists(name_of_individual, simplified_data_iter)
+
+
+    if not _check:
+        return db
+        
     for item in ripple_list:
         data_iter, data_noniter = divide.divide_by_iterable(item)
         _id = db.add("BASIC_DATA_SUMMARY", data_noniter)
 
-        m = Modify()
-        simplified_data_iter = m.get_name_and_type(data_iter)
-
-        name_of_individual = f"_BASIC_RAW_DATA_{_id}"
-        db.create_table_if_not_exists(name_of_individual, simplified_data_iter)
-
         for i in range(len(list(data_iter.values())[0])):
             simplified_data_iter_row = m.get_name_and_value(data_iter, i)
+            simplified_data_iter_row.setdefault("ID_ripple",_id)
             db.add(name_of_individual, simplified_data_iter_row)
+
+    return db
 
 
 if __name__ == "__main__":

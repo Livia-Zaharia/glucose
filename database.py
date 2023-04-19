@@ -5,13 +5,14 @@ import sqlite3
 import typing as t
 
 
+
 class DatabaseManager:
     """ A class specialized for the persistence layer using SQLite """
     
     def __init__(self, database_filename: str):
         """ Initializes the connection with the SQLite database """
         
-        self.connection = sqlite3.connect(database_filename)
+        self.connection = sqlite3.connect(database_filename,check_same_thread=False)
         self.key_conversion_needed=[]
 
     def __del__(self):
@@ -26,6 +27,7 @@ class DatabaseManager:
         """
         try:
             with self.connection:
+                
                 cursor = self.connection.cursor()
                 cursor.execute(statement, values or [])
                 return cursor
@@ -37,7 +39,7 @@ class DatabaseManager:
     
     def _type_for_columns(self,columns_specs:dict)->dict:
         """
-        Module that recieves a dict of column names and type of column data in python and returns a dict with the ID key inserted
+        Module that recieves a dict of column names and sample of column data in python and returns a dict with the ID key inserted
         plus the same keys as before which have been converted to SQL data types
         """
         new_columns={}
@@ -142,8 +144,8 @@ class DatabaseManager:
         table_name: str, 
         criteria: t.Dict[str, str] = {}, 
         order_by: t.Optional[str] = None,
-        ordered_descending: bool = False
-    ) -> sqlite3.Cursor:
+        ordered_descending: bool = False,
+        ) -> sqlite3.Cursor:
         """
         Takes in a table name and optionally a criteria as a dictionary, a column to order by
         and a boolean flag to order it by that column descending or not
@@ -165,3 +167,4 @@ class DatabaseManager:
         statement = statement + ";"
         
         return self._execute(statement, select_criteria_values)
+    

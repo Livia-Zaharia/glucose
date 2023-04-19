@@ -1,6 +1,8 @@
 import PySimpleGUI as sg
 from ripple import Ripple
 from typing import List
+from database import DatabaseManager
+
 
 """
 Module for a graphical use interface- it allows to generate html files outside the command line
@@ -12,8 +14,9 @@ class Gui:
     Class that has the GUI viewer defined
 
     """
-    def __init__(self, ripple_list:List[Ripple]):
+    def __init__(self, ripple_list:List[Ripple], db: DatabaseManager):
         self.ripple_list=ripple_list
+        self.db=db
     
     def create_viewer(self):
         """
@@ -49,9 +52,12 @@ class Gui:
             if event == "Go":
                 no=int(values["-IN-"])
                 current_ripple=self.ripple_list[no]
-                window.start_thread(lambda: current_ripple.create_graphic(no,True)  , '-OPERATION DONE-')
-            
-            elif event == "-OPERATION DONE-":
+                window.start_thread(lambda: current_ripple.create_graphic(no,True)  , '-OPERATION1 DONE-')
+                
+
+            elif event == "-OPERATION1 DONE-":
                 window["-OUT-"].update(f"{no} was written")
+                window.start_thread(lambda: print(self.db.select("_BASIC_RAW_DATA",{"ID_ripple":no}))  , '-OPERATION2 DONE-')
+
                 
         window.close()
