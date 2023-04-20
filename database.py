@@ -3,7 +3,10 @@
 import datetime
 import sqlite3
 import typing as t
+import pandas as pd
+from pathlib import Path
 
+CURRENT_PATH_CWD = Path.cwd()
 
 
 class DatabaseManager:
@@ -139,13 +142,13 @@ class DatabaseManager:
 
         self._execute(statement, delete_criteria_values)
 
-    def select(
+    def _select(
         self, 
         table_name: str, 
         criteria: t.Dict[str, str] = {}, 
         order_by: t.Optional[str] = None,
         ordered_descending: bool = False,
-        ) -> sqlite3.Cursor:
+        ) -> pd.DataFrame:
         """
         Takes in a table name and optionally a criteria as a dictionary, a column to order by
         and a boolean flag to order it by that column descending or not
@@ -166,5 +169,24 @@ class DatabaseManager:
 
         statement = statement + ";"
         
-        return self._execute(statement, select_criteria_values)
+        for item in select_criteria_values:
+            new_statement=statement.replace("?",str(item),1)
+    
+        return (pd.read_sql_query(new_statement, self.connection))
+    
+    def _write_to_xls_file(self, df:pd.DataFrame, name: str):
+        with pd.ExcelWriter(CURRENT_PATH_CWD / name, engine="xlsxwriter") as writer:
+            df.to_excel(writer, header=True, engine="xlsxwriter", index=True)
+    
+    def select_and_write_to_xls_file(
+        self,
+        name:str, 
+        table_name: str, 
+        criteria: t.Dict[str, str] = {}, 
+        order_by: t.Optional[str] = None,
+        ordered_descending: bool = False,
+        ) -> pd.DataFrame:
+        
+        df=self._select(table_name,criteria, order_by, ordered_descending)
+        self._write_to_xls_file(df, name)
     

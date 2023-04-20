@@ -27,18 +27,15 @@ def main():
     trend_list_count = d.parting(trend_list, threshold)
     ripple_list = d.generate_ripples(trend_list, trend_list_count)
 
-
-    # _write_images_to_disk(ripple_list=ripple_list)
     db=_create_database(divide=d, ripple_list=ripple_list)
-
-
 
     g= Gui(ripple_list,db)
     g.create_viewer()
+    # _write_images_to_disk(ripple_list=ripple_list, df=db.write_to_df())
 
 
 
-def _write_images_to_disk(ripple_list) -> None:
+def _write_images_to_disk(ripple_list,df) -> None:
     a = Analyze(ripple_list)
 
     ripple_connections = a.compare_graphs()
@@ -46,7 +43,6 @@ def _write_images_to_disk(ripple_list) -> None:
 
     dis = Display(r_list=ripple_list, ripple_connections=ripple_connections)
 
-    dis.write_summary_to_xls_file()
     dis.write_analysis_to_xls_file()
     dis.batch_write_images_to_disk()
 
@@ -56,10 +52,13 @@ def _create_database(divide: Divide, ripple_list: List[Ripple]) -> DatabaseManag
     Creates a database of ripples
     """
 
-    db = DatabaseManager("glucose.db")
+   
     p=Path.cwd()
     
     if p/"glucose.db" not in p.glob("*"):
+
+        db = DatabaseManager("glucose.db")
+
         data_iter, data_noniter = divide.divide_by_iterable(ripple_list[0])
         db.create_table_if_not_exists("BASIC_DATA_SUMMARY", data_noniter)
 
@@ -79,7 +78,11 @@ def _create_database(divide: Divide, ripple_list: List[Ripple]) -> DatabaseManag
                 simplified_data_iter_row.setdefault("ID_ripple",_id)
                 db.add(name_of_individual, simplified_data_iter_row)
 
-    return db
+        return db
+    
+    else:
+        db = DatabaseManager("glucose.db")
+        return db
 
 
 if __name__ == "__main__":

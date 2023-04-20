@@ -126,7 +126,6 @@ class Ripple:
 
         return legend_0
 
-
     def create_graphic(self, i: int, flag: bool) -> None:
         """
         Method to produce a graphic in a browser and then save as a html or png of the 
