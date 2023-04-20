@@ -57,7 +57,7 @@ class Gui:
 
             elif event == "-OPERATION1 DONE-":
                 window["-OUT-"].update(f"{no} was written")
-                window.start_thread(lambda: print(row for row in self.db.select("_BASIC_RAW_DATA",{"ID_ripple":no}))  , '-OPERATION2 DONE-')
+                window.start_thread(lambda: print(self.db.select("_BASIC_RAW_DATA",{"ID_ripple":no}).fetchall())  , '-OPERATION2 DONE-')
 
                 
         window.close()
