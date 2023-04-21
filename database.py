@@ -142,7 +142,7 @@ class DatabaseManager:
 
         self._execute(statement, delete_criteria_values)
 
-    def _select(
+    def _select_statement(
         self, 
         table_name: str, 
         criteria: t.Dict[str, str] = {}, 
@@ -169,10 +169,9 @@ class DatabaseManager:
 
         statement = statement + ";"
         
-        for item in select_criteria_values:
-            new_statement=statement.replace("?",str(item),1)
-    
-        return (pd.read_sql_query(new_statement, self.connection))
+        # self._execute(statement,select_criteria_values)
+        
+        return statement
     
     def _write_to_xls_file(self, df:pd.DataFrame, name: str):
         with pd.ExcelWriter(CURRENT_PATH_CWD / name, engine="xlsxwriter") as writer:
@@ -186,8 +185,13 @@ class DatabaseManager:
         order_by: t.Optional[str] = None,
         ordered_descending: bool = False,
         ) -> pd.DataFrame:
-        
-        df=self._select(table_name,criteria, order_by, ordered_descending)
+
+        select_criteria_values = tuple(criteria.values())
+
+        for item in select_criteria_values:
+            new_statement=self._select_statement(table_name,criteria, order_by, ordered_descending).replace("?",str(item),1)
+    
+        df=pd.read_sql_query(new_statement, self.connection)
         self._write_to_xls_file(df, name)
     
     def add_multiple_rows(self, table_name: str, data: t.Dict[str, t.List], tuple_data:t.List[t.Tuple]) -> None:

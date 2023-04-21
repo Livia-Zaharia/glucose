@@ -3,7 +3,7 @@ The main program where everything happens-it obtains the data from a csv importe
 and then generates the summary and the analysis
 
 """
-from typing import List
+import typing as t
 
 from data_acquisition import GetData
 from data_analysis import Analyze
@@ -29,9 +29,16 @@ def main():
 
     p=Path.cwd()
     m = Modify()
-
+    
     db=_create_basic_database(divide=d, ripple_list=ripple_list, p=p, m=m)
-    db_a=_create_analysis_database( ripple_list=ripple_list, p=p, m=m)
+    
+    a = Analyze(ripple_list)
+    ripple_connections = a.compare_graphs()
+    time_list = a.compare_duration()
+    
+    db_a=_create_analysis_database( ripple_connections, p, m=m)
+    db_a_summary=_extract_summary_of_analysis(db_a,ripple_list)
+
 
     g= Gui(ripple_list,db)
     g.create_viewer()
@@ -53,8 +60,7 @@ def _write_images_to_disk(ripple_list) -> None:
     # dis.write_analysis_to_xls_file()
     # dis.batch_write_images_to_disk()
 
-
-def _create_basic_database(divide: Divide, ripple_list: List[Ripple], p:Path, m:Modify) -> DatabaseManager:
+def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], p:Path, m:Modify) -> DatabaseManager:
     """
     Creates a database of ripples
 
@@ -88,31 +94,25 @@ def _create_basic_database(divide: Divide, ripple_list: List[Ripple], p:Path, m:
         db = DatabaseManager("glucose.db")
         return db
     
-def _create_analysis_database(ripple_list: List[Ripple], p:Path, m:Modify) -> DatabaseManager:
+def _create_analysis_database(ripple_connections: t.List[t.List[t.Tuple[float,int,int]]], p:Path, m:Modify) -> DatabaseManager:
     """
     Creates a database of ripple analysis
 
     """
     
-    if p/"glucose_analysis.db" not in p.glob("*"):
+    key_list=["percentage", "From_value", "To_value"]
+    ripple_connections_values=[]
 
-        a = Analyze(ripple_list)
+    for element in ripple_connections:
+        for item in element:
+            ripple_connections_values.append(item)           
 
-        ripple_connections = a.compare_graphs()
-        key_list=["percentage", "From_value", "To_value"]
-        ripple_connections_values=[]
-        time_list = a.compare_duration()
-
-        for element in ripple_connections:
-           for item in element:
-               ripple_connections_values.append(item)           
-
-        temp=m.convert_from_tuple_list_to_dict(ripple_connections_values,key_list)
-
-
-        db = DatabaseManager("glucose_analysis.db")
-        simplified_data = m.get_name_and_type(temp)
+    temp=m.convert_from_tuple_list_to_dict(ripple_connections_values,key_list)
+    simplified_data = m.get_name_and_type(temp)
         
+    if p/"glucose_analysis.db" not in p.glob("*"):
+        
+        db = DatabaseManager("glucose_analysis.db")
         name_of_individual = "_PATTERN_ANALYSIS_RAW_DATA"
         db.create_table_if_not_exists(name_of_individual, simplified_data)
 
@@ -126,6 +126,10 @@ def _create_analysis_database(ripple_list: List[Ripple], p:Path, m:Modify) -> Da
         db = DatabaseManager("glucose_analysis.db")
         return db
 
+def _extract_summary_of_analysis(db_a:DatabaseManager, ripple_list: t.List[Ripple]):
+    for i in range (len(ripple_list)):
+        pass
+        
 
 if __name__ == "__main__":
     main()
