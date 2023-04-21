@@ -39,3 +39,22 @@ class Modify:
             simplified_data_iter_row.setdefault(elem, list(data_iter[elem])[i])
 
         return simplified_data_iter_row
+    
+    def convert_from_tuple_list_to_dict(self,input_list:t.List[t.Tuple],key_list:t.List[str]) -> t.Dict[str,t.List]:
+        """
+        Method to convert a list of x tuples of n elements into a dict with n keys with lists of x values
+        """
+        result_dict={}
+        for key in key_list:
+            result_dict.setdefault(key,[])
+
+        for item in input_list:
+            k=0
+            for category_value in item:
+                result_dict[key_list[k]].append(category_value)
+                k+=1
+        
+        return result_dict
+
+
+

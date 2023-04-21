@@ -190,3 +190,35 @@ class DatabaseManager:
         df=self._select(table_name,criteria, order_by, ordered_descending)
         self._write_to_xls_file(df, name)
     
+    def add_multiple_rows(self, table_name: str, data: t.Dict[str, t.List], tuple_data:t.List[t.Tuple]) -> None:
+        """
+        Takes in a table name to INSERT data INTO and a data dictionary with columns
+        as keys and values as multiple rows and column values.
+        It returns the last used id
+        """
+        keys = data.keys()
+        
+        for elem in set(self.key_conversion_needed):
+            if elem not in keys:
+                # print(f"key: {elem} not in data.keys()={keys}, skipping...")
+                continue
+
+            data[elem] = str(data[elem])
+
+        column_names = ", ".join(keys)
+        placeholders=", ".join(["?"] * len(keys))
+        placeholders = f"({placeholders})"
+        placeholders=", ".join([f"{placeholders}"]*len(list(data.values())[0]))
+        column_values = tuple(tuple_data)
+
+        statement = f"""
+            INSERT INTO
+                {table_name} (
+                    {column_names}
+                ) VALUES 
+                    {placeholders}
+                ;
+        """
+
+        self._execute(statement, column_values)
+    

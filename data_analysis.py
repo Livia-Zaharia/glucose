@@ -93,7 +93,8 @@ class Analyze:
     def compare_graphs(self)->t.List[t.List[t.Tuple[float,int,int]]]:
         """
         Method that compares two graphs by taking each graph and comparing it to all the other graphs in the r-List.
-        It returns a list [with as many list as there are elements in r_list[each of witch contain a series of tuples(percentage, origin and comparison)]]
+        It returns a list [with as many list as there are elements in 
+        ripple_list[each of witch contain a list of tuples(percentage, origin and comparison) that have not null values]]
         """
         ripple_connections=[]
 
