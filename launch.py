@@ -33,32 +33,20 @@ def main():
     db=_create_basic_database(divide=d, ripple_list=ripple_list, p=p, m=m)
     
     a = Analyze(ripple_list)
+    dis = Display()
     ripple_connections = a.compare_graphs()
     time_list = a.compare_duration()
     
-    db_a=_create_analysis_database( ripple_connections, p, m=m)
-    db_a_summary=_extract_summary_of_analysis(db_a,ripple_list)
+    db_a=_create_analysis_database( ripple_connections, p, m)
+    db_a_summary=_extract_summary_of_analysis(ripple_connections, dis)
 
 
     g= Gui(ripple_list,db)
     g.create_viewer()
-    # _write_images_to_disk(ripple_list=ripple_list)
 
+    # dis.batch_write_images_to_disk(ripple_list)
 
-
-def _write_images_to_disk(ripple_list) -> None:
-    a = Analyze(ripple_list)
-
-    ripple_connections = a.compare_graphs()
-    time_list = a.compare_duration()
-
-    for item in ripple_connections:
-        print(len(item),"++++")
-
-    # dis = Display(r_list=ripple_list, ripple_connections=ripple_connections)
-
-    # dis.write_analysis_to_xls_file()
-    # dis.batch_write_images_to_disk()
+ 
 
 def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], p:Path, m:Modify) -> DatabaseManager:
     """
@@ -126,9 +114,15 @@ def _create_analysis_database(ripple_connections: t.List[t.List[t.Tuple[float,in
         db = DatabaseManager("glucose_analysis.db")
         return db
 
-def _extract_summary_of_analysis(db_a:DatabaseManager, ripple_list: t.List[Ripple]):
-    for i in range (len(ripple_list)):
-        pass
+def _extract_summary_of_analysis(ripple_connections: t.List[t.List[t.Tuple[float,int,int]]], dis:Display):
+            summary_list = []
+            name="graph analysis"
+
+            for item in ripple_connections:
+                percent, position_from, position_to = item[-1]
+                summary_list.append(f"from {position_from} to {position_to} there is a {round((percent) * 100)}% match")
+            
+            dis.write_analysis_to_xls_file(summary_list,name)
         
 
 if __name__ == "__main__":
