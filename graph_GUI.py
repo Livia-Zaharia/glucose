@@ -2,6 +2,10 @@ import PySimpleGUI as sg
 from ripple import Ripple
 from typing import List
 from database import DatabaseManager
+from pathlib import Path
+
+CURRENT_PATH_CWD = Path.cwd()
+IMAGES_PATH = CURRENT_PATH_CWD / "images_and_graphs"
 
 
 """
@@ -53,14 +57,6 @@ class Gui:
         
         """
 
-        # column = [
-        #     [
-        #         sg.Text("Number of element"),
-        #         sg.In(key="-IN-"),
-        #         sg.Text(key="-OUT-")
-        #     ],
-        # ]
-
 
         layout = [
             [
@@ -87,7 +83,12 @@ class Gui:
 
             elif event == "-OPERATION1 DONE-":
                 window["-OUT-"].update(f"{no} was written")
-                window.start_thread(lambda: (db.select_and_write_to_xls_file(f"_BASIC_RAW_DATA_{no}.xlsx","_BASIC_RAW_DATA",{"ID_ripple":no}))  , '-OPERATION2 DONE-')
+                
+                DATA_PATH=IMAGES_PATH/f"Ripple_no{no}"
+                DATA_PATH.mkdir(parents=True,exist_ok=True)
+                name=DATA_PATH/f"_BASIC_RAW_DATA_{no}.xlsx"
+
+                window.start_thread(lambda: (db.select_and_write_to_xls_file(name,"_BASIC_RAW_DATA",{"ID_ripple":no}))  , '-OPERATION2 DONE-')
 
                 
         window.close()

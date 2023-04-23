@@ -4,9 +4,7 @@ Data division method- it takes the raw values from the Dataframe and splits it i
 
 import copy
 import typing as t
-
 import pandas as pd
-
 from ripple import Ripple
 
 

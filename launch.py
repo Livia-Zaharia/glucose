@@ -14,6 +14,7 @@ from database import DatabaseManager
 from graph_GUI import Gui
 from ripple import Ripple
 from pathlib import Path
+CURRENT_PATH_CWD = Path.cwd()
 
 
 def main():
@@ -32,10 +33,9 @@ def main():
     ripple_list = d.generate_ripples(trend_list, trend_list_count)
     g.write_a_message("FILE DIVIDED")
 
-    p=Path.cwd()
     m = Modify()
     
-    db=_create_basic_database(divide=d, ripple_list=ripple_list, p=p, m=m)
+    db=_create_basic_database(d,ripple_list, CURRENT_PATH_CWD, m)
     g.write_a_message("BASIC DATABASE CREATED")
     
     a = Analyze(ripple_list)
@@ -43,7 +43,7 @@ def main():
     ripple_connections = a.compare_graphs()
     time_list = a.compare_duration()
     
-    db_a=_create_analysis_database( ripple_connections, p, m)
+    db_a=_create_analysis_database( ripple_connections, CURRENT_PATH_CWD, m)
     g.write_a_message("ANALYSIS DATABASE CREATED")
 
     db_a_summary=_extract_summary_of_analysis(ripple_connections, dis)
@@ -51,7 +51,7 @@ def main():
  
     g.create_viewer(ripple_list,db)
 
-    # dis.batch_write_images_to_disk(ripple_list)
+    # dis.batch_write_graphs_to_disk(ripple_list,False)
 
  
 

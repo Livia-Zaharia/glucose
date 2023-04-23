@@ -1,10 +1,13 @@
+"""
+The module for object Ripple. Has all the methods and values of it
+"""
+
 import copy
 from pathlib import Path
-
 import pandas as pd
 import plotly.express as px
 CURRENT_PATH_CWD = Path.cwd()
-IMAGES_PATH = CURRENT_PATH_CWD / "images"
+IMAGES_PATH = CURRENT_PATH_CWD / "images_and_graphs"
 
 
 class Ripple:
@@ -128,12 +131,14 @@ class Ripple:
 
     def create_graphic(self, i: int, flag: bool) -> None:
         """
-        Method to produce a graphic in a browser and then save as a html or png of the 
+        Method of ripple class to produce a graphic in a browser and then save as a html or png of the 
         ripple with the legend. Made using plotly express
+        i value is the position, flag value- True outputs html, False -outputs png directly
         
         """
-        IMAGES_PATH.mkdir(exist_ok=True)
-        ending_text = "images/{}.html"
+        DATA_PATH=IMAGES_PATH/f"Ripple_no{i}"
+        DATA_PATH.mkdir(parents=True,exist_ok=True)
+        
         g = self.bg
 
         legend_values = self._compile_legend()
@@ -153,6 +158,8 @@ class Ripple:
         fig.update_layout(margin=dict(l=0, r=0, b=0, t=0), xaxis=dict(title="Time", visible=True, showgrid=True),
                           yaxis=dict(title="Glucose", ticks="", showticklabels=True, showgrid=True))
         if flag == True:
-            fig.write_html(ending_text.format(i))
+            ending_text = DATA_PATH/f"images{i}.html"
+            fig.write_html(ending_text)
         else:
-            fig.write_image(ending_text.format(i))
+            ending_text = DATA_PATH/f"images{i}.png"
+            fig.write_image(ending_text)

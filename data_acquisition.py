@@ -3,7 +3,6 @@ Data acquisition module that imports the data from the csv
 
 """
 from pathlib import Path
-
 import pandas as pd
 
 CURRENT_PATH_CWD = Path.cwd()

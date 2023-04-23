@@ -1,4 +1,6 @@
-""" A module for the persistence layer """
+""" 
+A module for the persistence layer
+"""
 
 import datetime
 import sqlite3
@@ -7,13 +9,18 @@ import pandas as pd
 from pathlib import Path
 
 CURRENT_PATH_CWD = Path.cwd()
+IMAGES_PATH = CURRENT_PATH_CWD / "images_and_graphs"
 
 
 class DatabaseManager:
-    """ A class specialized for the persistence layer using SQLite """
+    """ 
+    A class specialized for the persistence layer using SQLite 
+    """
     
     def __init__(self, database_filename: str):
-        """ Initializes the connection with the SQLite database """
+        """
+        Initializes the connection with the SQLite database 
+        """
         
         self.connection = sqlite3.connect(database_filename,check_same_thread=False)
         self.key_conversion_needed=[]
@@ -98,6 +105,7 @@ class DatabaseManager:
         Takes in a table name to INSERT data INTO and a data dictionary with columns
         as keys and values as values.
         It returns the last used id
+        And it works row by row
         """
         keys = data.keys()
 
@@ -152,6 +160,7 @@ class DatabaseManager:
         """
         Takes in a table name and optionally a criteria as a dictionary, a column to order by
         and a boolean flag to order it by that column descending or not
+        returns the select statement construction
         """
         
         select_criteria_values = tuple(criteria.values())
@@ -174,7 +183,12 @@ class DatabaseManager:
         return statement
     
     def _write_to_xls_file(self, df:pd.DataFrame, name: str):
-        with pd.ExcelWriter(CURRENT_PATH_CWD / name, engine="xlsxwriter") as writer:
+        """
+        Method for writing to xls directly from the DB manager.
+        It passes through a pandas Dataframe and it is written
+        Called by select_and_write_to_xls_file
+        """
+        with pd.ExcelWriter(name, engine="xlsxwriter") as writer:
             df.to_excel(writer, header=True, engine="xlsxwriter", index=True)
     
     def select_and_write_to_xls_file(
@@ -185,8 +199,12 @@ class DatabaseManager:
         order_by: t.Optional[str] = None,
         ordered_descending: bool = False,
         ) -> pd.DataFrame:
+        """
+        Method that recieves the imput for a querry in a DB, then generates the xls at given location
+        """
 
         select_criteria_values = tuple(criteria.values())
+    
 
         for item in select_criteria_values:
             new_statement=self._select_statement(table_name,criteria, order_by, ordered_descending).replace("?",str(item),1)

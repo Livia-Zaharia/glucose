@@ -3,7 +3,6 @@ Data reconfiguration method to format any different type of data structure into 
 
 """
 from __future__ import annotations
-
 import typing as t
 
 
@@ -28,8 +27,8 @@ class Modify:
 
     def get_name_and_value(self, data_iter: t.Dict[str, t.List], i: int) -> t.Dict[str, int | float | str]:
         """
-        Method that receives a Dict with iterable values of EQUAL length,  that contain immutable values, which in turn are not iterable,
-        and returns a Dict containing the same keys with the value at a given position 
+        Method that receives a Dict with iterable values of EQUAL length,  that contain immutable values, which in turn are not iterable, 
+        AND an index and returns a Dict containing the same keys with the value at the given position 
         
         """
 
