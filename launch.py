@@ -12,25 +12,31 @@ from data_division import Divide
 from data_reconfig import Modify
 from database import DatabaseManager
 from graph_GUI import Gui
-# from data_display import Display
 from ripple import Ripple
 from pathlib import Path
 
 
 def main():
+
+    g= Gui()
+    file_location=g.select_file()
+
     gd = GetData()
-    glucose = gd.get_data('titlu_test - Copy.csv')
+    glucose = gd.get_data(file_location)
+    g.write_a_message("FILE ACQUIRED")
 
     d = Divide(glucose)
     trend_list = d.trend_setting()
     threshold = 1
     trend_list_count = d.parting(trend_list, threshold)
     ripple_list = d.generate_ripples(trend_list, trend_list_count)
+    g.write_a_message("FILE DIVIDED")
 
     p=Path.cwd()
     m = Modify()
     
     db=_create_basic_database(divide=d, ripple_list=ripple_list, p=p, m=m)
+    g.write_a_message("BASIC DATABASE CREATED")
     
     a = Analyze(ripple_list)
     dis = Display()
@@ -38,11 +44,12 @@ def main():
     time_list = a.compare_duration()
     
     db_a=_create_analysis_database( ripple_connections, p, m)
+    g.write_a_message("ANALYSIS DATABASE CREATED")
+
     db_a_summary=_extract_summary_of_analysis(ripple_connections, dis)
-
-
-    g= Gui(ripple_list,db)
-    g.create_viewer()
+    g.write_a_message("SUMMARY OF ANALYSIS CREATED")
+ 
+    g.create_viewer(ripple_list,db)
 
     # dis.batch_write_images_to_disk(ripple_list)
 
