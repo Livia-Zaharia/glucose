@@ -33,7 +33,7 @@ class Display:
 
     def batch_write_graphs_to_disk(self, ripple_list:t.List[Ripple], flag:bool):
         """
-        Method of batch writing files in png or html format
+        Method of batch writing files in png or html format flag= True writes html else writes png
         """
  
         for x in range(len(ripple_list)):

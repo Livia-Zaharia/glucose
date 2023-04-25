@@ -119,7 +119,7 @@ class Analyze:
 
         for item in ripple_connections:
             item.sort()
-
+        
         return ripple_connections
 
     def round_to_multiple(self, number:float,multiple:float)->float:

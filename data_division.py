@@ -6,6 +6,7 @@ import copy
 import typing as t
 import pandas as pd
 from ripple import Ripple
+from datetime import datetime
 
 
 class Divide:
@@ -13,8 +14,9 @@ class Divide:
     Class that contains methods for division
     """
 
-    def __init__(self,glucose:pd.DataFrame=[]):
+    def __init__(self,glucose:pd.DataFrame=[], insulin:pd.DataFrame=[]):
         self.glucose=glucose
+        self.insulin=insulin
 
     def trend_setting(self)->t.List[int]:
         """
@@ -165,3 +167,18 @@ class Divide:
                 data_noniter.pop(item)
 
         return (data_iter,data_noniter)
+    
+    def split_insulin_by_ripple(self, ripple_list:t.List[Ripple])->t.List[t.List[t.Tuple[datetime,str,float]]]:
+         """
+         Method that splits the insulin dataframe stored into a list of n lists (the lenght of the ripple list recieved) with tuples 
+         structured as(timestamp-type of insulin-dosage)
+         """
+         insulin_storage=[]
+         i=0
+         for elem in ripple_list:
+             insulin_list=[]
+             while self.insulin.iloc[i,0]<=elem.end_t:
+                 insulin_list.append((self.insulin.iloc[i,0],self.insulin.iloc[i,1],self.insulin.iloc[i,2]))
+                 i+=1
+             insulin_storage.append(insulin_list)
+         return insulin_storage

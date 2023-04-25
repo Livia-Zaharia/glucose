@@ -16,7 +16,7 @@ class Ripple:
     way it is defined, a Ripple object will contain only ONE  change of sign of the graph-simply put one change from
     an ascending part to descending part or vice versa. For more information see definition of add_values method.(
     bg=dataframe slice type-int values| time_v= dataframe slice type-datetime values| trend_v=float list type|
-    normalized_graph=float list type| mean= single float value| duration_v= timedelta type| min_v=int type| min_t=
+    normalized_graph=float list type| mean= single float value| start_t=datetime| end_t=datetime| duration_v= timedelta type| min_v=int type| min_t=
     timedate type| min_index= int type| max_v=int type| max_t= timedate type| max_index= int type)
 
     """
@@ -27,6 +27,8 @@ class Ripple:
         self.trend_v = []
         self.normalized_graph = []
         self.mean = 0.0
+        self.start_t=0
+        self.end_t=0
         self.duration_v = 0.0
         self.min_v = 0.0
         self.min_t = 0.0
@@ -62,7 +64,9 @@ class Ripple:
         objects the result is timedelta. self.duration=timedelta type
 
         """
-        self.duration_v = self.time_v.iat[len(self.time_v) - 1] - self.time_v.iat[0]
+        self.start_t=self.time_v.iat[0]
+        self.end_t=self.time_v.iat[len(self.time_v) - 1]
+        self.duration_v = self.end_t - self.start_t
 
     def _make_average_glucose(self) -> None:
         """
