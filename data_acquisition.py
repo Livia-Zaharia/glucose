@@ -51,7 +51,7 @@ def get_insulin_data(file_name: str) -> pd.DataFrame:
         Exception: If the input CSV file is missing or corrupted.
     """
     # Read the CSV file and store it in a DataFrame
-    df = read_csv_file(file_name)
+    df = read_csv_file(file_name=file_name)
     # Preprocess the insulin data and return the resulting DataFrame
     insulin = _preprocess_insulin_data(df)
 
@@ -72,7 +72,7 @@ def get_glucose_data(file_name: str) -> pd.DataFrame:
         Exception: If the input CSV file is missing or corrupted.
     """
     # Read the CSV file and store it in a DataFrame
-    df = read_csv_file(file_name)
+    df = read_csv_file(file_name=file_name)
     # Preprocess the glucose data and return the resulting DataFrame
     glucose = _preprocess_glucose_data(df)
 
