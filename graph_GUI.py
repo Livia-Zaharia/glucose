@@ -16,7 +16,7 @@ Module for a graphical use interface- it allows to generate html files outside t
 
 
 def write_a_message(text: str):
-    layout = [[sg.Text(text, font=('Arial Bold', 20), expand_x=True, justification='center')],]
+    layout = [[sg.Text(text, font=('Arial Bold', 20), expand_x=True, justification='center')], ]
     window = sg.Window('File processing', layout, size=(715, 100))
 
     while True:
@@ -26,6 +26,7 @@ def write_a_message(text: str):
             break
         if event == sg.TIMEOUT_KEY:
             break
+
     window.close()
 
 
@@ -83,14 +84,18 @@ def select_file() -> str:
     method that allows user to select file and get the file path
 
     """
-    layout = [[sg.Text('Select a file', font=('Arial Bold', 20), expand_x=True, justification='center')],
-              [sg.Input(enable_events=True, key='-IN-', font=('Arial Bold', 12), expand_x=True),
-               sg.FileBrowse("select")]
-              ]
+    layout = [
+        [sg.Text('Select a file', font=('Arial Bold', 20), expand_x=True, justification='center')],
+        [
+            sg.Input(enable_events=True, key='-IN-', font=('Arial Bold', 12), expand_x=True),
+            sg.FileBrowse("select")
+        ]
+    ]
     window = sg.Window('Select file', layout, size=(715, 100))
 
     while True:
         event, values = window.read()
+
         if event == sg.WIN_CLOSED or event == 'Exit':
             break
         if event == '-IN-':
@@ -100,4 +105,3 @@ def select_file() -> str:
     window.close()
 
     return a
-
