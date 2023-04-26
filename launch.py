@@ -6,7 +6,7 @@ and then generates the summary and the analysis
 import typing as t
 from pathlib import Path
 
-from data_acquisition import GetData
+import data_acquisition
 from data_analysis import Analyze
 from data_display import Display
 from data_division import Divide
@@ -21,9 +21,8 @@ CURRENT_PATH_CWD = Path.cwd()
 def main():
     file_location = select_file()
 
-    gd = GetData()
-    glucose = gd.get_data(file_location)
-    insulin = gd.get_insulin(file_location)
+    glucose = data_acquisition.get_data(file_location)
+    insulin = data_acquisition.get_insulin(file_location)
     write_a_message("FILE ACQUIRED")
 
     d = Divide(glucose, insulin)
