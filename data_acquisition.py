@@ -53,7 +53,7 @@ def get_insulin_data(file_name: str) -> pd.DataFrame:
     # Read the CSV file and store it in a DataFrame
     df = read_csv_file(file_name=file_name)
     # Preprocess the insulin data and return the resulting DataFrame
-    insulin = _preprocess_insulin_data(df)
+    insulin = _preprocess_insulin_data(df=df)
 
     return insulin
 
@@ -74,7 +74,7 @@ def get_glucose_data(file_name: str) -> pd.DataFrame:
     # Read the CSV file and store it in a DataFrame
     df = read_csv_file(file_name=file_name)
     # Preprocess the glucose data and return the resulting DataFrame
-    glucose = _preprocess_glucose_data(df)
+    glucose = _preprocess_glucose_data(df=df)
 
     return glucose
 
