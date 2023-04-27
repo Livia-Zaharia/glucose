@@ -60,7 +60,7 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager):
         if event == "Go":
             no = int(values["-IN-"])
             current_ripple = ripple_list[no]
-            window.start_thread(lambda: current_ripple.create_graphic(no, True), '-OPERATION1 DONE-')
+            window.start_thread(lambda: current_ripple.create_graphic(index=no, should_write_html=True, data_path=IMAGES_PATH), '-OPERATION1 DONE-')
 
         elif event == "-OPERATION1 DONE-":
             window["-OUT-"].update(f"{no} was written")
