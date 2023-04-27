@@ -7,15 +7,16 @@ import typing as t
 from pathlib import Path
 
 import data_acquisition
+import data_display
 from data_analysis import Analyze
-from data_display import Display
 from data_division import Divide
 from data_reconfig import Modify
 from database import DatabaseManager
-from graph_GUI import select_file, write_a_message, create_viewer
+from graph_gui import select_file, write_a_message, create_viewer
 from ripple import Ripple
 
 CURRENT_PATH_CWD = Path.cwd()
+IMAGES_PATH = CURRENT_PATH_CWD / "images_and_graphs"
 
 
 def main():
@@ -57,19 +58,18 @@ def main():
     si ca idee de baza the primary key cu care se invart toate e pozitia in lista de ripple- dupa ce sunt segmentate totul se cauta de acolo- pe secventa aia   
     """
     # analized_list=[]
-    dis = Display()
     ripple_connections = a.compare_graphs()
     time_list = a.compare_duration()
 
     db_a = _create_analysis_database(ripple_connections, CURRENT_PATH_CWD, m)
     write_a_message("ANALYSIS DATABASE CREATED")
 
-    db_a_summary = _extract_summary_of_analysis(ripple_connections, dis)
+    db_a_summary = _extract_summary_of_analysis(ripple_connections=ripple_connections)
     write_a_message("SUMMARY OF ANALYSIS CREATED")
 
     create_viewer(ripple_list, db)
 
-    # dis.batch_write_graphs_to_disk(ripple_list,False)
+    # data_display.batch_write_graphs_to_disk(ripple_list=ripple_list, base_path=IMAGES_PATH)
 
 
 def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], p: Path, m: Modify) -> DatabaseManager:
@@ -141,15 +141,15 @@ def _create_analysis_database(ripple_connections: t.List[t.List[t.Tuple[float, i
         return db
 
 
-def _extract_summary_of_analysis(ripple_connections: t.List[t.List[t.Tuple[float, int, int]]], dis: Display):
+def _extract_summary_of_analysis(ripple_connections: t.List[t.List[t.Tuple[float, int, int]]]):
     summary_list = []
-    name = "graph analysis"
+    sheet_name = "graph analysis"
 
     for item in ripple_connections:
         percent, position_from, position_to = item[-1]
         summary_list.append(f"from {position_from} to {position_to} there is a {round((percent) * 100)}% match")
 
-    dis.write_analysis_to_xls_file(summary_list, name)
+    data_display.write_analysis_to_xls_file(summary_list=summary_list, sheet_name=sheet_name)
 
 
 if __name__ == "__main__":
