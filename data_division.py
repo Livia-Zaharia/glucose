@@ -184,15 +184,26 @@ class Divide:
 
     def split_insulin_by_ripple(self, ripple_list: t.List[Ripple]) -> t.List[t.List[t.Tuple[datetime, str, float]]]:
         """
-        Method that splits the insulin dataframe stored into a list of n lists (the lenght of the ripple list recieved) with tuples
-        structured as(timestamp-type of insulin-dosage)
+        Method that splits the insulin dataframe stored into a list of n lists (the length of the ripple list received) with tuples
+        structured as (timestamp, type of insulin, dosage).
         """
         insulin_storage = []
         i = 0
+
+        # Iterate through the elements in the ripple_list.
         for elem in ripple_list:
             insulin_list = []
-            while self.insulin.iloc[i, 0] <= elem.end_t:
-                insulin_list.append((self.insulin.iloc[i, 0], self.insulin.iloc[i, 1], self.insulin.iloc[i, 2]))
+
+            # Loop until the insulin timestamp is less than or equal to the ripple end time or reaches the end of the
+            # dataframe.
+            while i < len(self.insulin) and self.insulin.iloc[i, 0] <= elem.end_t:
+                # Append the insulin data as a tuple to the insulin_list.
+                insulin_list.append(tuple(self.insulin.iloc[i, 0:3]))
+
+                # Increment the index to process the next insulin record.
                 i += 1
+
+            # Add the insulin_list to insulin_storage.
             insulin_storage.append(insulin_list)
+
         return insulin_storage
