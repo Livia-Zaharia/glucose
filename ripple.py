@@ -72,7 +72,6 @@ class Ripple:
         """
         Method for obtaining the mean value of all the bloodglucose values in this period of time.
         self.mean=float type
-        
         """
         x = 0
         count = 0
@@ -133,37 +132,38 @@ class Ripple:
 
         return legend_0
 
-    def create_graphic(self, i: int, flag: bool) -> None:
+    def create_graphic(self, index: int, should_write_html: bool, data_path: Path) -> None:
         """
-        Method of ripple class to produce a graphic in a browser and then save as a html or png of the 
-        ripple with the legend. Made using plotly express
-        i value is the position, flag value- True outputs html, False -outputs png directly
-        
-        """
-        DATA_PATH=IMAGES_PATH/f"Ripple_no{i}"
-        DATA_PATH.mkdir(parents=True,exist_ok=True)
-        
-        g = self.bg
+        Method of Ripple class to produce a graphic in a browser and then save as an HTML or PNG of the
+        ripple with the legend. Made using Plotly Express.
+        index value is the position, flag value- True outputs HTML, False -outputs PNG directly.
 
+        Args:
+            index: The index of the ripple used for naming the directory.
+            should_write_html: If True, write the graph in HTML format; otherwise, write it in PNG format.
+            data_path: The base path where the graph should be saved.
+        """
+        # Create the ripple graph using the class instance's data
         legend_values = self._compile_legend()
+        fig = px.line(self.bg, x=self.time_v, y=self.bg, range_y=[40, 400])
 
-        fig = px.line(g, x=self.time_v, y=self.bg, range_y=[40, 400])
-
+        # Add the graph elements and annotations
         fig.add_hline(max(self.bg), line_width=1, line_dash="dash")
         fig.add_hline(min(self.bg), line_width=1, line_dash="dash")
         fig.add_annotation(text="MIN", x=self.min_t, y=self.min_v)
         fig.add_annotation(text="MAX", x=self.max_t, y=self.max_v)
-
         fig.add_vline(self.time_v.iat[len(self.time_v) - 1], line_width=1, line_dash="dash")
-
         fig.add_annotation(text=legend_values, x=self.time_v.iat[len(self.time_v) - 1], y=300, xanchor="left",
                            font=dict(family="Arial", size=11))
 
+        # Update the graph layout
         fig.update_layout(margin=dict(l=0, r=0, b=0, t=0), xaxis=dict(title="Time", visible=True, showgrid=True),
                           yaxis=dict(title="Glucose", ticks="", showticklabels=True, showgrid=True))
-        if flag == True:
-            ending_text = DATA_PATH/f"images{i}.html"
-            fig.write_html(ending_text)
+
+        # Write the graph to the specified data path in either HTML or PNG format
+        if should_write_html:
+            ending_text = data_path / f"images{index}.html"
+            fig.write_html(str(ending_text))
         else:
-            ending_text = DATA_PATH/f"images{i}.png"
-            fig.write_image(ending_text)
+            ending_text = data_path / f"images{index}.png"
+            fig.write_image(str(ending_text))
