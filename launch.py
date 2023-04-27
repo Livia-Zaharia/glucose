@@ -8,9 +8,9 @@ from pathlib import Path
 
 import data_acquisition
 import data_display
+import data_reconfig
 from data_analysis import Analyze
 from data_division import Divide
-from data_reconfig import Modify
 from database import DatabaseManager
 from graph_gui import select_file, write_a_message, create_viewer
 from ripple import Ripple
@@ -36,9 +36,7 @@ def main():
     insulin_list = d.split_insulin_by_ripple(ripple_list)
     write_a_message("FILE DIVIDED")
 
-    m = Modify()
-
-    db = _create_basic_database(d, ripple_list, CURRENT_PATH_CWD, m)
+    db = _create_basic_database(divide=d, ripple_list=ripple_list, path=CURRENT_PATH_CWD)
     write_a_message("BASIC DATABASE CREATED")
 
     a = Analyze(ripple_list)
@@ -61,7 +59,7 @@ def main():
     ripple_connections = a.compare_graphs()
     time_list = a.compare_duration()
 
-    db_a = _create_analysis_database(ripple_connections, CURRENT_PATH_CWD, m)
+    db_a = _create_analysis_database(ripple_connections=ripple_connections, path=CURRENT_PATH_CWD)
     write_a_message("ANALYSIS DATABASE CREATED")
 
     db_a_summary = _extract_summary_of_analysis(ripple_connections=ripple_connections)
@@ -72,31 +70,31 @@ def main():
     # data_display.batch_write_graphs_to_disk(ripple_list=ripple_list, base_path=IMAGES_PATH)
 
 
-def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], p: Path, m: Modify) -> DatabaseManager:
+def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], path: Path) -> DatabaseManager:
     """
     Creates a database of ripples
 
     """
 
-    if p / "glucose.db" not in p.glob("*"):
+    if path / "glucose.db" not in path.glob("*"):
 
         db = DatabaseManager("glucose.db")
 
-        data_iter, data_noniter = divide.divide_by_iterable(ripple_list[0])
+        data_dict, data_noniter = divide.divide_by_iterable(data=ripple_list[0])
         db.create_table_if_not_exists("BASIC_DATA_SUMMARY", data_noniter)
 
-        simplified_data_iter = m.get_name_and_type(data_iter)
+        simplified_data_iter = data_reconfig.get_name_and_type(data_dict=data_dict)
         simplified_data_iter.setdefault("ID_ripple", 0)
 
         name_of_individual = "_BASIC_RAW_DATA"
         db.create_table_if_not_exists(name_of_individual, simplified_data_iter)
 
         for item in ripple_list:
-            data_iter, data_noniter = divide.divide_by_iterable(item)
+            data_dict, data_noniter = divide.divide_by_iterable(data=item)
             _id = db.add("BASIC_DATA_SUMMARY", data_noniter)
 
-            for i in range(len(list(data_iter.values())[0])):
-                simplified_data_iter_row = m.get_name_and_value(data_iter, i)
+            for index in range(len(list(data_dict.values())[0])):
+                simplified_data_iter_row = data_reconfig.get_name_and_value(data_iter=data_dict, index=index)
                 simplified_data_iter_row.setdefault("ID_ripple", _id)
                 db.add(name_of_individual, simplified_data_iter_row)
 
@@ -107,8 +105,8 @@ def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], p: Path,
         return db
 
 
-def _create_analysis_database(ripple_connections: t.List[t.List[t.Tuple[float, int, int]]], p: Path,
-                              m: Modify) -> DatabaseManager:
+def _create_analysis_database(ripple_connections: t.List[t.List[t.Tuple[float, int, int]]], path: Path) \
+        -> DatabaseManager:
     """
     Creates a database of ripple analysis
 
@@ -121,17 +119,17 @@ def _create_analysis_database(ripple_connections: t.List[t.List[t.Tuple[float, i
         for item in element:
             ripple_connections_values.append(item)
 
-    temp = m.convert_from_tuple_list_to_dict(ripple_connections_values, key_list)
-    simplified_data = m.get_name_and_type(temp)
+    temp = data_reconfig.convert_from_tuple_list_to_dict(input_list=ripple_connections_values, key_list=key_list)
+    simplified_data = data_reconfig.get_name_and_type(temp)
 
-    if p / "glucose_analysis.db" not in p.glob("*"):
+    if path / "glucose_analysis.db" not in path.glob("*"):
 
         db = DatabaseManager("glucose_analysis.db")
         name_of_individual = "_PATTERN_ANALYSIS_RAW_DATA"
         db.create_table_if_not_exists(name_of_individual, simplified_data)
 
-        for i in range(len(list(temp.values())[0])):
-            simplified_data_iter_row = m.get_name_and_value(temp, i)
+        for index in range(len(list(temp.values())[0])):
+            simplified_data_iter_row = data_reconfig.get_name_and_value(data_iter=temp, index=i)
             db.add(name_of_individual, simplified_data_iter_row)
 
         return db
