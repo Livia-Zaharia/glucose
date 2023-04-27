@@ -154,25 +154,32 @@ class Divide:
 
         return r_temp
 
-    def divide_by_iterable(self, data: Ripple) -> t.Tuple[dict, dict]:
+    @staticmethod
+    def divide_by_iterable(data: Ripple) -> t.Tuple[dict, dict]:
         """
-        Method that splits any given ripple into dictionaries of iterable and respectively non iterable elements
+        Method that splits any given ripple into dictionaries of iterable and
+        non-iterable elements.
         """
+        # Create a deep copy of the original data dictionary to preserve input data.
+        data_dict = copy.deepcopy(dict(vars(data)))
 
-        to_be_processed = copy.deepcopy(dict(vars(data)))
-        data_iter = copy.deepcopy(to_be_processed)
-        data_noniter = copy.deepcopy(to_be_processed)
+        # Initialize dictionaries to store iterable and non-iterable items.
+        data_iter = {}
+        data_noniter = {}
 
-        for item in list(to_be_processed.keys()):
-
+        # Iterate through the keys of the data dictionary.
+        for item in data_dict.keys():
             try:
-                iter(to_be_processed[item])
+                # Check if the item is iterable.
+                iter(data_dict[item])
             except TypeError:
-                data_iter.pop(item)
+                # If not iterable, add the item to the non-iterable dictionary.
+                data_noniter[item] = data_dict[item]
             else:
-                data_noniter.pop(item)
+                # If iterable, add the item to the iterable dictionary.
+                data_iter[item] = data_dict[item]
 
-        return (data_iter, data_noniter)
+        return data_iter, data_noniter
 
     def split_insulin_by_ripple(self, ripple_list: t.List[Ripple]) -> t.List[t.List[t.Tuple[datetime, str, float]]]:
         """
