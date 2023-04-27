@@ -131,27 +131,28 @@ class Divide:
 
     def generate_ripples(self, trend_list: t.List[int], trend_list_count: t.List[int]) -> t.List[Ripple]:
         """
-        Method that creates a list of ripple class and loads all the data into each element.
+        Method that creates a list of Ripple instances and loads all the data into each element.
         Uses the method add_values() from class Ripple.
-        
         """
-        ripple_list = []
-        j = 0
-
-        for x in trend_list_count:
-            r_temp = Ripple()
-
-            bg: pd.DataFrame = self.glucose.iloc[j:j + x, 1]
-            time: pd.DataFrame = self.glucose.iloc[j:j + x, 0]
-            trend = trend_list[j:j + x]
-
-            r_temp.add_values(bg_value=bg, time_value=time, trend_value=trend)
-
-            ripple_list.append(r_temp)
-
-            j += x
+        ripple_list = [
+            self.create_ripple(j, x, trend_list)
+            for j, x in enumerate(trend_list_count)
+        ]
 
         return ripple_list
+
+    def create_ripple(self, j: int, x: int, trend_list: t.List[int]) -> Ripple:
+        r_temp = Ripple()
+
+        # Extract relevant data slices
+        bg = self.glucose.iloc[j:j + x, 1]
+        time = self.glucose.iloc[j:j + x, 0]
+        trend = trend_list[j:j + x]
+
+        # Add values to the Ripple instance
+        r_temp.add_values(bg_value=bg, time_value=time, trend_value=trend)
+
+        return r_temp
 
     def divide_by_iterable(self, data: Ripple) -> t.Tuple[dict, dict]:
         """
