@@ -16,6 +16,51 @@ class Analyze:
     def __init__(self, r_list: t.List[Ripple]):
         self.r_list = r_list
 
+    def _compare_ripple_items(self, ripple1: Ripple, ripple2: Ripple) -> t.Tuple[float, float]:
+        """
+        Compare two Ripple items and return their percentages of close values.
+        """
+        common_interval, close_value_count = self._compare_two_graphs(ripple1, ripple2)
+
+        if close_value_count != 0:
+            percent_ripple1 = round(close_value_count / len(ripple1.normalized_graph), 2)
+            percent_ripple2 = round(close_value_count / len(ripple2.normalized_graph), 2)
+            return percent_ripple1, percent_ripple2
+        return 0, 0
+
+    def _compare_ripple_pairs(self, index1: int, ripple1: Ripple, index2: int, ripple2: Ripple,
+                              connections: t.List[t.List[t.Tuple[float, int, int]]]) -> None:
+        """
+        Compare a pair of Ripple items and update the connections list accordingly.
+        """
+        percent_ripple1, percent_ripple2 = self._compare_ripple_items(ripple1, ripple2)
+
+        if percent_ripple1 != 0 and percent_ripple2 != 0:
+            connections[index1].append((percent_ripple1, index1, index2))
+            connections[index2].append((percent_ripple2, index2, index1))
+
+    def compare_graphs(self) -> t.List[t.List[t.Tuple[float, int, int]]]:
+        """
+        Method that compares two graphs by taking each graph and comparing it to all the other graphs in the ripple_list.
+        It returns a list [with as many lists as there are elements in ripple_list[each of which contain a list of
+        tuples(percentage, origin and comparison) that have not null values]]
+        """
+        # Initialize connections list with empty lists.
+        connections = [[] for _ in self.ripple_list]
+
+        # Generate all unique pairs of indices in ripple_list.
+        pairs = [(i, j) for i in range(len(self.ripple_list)) for j in range(i + 1, len(self.ripple_list))]
+
+        # Iterate through each unique pair of indices and compare the corresponding Ripple items.
+        for index1, index2 in pairs:
+            self._compare_ripple_pairs(index1, self.ripple_list[index1], index2, self.ripple_list[index2], connections)
+
+        # Sort each list of tuples in connections.
+        for item in connections:
+            item.sort()
+
+        return connections
+
     @staticmethod
     def _compare_two_graphs(ripple_a: Ripple, ripple_b: Ripple) -> t.Tuple[int, int]:
         """
@@ -83,35 +128,7 @@ class Analyze:
 
         return len(compare_a), sum_of_elements
 
-    def compare_graphs(self) -> t.List[t.List[t.Tuple[float, int, int]]]:
-        """
-        Method that compares two graphs by taking each graph and comparing it to all the other graphs in the r-List.
-        It returns a list [with as many list as there are elements in ripple_list[each of witch contain a list of
-        tuples(percentage, origin and comparison) that have not null values]]
-        """
-        ripple_connections = []
 
-        for _ in self.r_list:
-            ripple_connections.append([])
-
-        for search_item in self.r_list:
-
-            for compare_item in self.r_list[self.r_list.index(search_item) + 1:]:
-                common_interval, are_close_values = self._compare_two_graphs(search_item, compare_item)
-
-                if are_close_values != 0:
-                    percent_search_value = round(are_close_values / len(search_item.normalized_graph), 2)
-                    percent_compare_value = round(are_close_values / len(compare_item.normalized_graph), 2)
-
-                    ripple_connections[self.r_list.index(search_item)].append(
-                        (percent_search_value, self.r_list.index(search_item), self.r_list.index(compare_item)))
-                    ripple_connections[self.r_list.index(compare_item)].append(
-                        (percent_compare_value, self.r_list.index(compare_item), self.r_list.index(search_item)))
-
-        for item in ripple_connections:
-            item.sort()
-
-        return ripple_connections
 
     @staticmethod
     def round_to_multiple(number: float, multiple: float) -> float:
