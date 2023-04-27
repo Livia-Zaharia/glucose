@@ -63,8 +63,6 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager):
         if event == "Exit" or event == sg.WIN_CLOSED:
             break
 
-        # Set index to default 0
-        index = 0
         # If the event is "Go", create the graphic for the selected Ripple
         if event == "Go":
             index = int(values["-IN-"])
