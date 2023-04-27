@@ -22,8 +22,8 @@ IMAGES_PATH = CURRENT_PATH_CWD / "images_and_graphs"
 def main():
     file_location = select_file()
 
-    glucose = data_acquisition.get_data(file_location)
-    insulin = data_acquisition.get_insulin(file_location)
+    glucose = data_acquisition.get_glucose_data(file_name=file_location)
+    insulin = data_acquisition.get_insulin_data(file_name=file_location)
     write_a_message("FILE ACQUIRED")
 
     d = Divide(glucose, insulin)

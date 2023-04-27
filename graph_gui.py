@@ -55,7 +55,7 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager):
         if event == "Exit" or event == sg.WIN_CLOSED:
             break
 
-        no = 0
+        # no = 0
 
         if event == "Go":
             no = int(values["-IN-"])
@@ -71,7 +71,7 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager):
 
             window.start_thread(
                 lambda: (
-                    db.select_and_write_to_xls_file(str(name.absolute()), "_BASIC_RAW_DATA", {"ID_ripple": str(no)})
+                    db.select_and_write_to_xls_file(name, "_BASIC_RAW_DATA", {"ID_ripple": str(no)})
                 ),
                 '-OPERATION2 DONE-'
             )
