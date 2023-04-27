@@ -55,7 +55,7 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager):
         if event == "Exit" or event == sg.WIN_CLOSED:
             break
 
-        no = 0
+        # no = 0
 
         if event == "Go":
             no = int(values["-IN-"])
