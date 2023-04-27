@@ -25,7 +25,7 @@ def write_a_message(text: str):
 
     while True:
         # Read events and values from the window
-        event, values = window.read(timeout=5000)
+        event, values = window.read(timeout=3000)
 
         # If the event is "Exit" or the window is closed, break the loop
         if event == "Exit" or event == sg.WIN_CLOSED:
@@ -46,9 +46,11 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager):
             [
                 sg.Text("Number of element", font=('Arial Bold', 20), expand_x=True, justification='center'),
                 sg.In(key="-IN-"),
-                sg.Text(key="-OUT-")
+                sg.Text("                   ",key="-OUT-")
             ],
-            sg.Button("Go")
+            [sg.Button("-CREATE ONE-"),
+             sg.Button("-CREATE ALL-")
+            ]
         ]
     ]
 
@@ -63,20 +65,20 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager):
         if event == "Exit" or event == sg.WIN_CLOSED:
             break
 
-        # If the event is "Go", create the graphic for the selected Ripple
-        if event == "Go":
+        # If the event is "-CREATE ONE-", create the graphic and the excel for the selected Ripple
+        if event == "-CREATE ONE-":
             index = int(values["-IN-"])
             current_ripple = ripple_list[index]
-            window.start_thread(
-                lambda: current_ripple.create_graphic(index=index, should_write_html=True, data_path=IMAGES_PATH),
-                '-OPERATION1 DONE-')
-
-        # If the operation of creating the graphic is done, update the output text and write data to an Excel file
-        elif event == "-OPERATION1 DONE-":
-            window["-OUT-"].update(f"{index} was written")
-
+            
             data_path = IMAGES_PATH / f"Ripple_no{index}"
             data_path.mkdir(parents=True, exist_ok=True)
+
+            window.start_thread(
+                lambda: current_ripple.create_graphic(index=index, should_write_html=True, data_path=data_path),
+                '-OPERATION1 DONE-')
+            
+            window["-OUT-"].update(f"{index} was written")
+
             name = data_path / f"_BASIC_RAW_DATA_{index}.xlsx"
 
             window.start_thread(
@@ -86,6 +88,33 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager):
                 '-OPERATION2 DONE-'
             )
 
+        # If the event is "-CREATE ALL-", create the graphic and the excel for ALL the Ripples
+        elif event == "-CREATE ALL-":
+            for index in range (len(ripple_list)):
+                current_ripple = ripple_list[index]
+
+               
+                data_path = IMAGES_PATH / f"Ripple_no{index}"
+                data_path.mkdir(parents=True, exist_ok=True) 
+                
+                window.start_thread(
+                lambda: current_ripple.create_graphic(index=index, should_write_html=True, data_path=data_path),
+                '-OPERATION3 DONE-')
+
+                window["-OUT-"].update(f"{index} was written")
+
+                name = data_path / f"_BASIC_RAW_DATA_{index}.xlsx"
+
+                window.start_thread(
+                lambda: (
+                    db.select_and_write_to_xls_file(str(name), "_BASIC_RAW_DATA", {"ID_ripple": str(index)})
+                        ),
+                '-OPERATION4 DONE-'
+                )
+                             
+            break
+
+
     # Close the window
     window.close()
 
@@ -94,10 +123,10 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager):
 def select_file() -> str:
     # Define the layout for the file selection window
     layout = [
-        [sg.Text('Select a file', font=('Arial Bold', 20), expand_x=True, justification='center')],
+        [sg.Text('Select a csv file', font=('Arial Bold', 20), expand_x=True, justification='center')],
         [
             sg.Input(enable_events=True, key='-IN-', font=('Arial Bold', 12), expand_x=True),
-            sg.FileBrowse("select")
+            sg.FileBrowse("select",file_types=(("CSV files","*.csv"),))
         ]
     ]
     # Create a window with the defined layout and size

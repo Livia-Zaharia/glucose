@@ -41,19 +41,13 @@ def main():
 
     a = Analyze(ripple_list)
     """
-    Because probably i'll edit it later-logica care urmeaza
-    data_analysis si clasa analyze se vor tansforma un pic- cam in echivalentul ui ripple pentru analize
-    adica pe langa metodele atasate clasei vor aparea valori declarate si stocate in analyze- rezultate de teste de analiza pe care 
-    sa le poti chema apoi in calup.
     nu pot fi stocate in ripple pentru ca ele vorbesc de relatia obiectului ripple cu o grupare de alte rippleuri care normal, nu exist ain interiorul sau
     deci ca modificari vom avea un analized list in care pentru fiecare ripple de la 0-409 vom avea- lista cu asemanari grafice cu celelalte 409 valori,
     max de asemanare grafica, analiza de insulina locala- daca ai injectii la ce distanta de maxim esti- in cat timp a coborat, daca sunt multiple injectii ce se intampla in interval,
     lista cu asemanari cu valorile de insulina, maximul de asemanare cu valorile de insulina, incadrare la o categorie de timp,
     iar fiecare din aceste asemanari va da un procent pentru a putea spune cat % se asemeaman situatiile in ce parametrii
 
-    cam asta mai e de modificat- dar pana la punctul asta e stabil
-    also ca criteriu general sa ii fac scoatere totala- adica daca am chef sa astept sa le scot toate datele si pngurile automat- adica mai trebuie un buton
-    si ca idee de baza the primary key cu care se invart toate e pozitia in lista de ripple- dupa ce sunt segmentate totul se cauta de acolo- pe secventa aia   
+    also ca criteriu general sa ii fac scoatere totala- adica daca am chef sa astept sa le scot toate datele si pngurile automat- adica mai trebuie un buton  
     """
     # analized_list=[]
     ripple_connections = a.compare_graphs()
