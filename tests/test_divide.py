@@ -17,7 +17,7 @@ def sample_data():
 
 @pytest.fixture
 def trend_list():
-    return [10, 10]
+    return [10, 10, 0]
 
 
 @pytest.fixture
