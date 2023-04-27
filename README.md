@@ -44,4 +44,6 @@ As output it has a database containg the values divided according to the inheren
 ### 5.PySimpleGui
 `python pip -m install pysimplegui`
 
-
+#
+### 6. pytest
+`pip install pytest`
