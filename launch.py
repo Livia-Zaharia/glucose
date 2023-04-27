@@ -129,7 +129,7 @@ def _create_analysis_database(ripple_connections: t.List[t.List[t.Tuple[float, i
         db.create_table_if_not_exists(name_of_individual, simplified_data)
 
         for index in range(len(list(temp.values())[0])):
-            simplified_data_iter_row = data_reconfig.get_name_and_value(data_iter=temp, index=i)
+            simplified_data_iter_row = data_reconfig.get_name_and_value(data_iter=temp, index=index)
             db.add(name_of_individual, simplified_data_iter_row)
 
         return db
