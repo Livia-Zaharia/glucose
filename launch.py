@@ -39,7 +39,7 @@ def main():
     db = _create_basic_database(divide=d, ripple_list=ripple_list, path=CURRENT_PATH_CWD)
     write_a_message("BASIC DATABASE CREATED")
 
-    a = Analyze(ripple_list)
+    a = Analyze(ripple_list=ripple_list)
     """
     Because probably i'll edit it later-logica care urmeaza
     data_analysis si clasa analyze se vor tansforma un pic- cam in echivalentul ui ripple pentru analize

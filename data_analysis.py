@@ -13,8 +13,8 @@ class Analyze:
     Class that contains methods for analysis
     """
 
-    def __init__(self, r_list: t.List[Ripple]):
-        self.r_list = r_list
+    def __init__(self, ripple_list: t.List[Ripple]):
+        self.ripple_list = ripple_list
 
     def _compare_ripple_items(self, ripple1: Ripple, ripple2: Ripple) -> t.Tuple[float, float]:
         """
@@ -41,9 +41,9 @@ class Analyze:
 
     def compare_graphs(self) -> t.List[t.List[t.Tuple[float, int, int]]]:
         """
-        Method that compares two graphs by taking each graph and comparing it to all the other graphs in the ripple_list.
-        It returns a list [with as many lists as there are elements in ripple_list[each of which contain a list of
-        tuples(percentage, origin and comparison) that have not null values]]
+        Method that compares two graphs by taking each graph and comparing it to all the other graphs in the
+        ripple_list. It returns a list [with as many lists as there are elements in ripple_list[each of which contain
+        a list of tuples(percentage, origin and comparison) that have not null values]]
         """
         # Initialize connections list with empty lists.
         connections = [[] for _ in self.ripple_list]
@@ -128,8 +128,6 @@ class Analyze:
 
         return len(compare_a), sum_of_elements
 
-
-
     @staticmethod
     def round_to_multiple(number: float, multiple: float) -> float:
         """
@@ -143,7 +141,7 @@ class Analyze:
         Method for comparing duration.It returns a list with all unique duration in hours
         """
         time_list = []
-        for item in self.r_list:
+        for item in self.ripple_list:
             time = item.duration_v.total_seconds()
             time = self.round_to_multiple(time, 3600)
             time_list.append(time / 3600)
