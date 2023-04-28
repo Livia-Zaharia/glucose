@@ -32,7 +32,6 @@ class Analyze:
             connections[index1].append((percent_ripple1, index1, index2))
             connections[index2].append((percent_ripple2, index2, index1))
 
-
     def compare_graphs(self) -> t.List[t.List[t.Tuple[float, int, int]]]:
         """
         Method that compares two graphs by taking each graph and comparing it to all the other graphs in the
@@ -48,8 +47,6 @@ class Analyze:
         # Iterate through each unique pair of indices and compare the corresponding Ripple items.
         for index1, index2 in pairs:
             self._compare_ripple_pairs(index1, self.ripple_list[index1], index2, self.ripple_list[index2], connections)
-            print("SOMETHING")
-            print (len(connections))
 
         # Sort each list of tuples in connections.
         for item in connections:
@@ -110,7 +107,6 @@ class Analyze:
 
         return len(compare_a), sum_of_elements
 
-
     @staticmethod
     def round_to_multiple(number: float, multiple: float) -> float:
         """
@@ -123,7 +119,6 @@ class Analyze:
         Method for comparing duration.It returns a list with all unique duration in hours
         """
         time_list = []
-      
         for item in self.ripple_list:
             time = item.duration_v.total_seconds()
             time = self.round_to_multiple(time, 3600)

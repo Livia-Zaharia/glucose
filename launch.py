@@ -39,7 +39,7 @@ def main():
     db = _create_basic_database(divide=d, ripple_list=ripple_list, path=CURRENT_PATH_CWD)
     write_a_message("BASIC DATABASE CREATED")
 
-    a = Analyze(ripple_list)
+    a = Analyze(ripple_list=ripple_list)
     """
     nu pot fi stocate in ripple pentru ca ele vorbesc de relatia obiectului ripple cu o grupare de alte rippleuri care normal, nu exist ain interiorul sau
     deci ca modificari vom avea un analized list in care pentru fiecare ripple de la 0-409 vom avea- lista cu asemanari grafice cu celelalte 409 valori,
