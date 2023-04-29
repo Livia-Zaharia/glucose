@@ -243,6 +243,8 @@ class Divide:
             for i in range(len(ripple_list)) 
         ]
 
+        return ripple_stats_list
+
     def _create_ripple_stats(self, index: int, ripple_list: t.List[Ripple], ripple_connections: t.List[t.List[t.Tuple[float, int, int]]], time_list:t.List[float], insulin_list:t.List[t.List[t.Tuple[datetime, str, float]]]) -> Ripple_stats:
         r_stat_temp= Ripple_stats(ripple_list[index])
 

@@ -28,15 +28,15 @@ class Ripple_stats:
 
     def add_values(self, index:int, slow_insulin_seq, fast_insulin_seq,ripple_list:t.List[Ripple], ripple_connections:t.List[t.List[t.Tuple[float, int, int]]], time_list:t.List[float]):
         self.max_graph_similarity=ripple_connections[index][-1]
-        self.duration_category=rm(ripple_list[index].duration_v.total_seconds(),3600)
+        self.duration_category=(rm(self.base.duration_v.total_seconds(),3600))/3600
 
         self.slow_insulin_seq=slow_insulin_seq
-        if len(self.slow_insulin_seq)!=0:
-            self.slow_insulin_exists==True
+        if self.slow_insulin_seq:
+            self.slow_insulin_exists=True
 
         self.fast_insulin_seq=fast_insulin_seq
-        if len(self.fast_insulin_seq)!=0:
-            self.fast_insulin_exists==True
+        if self.fast_insulin_seq:
+            self.fast_insulin_exists=True
 
         self._check_duration_category(time_list)
 
