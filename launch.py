@@ -33,25 +33,17 @@ def main():
     trend_list_count = d.parting(trend_list, threshold)
 
     ripple_list = d.generate_ripples(trend_list, trend_list_count)
-    insulin_list = d.split_insulin_by_ripple(ripple_list)
     write_a_message("FILE DIVIDED")
 
     db = _create_basic_database(divide=d, ripple_list=ripple_list, path=CURRENT_PATH_CWD)
     write_a_message("BASIC DATABASE CREATED")
 
     a = Analyze(ripple_list=ripple_list)
-    """
-    nu pot fi stocate in ripple pentru ca ele vorbesc de relatia obiectului ripple cu o grupare de alte rippleuri care normal, nu exist ain interiorul sau
-    deci ca modificari vom avea un analized list in care pentru fiecare ripple de la 0-409 vom avea- lista cu asemanari grafice cu celelalte 409 valori,
-    max de asemanare grafica, analiza de insulina locala- daca ai injectii la ce distanta de maxim esti- in cat timp a coborat, daca sunt multiple injectii ce se intampla in interval,
-    lista cu asemanari cu valorile de insulina, maximul de asemanare cu valorile de insulina, incadrare la o categorie de timp,
-    iar fiecare din aceste asemanari va da un procent pentru a putea spune cat % se asemeaman situatiile in ce parametrii
-
-    also ca criteriu general sa ii fac scoatere totala- adica daca am chef sa astept sa le scot toate datele si pngurile automat- adica mai trebuie un buton  
-    """
-    # analized_list=[]
+    
     ripple_connections = a.compare_graphs()
     time_list = a.compare_duration()
+
+    ripple_stat_list=d.generate_ripple_statistics(ripple_list,ripple_connections,time_list)
 
     db_a = _create_analysis_database(ripple_connections=ripple_connections, path=CURRENT_PATH_CWD)
     write_a_message("ANALYSIS DATABASE CREATED")

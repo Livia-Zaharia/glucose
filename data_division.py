@@ -9,6 +9,7 @@ from datetime import datetime
 import pandas as pd
 
 from ripple import Ripple
+from data_statistic import Ripple_stats
 
 
 class Divide:
@@ -135,13 +136,13 @@ class Divide:
         Uses the method add_values() from class Ripple.
         """
         ripple_list = [
-            self.create_ripple(j, x, trend_list)
+            self._create_ripple(j, x, trend_list)
             for j, x in enumerate(trend_list_count)
         ]
 
         return ripple_list
 
-    def create_ripple(self, j: int, x: int, trend_list: t.List[int]) -> Ripple:
+    def _create_ripple(self, j: int, x: int, trend_list: t.List[int]) -> Ripple:
         r_temp = Ripple()
 
         # Extract relevant data slices
@@ -182,7 +183,7 @@ class Divide:
 
         return data_iter, data_noniter
 
-    def split_insulin_by_ripple(self, ripple_list: t.List[Ripple]) -> t.List[t.List[t.Tuple[datetime, str, float]]]:
+    def _split_insulin_by_ripple(self, ripple_list: t.List[Ripple]) -> t.List[t.List[t.Tuple[datetime, str, float]]]:
         """
         Method that splits the insulin dataframe stored into a list of n lists (the length of the ripple list received) with tuples
         structured as (timestamp, type of insulin, dosage).
@@ -207,3 +208,47 @@ class Divide:
             insulin_storage.append(insulin_list)
 
         return insulin_storage
+    
+    @staticmethod
+    def _divide_by_fast_or_slow_insulin(single_ripple_insulin:t.List[t.Tuple[datetime, str, float]] ) -> t.Tuple[t.List, t.List]:
+            """
+            Method that splits any given single ripple insulin list
+            into separate list for Fast-Acting and Long-Acting insulin
+
+            """
+
+            # Initialize lists to store fast acting and slow acting items.
+            slow_insulin_seq=[]
+            fast_insulin_seq=[]
+
+            # Iterate through the list
+            for item in single_ripple_insulin:
+                if item[1] == "Fast-Acting":
+                    fast_insulin_seq.append(item)
+                else:
+                    slow_insulin_seq.append(item)
+
+            return  slow_insulin_seq, fast_insulin_seq
+    
+    def generate_ripple_statistics(self, ripple_list: t.List[Ripple], ripple_connections: t.List[t.List[t.Tuple[float, int, int]]], time_list:t.List[float]) -> t.List[Ripple_stats]:
+        """
+        Method that generates the ripple statistic list- a list where, for each ripple element
+        you have the statistics related to it in relation to other ripples and itself
+        """
+
+        insulin_list=self._split_insulin_by_ripple(ripple_list)
+
+        ripple_stats_list=[
+            self._create_ripple_stats(i,ripple_list, ripple_connections, time_list,insulin_list)
+            for i in range(len(ripple_list)) 
+        ]
+
+    def _create_ripple_stats(self, index: int, ripple_list: t.List[Ripple], ripple_connections: t.List[t.List[t.Tuple[float, int, int]]], time_list:t.List[float], insulin_list:t.List[t.List[t.Tuple[datetime, str, float]]]) -> Ripple_stats:
+        r_stat_temp= Ripple_stats(ripple_list[index])
+
+        slow_insulin_seq, fast_insulin_seq=self._divide_by_fast_or_slow_insulin(insulin_list[index])
+    
+        r_stat_temp.add_values(index, slow_insulin_seq, fast_insulin_seq, ripple_list,ripple_connections, time_list)
+
+        return r_stat_temp
+        

@@ -1,6 +1,14 @@
 import math
 import typing as t
 from ripple import Ripple
+
+def round_to_multiple(number: float, multiple: float) -> float:
+        """
+        Simple method of rounding up to a set value
+        
+        """
+        return multiple * round(number / multiple)
+
 class Analyze:
     """
     Class that contains methods for analysis
@@ -107,23 +115,16 @@ class Analyze:
 
         return len(compare_a), sum_of_elements
 
-    @staticmethod
-    def round_to_multiple(number: float, multiple: float) -> float:
-        """
-        Simple method of rounding up to a set value
-        
-        """
-        return multiple * round(number / multiple)
     def compare_duration(self) -> t.List[float]:
         """
-        Method for comparing duration.It returns a list with all unique duration in hours
+        Method for comparing duration.It returns a list with all duration in hours
         """
         time_list = []
         for item in self.ripple_list:
             time = item.duration_v.total_seconds()
-            time = self.round_to_multiple(time, 3600)
+            time = round_to_multiple(time, 3600)
             time_list.append(time / 3600)
-        time_list.sort()
-        time_list = set(time_list)
-        time_list = list(time_list)
+        # time_list.sort()
+        # time_list = set(time_list)
+        # time_list = list(time_list)
         return time_list
