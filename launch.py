@@ -45,8 +45,8 @@ def main():
 
     ripple_stat_list=d.generate_ripple_statistics(ripple_list,ripple_connections,time_list)
     for elem in ripple_stat_list:
-        print(vars(elem))
-        print("*"*50)
+         print(vars(elem))
+         print("*"*50)
 
     db_a = _create_analysis_database(ripple_connections=ripple_connections, path=CURRENT_PATH_CWD)
     write_a_message("ANALYSIS DATABASE CREATED")
