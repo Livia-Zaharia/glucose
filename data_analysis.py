@@ -69,23 +69,49 @@ class Analyze:
         graphs starting from the max in normalized form. Then it returns a tuple having (total length compared,
         number of items in that comparison that are relatively close in value to each other)
         """
+
+        #start indexes of ripple A and ripple B- index- as in list[index]
+        #we are going to use list positioning to go through the values
         start_a_index = 0
         start_b_index = 0
+        
         flag = 0
+
+        #max value index for ripple A and B
         max_a_index = ripple_a.max_index
         max_b_index = ripple_b.max_index
+        
+        #end index for ripple A and B
         end_a_index = len(ripple_a.normalized_graph) - 1
         end_b_index = len(ripple_b.normalized_graph) - 1
+        
+        #select which ripple is longer in absolute values
+        #if ripple A is longer then flag=1
+        #if ripple B is longer then flag=2
         if end_a_index > end_b_index:
             flag = 1
         elif end_a_index < end_b_index:
             flag = 2
+        
+        #case 1- when maximum value is placed at the begining of the graph
+        #in this case we must choose which ripple is longer using (flag)
+        #and to trim the graph according to who is longer
+        #trimming= setting the values of start and end of the ripples in such way that both
+        #ripple slices have the same length according to the indexes they came in with
         if max_a_index == 0 and max_b_index == 0:
+            
+            #since ripple A is longer then the end of ripple A will take the
+            #same index as that of ripple B or the opposite in the else
             if flag == 1:
                 end_a_index = end_b_index
             elif flag == 2:
                 end_b_index = end_a_index
+
+        #case 2 -when maximum value is placed at the end of the graph
+        #in this case the index is not directly edited        
         elif max_a_index == end_a_index and max_b_index == end_b_index:
+            
+            
             if flag == 1:
                 start_a_index = end_a_index - end_b_index
             elif flag == 2:

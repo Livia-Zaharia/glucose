@@ -57,29 +57,45 @@ class Divide:
         """
         Method that divides the values based on trend that changes sign- 
         after we have the trend list we can easily break the whole data into sequences.
-
+        It has an input of trend list- a list of trends (deltas between the current value and the next, 
+        with sign to know if it increasease ore decreases) and a threshold, a limit of variation to consider as a change. Basically 
+        the minimum value increment for a change min values to consider a change.
+        
         """
-
+        #the list that is going to be an output- list of items that represent the number of elements in a ripple
         trend_list_count = []
 
+        #keeps track of the number that is going to be inserted in the list
         count = 0
+        #how many positive or negatives values were counted till a certain point
         count_positive = 0
         count_negative = 0
         k = 0
 
+        #keeps track of change in sign-if it increments up to two
+        #it means we had two sign changes so if all the other conditions were satisfied we can append
         switch = 0
 
+        #values of average of the trend- it will be compared with 
+        # threshold so that you can round(or not) the values- like take into account only differences more than 5 units 
         positive_trend = 0
         negative_trend = 0
 
+        #previous values of trends
         positive_trend_prev = 0
         negative_trend_prev = 0
 
         while k < len(self.glucose):
 
+            #starts with the first trend in the list
             a_n = trend_list[k]
 
+            #checks if it enters the branch with positive
             if a_n >= 0 and k < len(self.glucose):
+
+                #while trends are positive continue to count how many they are(count_positive)
+                #how many passes or general index (k)
+                #and do a mass addition of the trend(positive_trend)
 
                 while a_n >= 0 and k < len(self.glucose) - 1:
                     count_positive += 1
@@ -89,10 +105,17 @@ class Divide:
                     a_n = trend_list[k]
                     count += 1
 
+                #at the end we do the trend average (rewritten positive trend)
+                #and we record we passed through a phase (the positive)
                 positive_trend = positive_trend / count_positive
                 switch += 1
 
+            #checks if it will enter the branch with negative
             elif a_n < 0 and k < len(self.glucose):
+
+                #while trends are negative continue to count how many they are(count_negative)
+                #how many passes or general index-incremented since before (k)
+                #and do a mass addition of the trend(negative_trend)
 
                 while a_n < 0 and k < len(self.glucose) - 1:
                     count_negative += 1
@@ -102,15 +125,26 @@ class Divide:
                     a_n = trend_list[k]
                     count += 1
 
+                #at the end we do the trend average (rewritten negative trend)
+                #and we record we passed through a phase (the negative)
                 negative_trend = negative_trend / count_negative
                 negative_trend = negative_trend * (-1)
                 switch += 1
-
+            
+            #check if we had two changes of signs and at least 50 items
+            #then we can partition, else do all of the above again until
+            #  you fulfill these first criterias
             if switch >= 2 and count > 50:
 
+                #values are reintialized to be used in the next loop
                 count_positive = 0
                 count_negative = 0
 
+                #checks the second criterion, that the curves are not too flat
+                #because since threshold is 1, not to pass this condition means that the variation was so low
+                # (under 1), that it can be considered a flat liner. It checks positive trend and negative 
+                # trend for the case where switch is 2 and the rest is for the cases where extra switches are needed to meet the first criteria
+                
                 if (positive_trend >= threshold and
                     negative_trend >= threshold) or (positive_trend_prev >= threshold and
                                                      negative_trend >= threshold) or (positive_trend >= threshold and
