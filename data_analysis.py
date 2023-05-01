@@ -111,31 +111,54 @@ class Analyze:
         #in this case the index is not directly edited        
         elif max_a_index == end_a_index and max_b_index == end_b_index:
             
-            
+            #since ripple A is longer it is going to start from the difference between the two
+            #similar for ripple B longer
             if flag == 1:
                 start_a_index = end_a_index - end_b_index
             elif flag == 2:
                 start_b_index = end_b_index - end_a_index
+
+        #case 3- when maximum value is somwhere in the center for both ripple A and ripple B        
         elif max_a_index != 0 and max_b_index != 0 and max_a_index != end_a_index and max_b_index != end_b_index:
+            
+            #end part is the diference between the maximum value and the end for both ripples.
+            # At the end we need a common end part value to be added to the max value index
             end_part_a = end_a_index - max_a_index
             end_part_b = end_b_index - max_b_index
+            
+            #choosing the smaller end part because it will always be included in the longer one
             if end_part_a <= end_part_b:
                 end_part = end_part_a
             else:
                 end_part = end_part_b
+            
             if max_a_index <= max_b_index:
                 start_part = max_a_index
             else:
                 start_part = max_b_index
+            
+            #define the index of the split. considering we have a fixed value- max,
+            # everything we do will be in regards to it. so the interval will be defined
+            # as starting from max-the smallest start part and 
+            # ending in max +the smallest ending part
             start_a_index = max_a_index - start_part
             start_b_index = max_b_index - start_part
             end_a_index = max_a_index + end_part
             end_b_index = max_b_index + end_part
+        
+        #case 4- any other case means that the ripple are not comparable, for example having a ripple which starts with the max
+        #and another that ends with the max- they can have no common overlapping since the pivot value, the max, is in extremes
         else:
             return 0, 0
+        
+        #value that counts how many elements are similar
         sum_of_elements = 0
+        
+        #the actual splicing
         compare_a = ripple_a.normalized_graph[start_a_index:end_a_index]
         compare_b = ripple_b.normalized_graph[start_b_index:end_b_index]
+        
+        #the comparison element by element
         for x in range(len(compare_a)):
             sum_of_elements += int(math.isclose(compare_a[x], compare_b[x], rel_tol=0.05))
 
