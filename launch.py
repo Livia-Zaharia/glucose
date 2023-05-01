@@ -33,6 +33,11 @@ def main():
     trend_list_count = d.parting(trend_list, threshold)
 
     ripple_list = d.generate_ripples(trend_list, trend_list_count)
+    #to check if division was correct
+    # for no,item in enumerate (ripple_list[:10]):
+    #     print("for item {no}")
+    #     print(item.start_t)
+    #     print(item.end_t)
     write_a_message("FILE DIVIDED")
 
     db = _create_basic_database(divide=d, ripple_list=ripple_list, path=CURRENT_PATH_CWD)
@@ -44,10 +49,17 @@ def main():
     time_list = a.compare_duration()
 
     ripple_stat_list=d.generate_ripple_statistics(ripple_list,ripple_connections,time_list)
-    for elem in ripple_stat_list:
-         print(vars(elem))
-         print("*"*50)
+    # for elem in ripple_stat_list:
+    #      v=vars(elem)
+    #      print(v["fast_insulin_seq"])
+    #      print("?"*25)
+    #      if v["fast_insulin_seq"]:
+    #          for item in v["fast_insulin_seq"]:
+    #             print(type(item[0]))
+    #      print("*"*50)
 
+    # for item in ripple_list[:10]:
+    #     item.create_graphic(1,True,"1")
     db_a = _create_analysis_database(ripple_connections=ripple_connections, path=CURRENT_PATH_CWD)
     write_a_message("ANALYSIS DATABASE CREATED")
 

@@ -69,19 +69,30 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager):
         if event == "-CREATE ONE-":
             index = int(values["-IN-"])
             current_ripple = ripple_list[index]
+            # current_ripple_stat=ripple_stat_list[index]
+            # slow_insulin_seq=current_ripple_stat.slow_insulin_seq
+            # if slow_insulin_seq:
+            #     sl=slow_insulin_seq[0][0]
+            # else:
+            #     sl=False
+            # fast_insulin_seq=current_ripple_stat.fast_insulin_seq
+            # if fast_insulin_seq:
+            #     fw=fast_insulin_seq[0][0]
+            # else:
+            #     fw=False
             
             data_path = IMAGES_PATH / f"Ripple_no{index}"
             data_path.mkdir(parents=True, exist_ok=True)
 
-            window.start_thread(
-                lambda: current_ripple.create_graphic(index=index, should_write_html=True, data_path=data_path),
+            window.perform_long_operation(
+                lambda: current_ripple.create_graphic(index=index, should_write_html=True,data_path=data_path),
                 '-OPERATION1 DONE-')
             
             window["-OUT-"].update(f"{index} was written")
 
             name = data_path / f"_BASIC_RAW_DATA_{index}.xlsx"
 
-            window.start_thread(
+            window.perform_long_operation(
                 lambda: (
                     db.select_and_write_to_xls_file(str(name), "_BASIC_RAW_DATA", {"ID_ripple": str(index)})
                 ),
@@ -89,28 +100,31 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager):
             )
 
         # If the event is "-CREATE ALL-", create the graphic and the excel for ALL the Ripples
+        #use perform_long_operation rather than start thread since perform long operation also closes the thread
+       
         elif event == "-CREATE ALL-":
             for index in range (len(ripple_list)):
                 current_ripple = ripple_list[index]
-
-               
+            
                 data_path = IMAGES_PATH / f"Ripple_no{index}"
-                data_path.mkdir(parents=True, exist_ok=True) 
-                
-                window.start_thread(
-                lambda: current_ripple.create_graphic(index=index, should_write_html=True, data_path=data_path),
-                '-OPERATION3 DONE-')
+                data_path.mkdir(parents=True, exist_ok=True)
 
+                window.perform_long_operation(
+                    lambda: current_ripple.create_graphic(index=index, should_write_html=True,data_path=data_path),
+                    '-OPERATION3 DONE-'
+                    )
+            
                 window["-OUT-"].update(f"{index} was written")
 
                 name = data_path / f"_BASIC_RAW_DATA_{index}.xlsx"
 
-                window.start_thread(
-                lambda: (
-                    db.select_and_write_to_xls_file(str(name), "_BASIC_RAW_DATA", {"ID_ripple": str(index)})
-                        ),
-                '-OPERATION4 DONE-'
-                )
+                window.perform_long_operation(
+                    lambda: (
+                        db.select_and_write_to_xls_file(str(name), "_BASIC_RAW_DATA", {"ID_ripple": str(index)})
+                            ),
+                    '-OPERATION4 DONE-'
+                    )
+
                              
             break
 

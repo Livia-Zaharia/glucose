@@ -142,6 +142,8 @@ class Ripple:
             index: The index of the ripple used for naming the directory.
             should_write_html: If True, write the graph in HTML format; otherwise, write it in PNG format.
             data_path: The base path where the graph should be saved.
+            slow_insulin_seq: the list of slow insulin events formated as a list of tuples(timestamp, type, value)
+            fast_insulin_seq: the list of fast insulin events formated as a list of tuples (timestamp, type, value)
         """
         # Create the ripple graph using the class instance's data
         legend_values = self._compile_legend()
@@ -152,6 +154,13 @@ class Ripple:
         fig.add_hline(min(self.bg), line_width=1, line_dash="dash")
         fig.add_annotation(text="MIN", x=self.min_t, y=self.min_v)
         fig.add_annotation(text="MAX", x=self.max_t, y=self.max_v)
+        # if fast_insulin_seq:
+        #     # for elem in fast_insulin_seq:
+        #     fig.add_vline(fast_insulin_seq, line_width=2, line_dash="dash")
+        
+        # if slow_insulin_seq:
+        #     # for elem in slow_insulin_seq:
+        #     fig.add_vline(slow_insulin_seq, line_width=2, line_dash="dash")
         fig.add_vline(self.time_v.iat[len(self.time_v) - 1], line_width=1, line_dash="dash")
         fig.add_annotation(text=legend_values, x=self.time_v.iat[len(self.time_v) - 1], y=300, xanchor="left",
                            font=dict(family="Arial", size=11))
@@ -164,6 +173,7 @@ class Ripple:
         if should_write_html:
             ending_text = data_path / f"images{index}.html"
             fig.write_html(str(ending_text))
+
         else:
             ending_text = data_path / f"images{index}.png"
             fig.write_image(str(ending_text))

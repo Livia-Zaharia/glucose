@@ -130,7 +130,8 @@ class DatabaseManager:
         """
 
         result = self._execute(statement, column_values)
-        return result.lastrowid
+        #because the lastrow id will literally return the last- that means not 0 if it si first, but 1
+        return (result.lastrowid-1)
 
     def delete(self, table_name: str, criteria: t.Dict[str, str]) -> None:
         """

@@ -169,9 +169,22 @@ class Divide:
         Method that creates a list of Ripple instances and loads all the data into each element.
         Uses the method add_values() from class Ripple.
         """
+        
+        #here it is necessary to have that temp list because
+        # we are going incrementing by the elements we extract from trend list count
+        # so we have pairs of j,x (0,54)(54,56)(110,49) where trend list count was [54,56,49] that are going to slice as follows
+        #[0:54][54:110][110:160] and it works because the slicing doesn't take the last value inclusevly
+        
+        temp_list=[]
+        sum=0
+        for elem in trend_list_count:
+            temp_list.append((sum, elem))
+            sum+=elem
+
+
         ripple_list = [
             self._create_ripple(j, x, trend_list)
-            for j, x in enumerate(trend_list_count)
+            for (j,x) in temp_list
         ]
 
         return ripple_list
