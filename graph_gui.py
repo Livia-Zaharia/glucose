@@ -61,10 +61,6 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager, ripple_stat_li
     while True:
         # Read events and values from the window
         event, values = window.read()
-        print(event)
-        print("+++++")
-        print(values)
-        print("*****"*50)
 
         # If the event is "Exit" or the window is closed, break the loop
         if event == "Exit" or event == sg.WIN_CLOSED:
@@ -82,18 +78,15 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager, ripple_stat_li
             data_path = IMAGES_PATH / f"Ripple_no{index}"
             data_path.mkdir(parents=True, exist_ok=True)
 
-            print("before op1")
 
             window.perform_long_operation(
                 lambda: current_ripple.create_graphic(index=index, should_write_html=True,data_path=data_path, slow_insulin=slow_insulin_seq, fast_insulin=fast_insulin_seq),
                 '-OPERATION1 DONE-')
-            print(window.read())
-            print("after op1")
+
             
             window["-OUT-"].update(f"{index} was written")
 
             name = data_path / f"_BASIC_RAW_DATA_{index}.xlsx"
-            print("before op2")
 
             window.perform_long_operation(
                 lambda: (
@@ -101,7 +94,6 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager, ripple_stat_li
                 ),
                 '-OPERATION2 DONE-'
             )
-            print("after op2")
 
         # If the event is "-CREATE ALL-", create the graphic and the excel for ALL the Ripples
         #use perform_long_operation rather than start thread since perform long operation also closes the thread
@@ -122,11 +114,7 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager, ripple_stat_li
                     '-OPERATION3 DONE-'
                     )
                 event,values=window.read()
-                # print(window.read())
-                # print("after op3")
 
-                # if event == '-OPERATION3 DONE-':
-                # window["-OUT-"].update(f"{index} was written")
                 name = data_path / f"_BASIC_RAW_DATA_{index}.xlsx"
 
                 window.perform_long_operation(

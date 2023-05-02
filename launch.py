@@ -33,11 +33,7 @@ def main():
     trend_list_count = d.parting(trend_list, threshold)
 
     ripple_list = d.generate_ripples(trend_list, trend_list_count)
-    #to check if division was correct
-    # for no,item in enumerate (ripple_list[:10]):
-    #     print("for item {no}")
-    #     print(item.start_t)
-    #     print(item.end_t)
+
     write_a_message("FILE DIVIDED")
 
     db = _create_basic_database(divide=d, ripple_list=ripple_list, path=CURRENT_PATH_CWD)
