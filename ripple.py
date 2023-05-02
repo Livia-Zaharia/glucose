@@ -157,11 +157,29 @@ class Ripple:
         
         if fast_insulin:
           for elem in fast_insulin:
-            fig.add_vline(elem[0], line_width=2, line_dash="dash")
+
+            insulin_type=elem[1]
+            value=elem[2]
+
+            fig.add_vline(elem[0], line_width=2, line_dash="dash", line_color="red", 
+                          label=dict(text=f"{insulin_type}-{value}u",textposition="middle", 
+                                     font=dict(size=18, color="red"), 
+                                     yanchor="top"
+                                     )
+                        )
         
         if slow_insulin:
           for elem in slow_insulin:
-            fig.add_vline(elem[0], line_width=2, line_dash="dash")
+
+            insulin_type=elem[1]
+            value=elem[2]
+
+            fig.add_vline(elem[0], line_width=2, line_dash="dash", line_color="green",
+                          label=dict(text=f"{insulin_type}-{value}u",textposition="middle", 
+                                     font=dict(size=18, color="green"), 
+                                     yanchor="top"
+                                     )
+                            )
 
         fig.add_vline(self.time_v.iat[len(self.time_v) - 1], line_width=1, line_dash="dash")
         fig.add_annotation(text=legend_values, x=self.time_v.iat[len(self.time_v) - 1], y=300, xanchor="left",

@@ -49,17 +49,7 @@ def main():
     time_list = a.compare_duration()
 
     ripple_stat_list=d.generate_ripple_statistics(ripple_list,ripple_connections,time_list)
-    # for elem in ripple_stat_list:
-    #      v=vars(elem)
-    #      print(v["fast_insulin_seq"])
-    #      print("?"*25)
-    #      if v["fast_insulin_seq"]:
-    #          for item in v["fast_insulin_seq"]:
-    #             print(type(item[0]))
-    #      print("*"*50)
 
-    # for item in ripple_list[:10]:
-    #     item.create_graphic(1,True,"1")
     db_a = _create_analysis_database(ripple_connections=ripple_connections, path=CURRENT_PATH_CWD)
     write_a_message("ANALYSIS DATABASE CREATED")
 
