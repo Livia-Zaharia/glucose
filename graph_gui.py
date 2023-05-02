@@ -60,6 +60,10 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager):
     while True:
         # Read events and values from the window
         event, values = window.read()
+        print(event)
+        print("+++++")
+        print(values)
+        print("*****"*50)
 
         # If the event is "Exit" or the window is closed, break the loop
         if event == "Exit" or event == sg.WIN_CLOSED:
@@ -84,13 +88,18 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager):
             data_path = IMAGES_PATH / f"Ripple_no{index}"
             data_path.mkdir(parents=True, exist_ok=True)
 
+            print("before op1")
+
             window.perform_long_operation(
                 lambda: current_ripple.create_graphic(index=index, should_write_html=True,data_path=data_path),
                 '-OPERATION1 DONE-')
+            print(window.read())
+            print("after op1")
             
             window["-OUT-"].update(f"{index} was written")
 
             name = data_path / f"_BASIC_RAW_DATA_{index}.xlsx"
+            print("before op2")
 
             window.perform_long_operation(
                 lambda: (
@@ -98,32 +107,41 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager):
                 ),
                 '-OPERATION2 DONE-'
             )
+            print("after op2")
 
         # If the event is "-CREATE ALL-", create the graphic and the excel for ALL the Ripples
         #use perform_long_operation rather than start thread since perform long operation also closes the thread
        
-        elif event == "-CREATE ALL-":
+        if event == "-CREATE ALL-":
             for index in range (len(ripple_list)):
                 current_ripple = ripple_list[index]
             
                 data_path = IMAGES_PATH / f"Ripple_no{index}"
                 data_path.mkdir(parents=True, exist_ok=True)
 
+                # print(event)
+                # print("-------")
+                # print(values)
+                # print("---"*50)
+
                 window.perform_long_operation(
                     lambda: current_ripple.create_graphic(index=index, should_write_html=True,data_path=data_path),
                     '-OPERATION3 DONE-'
                     )
-            
-                window["-OUT-"].update(f"{index} was written")
+                event,values=window.read()
+                # print(window.read())
+                # print("after op3")
 
-                name = data_path / f"_BASIC_RAW_DATA_{index}.xlsx"
+                if event == '-OPERATION3 DONE-':
+                    window["-OUT-"].update(f"{index} was written")
+                    name = data_path / f"_BASIC_RAW_DATA_{index}.xlsx"
 
-                window.perform_long_operation(
-                    lambda: (
-                        db.select_and_write_to_xls_file(str(name), "_BASIC_RAW_DATA", {"ID_ripple": str(index)})
-                            ),
-                    '-OPERATION4 DONE-'
-                    )
+                    window.perform_long_operation(
+                        lambda: (
+                            db.select_and_write_to_xls_file(str(name), "_BASIC_RAW_DATA", {"ID_ripple": str(index)})
+                                ),
+                        '-OPERATION4 DONE-'
+                        )
 
                              
             break
