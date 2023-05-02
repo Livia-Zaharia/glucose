@@ -132,7 +132,7 @@ class Ripple:
 
         return legend_0
 
-    def create_graphic(self, index: int, should_write_html: bool, data_path: Path) -> None:
+    def create_graphic(self, index: int, should_write_html: bool, data_path: Path, slow_insulin, fast_insulin) -> None:
         """
         Method of Ripple class to produce a graphic in a browser and then save as an HTML or PNG of the
         ripple with the legend. Made using Plotly Express.
@@ -154,13 +154,15 @@ class Ripple:
         fig.add_hline(min(self.bg), line_width=1, line_dash="dash")
         fig.add_annotation(text="MIN", x=self.min_t, y=self.min_v)
         fig.add_annotation(text="MAX", x=self.max_t, y=self.max_v)
-        # if fast_insulin_seq:
-        #     # for elem in fast_insulin_seq:
-        #     fig.add_vline(fast_insulin_seq, line_width=2, line_dash="dash")
         
-        # if slow_insulin_seq:
-        #     # for elem in slow_insulin_seq:
-        #     fig.add_vline(slow_insulin_seq, line_width=2, line_dash="dash")
+        if fast_insulin:
+          for elem in fast_insulin:
+            fig.add_vline(elem[0], line_width=2, line_dash="dash")
+        
+        if slow_insulin:
+          for elem in slow_insulin:
+            fig.add_vline(elem[0], line_width=2, line_dash="dash")
+
         fig.add_vline(self.time_v.iat[len(self.time_v) - 1], line_width=1, line_dash="dash")
         fig.add_annotation(text=legend_values, x=self.time_v.iat[len(self.time_v) - 1], y=300, xanchor="left",
                            font=dict(family="Arial", size=11))

@@ -66,7 +66,7 @@ def main():
     db_a_summary = _extract_summary_of_analysis(ripple_connections=ripple_connections)
     write_a_message("SUMMARY OF ANALYSIS CREATED")
 
-    create_viewer(ripple_list, db)
+    create_viewer(ripple_list, db, ripple_stat_list)
 
     # data_display.batch_write_graphs_to_disk(ripple_list=ripple_list, base_path=IMAGES_PATH)
 

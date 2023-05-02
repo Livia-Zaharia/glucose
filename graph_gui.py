@@ -5,6 +5,7 @@ import PySimpleGUI as sg
 
 from database import DatabaseManager
 from ripple import Ripple
+from data_statistic import Ripple_stats
 
 # Set the current working directory path
 CURRENT_PATH_CWD = Path.cwd()
@@ -39,7 +40,7 @@ def write_a_message(text: str):
 
 
 # Function to create a viewer for selecting a Ripple and displaying its graph
-def create_viewer(ripple_list: List[Ripple], db: DatabaseManager):
+def create_viewer(ripple_list: List[Ripple], db: DatabaseManager, ripple_stat_list:List[Ripple_stats]):
     # Define the layout for the viewer window
     layout = [
         [
@@ -73,17 +74,10 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager):
         if event == "-CREATE ONE-":
             index = int(values["-IN-"])
             current_ripple = ripple_list[index]
-            # current_ripple_stat=ripple_stat_list[index]
-            # slow_insulin_seq=current_ripple_stat.slow_insulin_seq
-            # if slow_insulin_seq:
-            #     sl=slow_insulin_seq[0][0]
-            # else:
-            #     sl=False
-            # fast_insulin_seq=current_ripple_stat.fast_insulin_seq
-            # if fast_insulin_seq:
-            #     fw=fast_insulin_seq[0][0]
-            # else:
-            #     fw=False
+            current_ripple_stat=ripple_stat_list[index]
+            slow_insulin_seq=current_ripple_stat.slow_insulin_seq
+            fast_insulin_seq=current_ripple_stat.fast_insulin_seq
+
             
             data_path = IMAGES_PATH / f"Ripple_no{index}"
             data_path.mkdir(parents=True, exist_ok=True)
@@ -91,7 +85,7 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager):
             print("before op1")
 
             window.perform_long_operation(
-                lambda: current_ripple.create_graphic(index=index, should_write_html=True,data_path=data_path),
+                lambda: current_ripple.create_graphic(index=index, should_write_html=True,data_path=data_path, slow_insulin=slow_insulin_seq, fast_insulin=fast_insulin_seq),
                 '-OPERATION1 DONE-')
             print(window.read())
             print("after op1")
@@ -115,33 +109,32 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager):
         if event == "-CREATE ALL-":
             for index in range (len(ripple_list)):
                 current_ripple = ripple_list[index]
+                current_ripple_stat=ripple_stat_list[index]
+                slow_insulin_seq=current_ripple_stat.slow_insulin_seq
+                fast_insulin_seq=current_ripple_stat.fast_insulin_seq
+
             
                 data_path = IMAGES_PATH / f"Ripple_no{index}"
                 data_path.mkdir(parents=True, exist_ok=True)
 
-                # print(event)
-                # print("-------")
-                # print(values)
-                # print("---"*50)
-
                 window.perform_long_operation(
-                    lambda: current_ripple.create_graphic(index=index, should_write_html=True,data_path=data_path),
+                    lambda: current_ripple.create_graphic(index=index, should_write_html=True,data_path=data_path, slow_insulin=slow_insulin_seq, fast_insulin=fast_insulin_seq),
                     '-OPERATION3 DONE-'
                     )
                 event,values=window.read()
                 # print(window.read())
                 # print("after op3")
 
-                if event == '-OPERATION3 DONE-':
-                    window["-OUT-"].update(f"{index} was written")
-                    name = data_path / f"_BASIC_RAW_DATA_{index}.xlsx"
+                # if event == '-OPERATION3 DONE-':
+                # window["-OUT-"].update(f"{index} was written")
+                name = data_path / f"_BASIC_RAW_DATA_{index}.xlsx"
 
-                    window.perform_long_operation(
-                        lambda: (
-                            db.select_and_write_to_xls_file(str(name), "_BASIC_RAW_DATA", {"ID_ripple": str(index)})
-                                ),
-                        '-OPERATION4 DONE-'
-                        )
+                window.perform_long_operation(
+                    lambda: (
+                           db.select_and_write_to_xls_file(str(name), "_BASIC_RAW_DATA", {"ID_ripple": str(index)})
+                           ),
+                    '-OPERATION4 DONE-'
+                    )
 
                              
             break
