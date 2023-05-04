@@ -20,6 +20,7 @@ IMAGES_PATH = CURRENT_PATH_CWD / "images_and_graphs"
 
 
 def main():
+
     file_location = select_file()
 
     glucose = data_acquisition.get_glucose_data(file_name=file_location)
@@ -31,9 +32,7 @@ def main():
 
     threshold = 1
     trend_list_count = d.parting(trend_list, threshold)
-
     ripple_list = d.generate_ripples(trend_list, trend_list_count)
-
     write_a_message("FILE DIVIDED")
 
     db = _create_basic_database(divide=d, ripple_list=ripple_list, path=CURRENT_PATH_CWD)
@@ -45,6 +44,12 @@ def main():
     time_list = a.compare_duration()
 
     ripple_stat_list=d.generate_ripple_statistics(ripple_list,ripple_connections,time_list)
+
+    for elem in ripple_stat_list[:10]:
+        item=vars(elem)
+        print (item)
+        print("*"*50)
+    
 
     db_a = _create_analysis_database(ripple_connections=ripple_connections, path=CURRENT_PATH_CWD)
     write_a_message("ANALYSIS DATABASE CREATED")

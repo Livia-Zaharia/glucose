@@ -15,49 +15,54 @@ class Ripple_stats:
     duration_similarity= a list of indexes of similar ripple in regards to the duration category
     slow_insulin_seq/fast_insulin= lists of tuple (datetime, str,float) where there are only values of slow/fast acting insulin
     slow/fast_ insulin_exists= bool flag to check or not tests for these parameters 
+     
     """
 
     def __init__(self, base_ripple:Ripple):
         #about the ripple
-        self.base=base_ripple
+        self.base_max_t=base_ripple.max_t
+        self.base_min_t=base_ripple.min_t
         self.is_ascending=True
         
         #about the graph
-        self.max_graph_similarity=()
+        self.max_graph_similarity=""
         
         #about the time
-        self.duration_category=0
-        self.duration_similarity=[]
+        self.duration_category=(rm(base_ripple.duration_v.total_seconds(),3600))/3600
+        # self.duration_similarity=[]
         
         #about the long acting insulin
         self.slow_insulin_seq=[]
-        self.slow_insulin_exists=False
-        self.slow_time_from_max=()
-        self.slow_time_to_min=()
-        
+        self.slow_time_vs_max=0
+        self.slow_time_vs_min=0
+                
         #about the fast acting insulin
         self.fast_insulin_seq=[]
-        self.fast_insulin_exists=False
-        self.fast_time_from_max=()
-        self.fast_time_to_min=()
-
+        self.fast_time_vs_max=0
+        self.fast_time_vs_min=0
+        
     def add_values(self, index:int, slow_insulin_seq, fast_insulin_seq,ripple_list:t.List[Ripple], ripple_connections:t.List[t.List[t.Tuple[float, int, int]]], time_list:t.List[float]):
-        self.max_graph_similarity=ripple_connections[index][-1]
-        self.duration_category=(rm(self.base.duration_v.total_seconds(),3600))/3600
+        
+        percent, position_from, position_to =ripple_connections[index][-1]
+        self.max_graph_similarity=f"{percent*100}% -from {position_from}-to {position_to}"
 
         self.slow_insulin_seq=slow_insulin_seq
         if self.slow_insulin_seq:
-            self.slow_insulin_exists=True
+            slow_insulin_exists=True
+        else:
+            slow_insulin_exists=False
 
         self.fast_insulin_seq=fast_insulin_seq
         if self.fast_insulin_seq:
-            self.fast_insulin_exists=True
+            fast_insulin_exists=True
+        else:
+            fast_insulin_exists=False
 
-        if self.base.max_t < self.base.min_t:
+        if self.base_max_t < self.base_min_t:
             self.is_ascending=False
 
-        self._check_duration_category(time_list)
-        self._check_insulin_positioning()
+        # self._check_duration_category(time_list)
+        self._check_insulin_positioning(slow_insulin_exists,fast_insulin_exists)
 
     def _check_duration_category(self, time_list:t.List[float]) -> t.List[int]:
         """
@@ -68,19 +73,19 @@ class Ripple_stats:
                 self.duration_similarity.append(index)
 
     @staticmethod
-    def time_in_range(start, end, x):
+    def time_in_range(start, end, x) ->bool:
         """Return true if x is in the range [start, end]"""
         if start <= end:
             return start <= x <= end
         else:
             return start <= x or x <= end
 
-    def _check_insulin_positioning(self):
-        if self.slow_insulin_exists:
-            self.slow_time_from_max,self.slow_time_to_min = self.analize_positions(self.slow_insulin_seq)
+    def _check_insulin_positioning(self,slow_insulin_exists,fast_insulin_exists):
+        if slow_insulin_exists:
+            self.slow_time_vs_max,self.slow_time_vs_min = self.analize_positions(self.slow_insulin_seq)
         
-        if self.fast_insulin_exists:
-            self.fast_time_from_max,self.fast_time_to_min = self.analize_positions(self.fast_insulin_seq)            
+        if fast_insulin_exists:
+            self.fast_time_vs_max,self.fast_time_vs_min = self.analize_positions(self.fast_insulin_seq)            
 
     def analize_positions(self,interval_list:list) -> t.Tuple[datetime.timedelta,datetime.timedelta]:
         """
@@ -91,8 +96,8 @@ class Ripple_stats:
         because that case is not feasible in the context of this ripple   
 
         """     
-        max_glucose_time=self.base.max_t
-        min_glucose_time=self.base.min_t
+        max_glucose_time=self.base_max_t
+        min_glucose_time=self.base_min_t
 
         #list that will be used to check the position of insulin events
         interval_list_check=[]
@@ -110,8 +115,8 @@ class Ripple_stats:
             #it means the insulin events are grouped and can be considered as one, individual shot. 
             #this shot will be positioned in between the values of glucose interval (first case)
             
-            from_max=start_insulin_time-max_glucose_time
-            to_min=end_insulin_time-min_glucose_time
+            from_max=(start_insulin_time-max_glucose_time) if (start_insulin_time>max_glucose_time) else (max_glucose_time-start_insulin_time)
+            to_min=(end_insulin_time-min_glucose_time) if (end_insulin_time>min_glucose_time) else (min_glucose_time-end_insulin_time)
             return (from_max, to_min)
         
         elif sum == 0 :
@@ -142,8 +147,9 @@ class Ripple_stats:
                     #the case where the insulin interval is positioned outside at the begining of the glucose interval
                     #is_ascending false shows that it starts of in high value
 
-                    from_max=start_insulin_time-max_glucose_time
-                    to_min=end_insulin_time-min_glucose_time
+                    from_max=(start_insulin_time-max_glucose_time) if (start_insulin_time>max_glucose_time) else (max_glucose_time-start_insulin_time)
+                    to_min=(end_insulin_time-min_glucose_time) if (end_insulin_time>min_glucose_time) else (min_glucose_time-end_insulin_time)
+                   
                     return (from_max, to_min)
                 else:
                     #the case in which the insulin interval is after the end of a decreasing interval
@@ -177,8 +183,13 @@ class Ripple_stats:
                         if elem:
                             short_interval.append(interval_list[i])
                     
-                    from_max=start_insulin_time-max_glucose_time
-                    to_min=end_insulin_time-min_glucose_time
+                    
+                    start_insulin_time=short_interval[0][0]
+                    end_insulin_time=short_interval[-1][0]
+                    
+                    from_max=(start_insulin_time-max_glucose_time) if (start_insulin_time>max_glucose_time) else (max_glucose_time-start_insulin_time)
+                    to_min=(end_insulin_time-min_glucose_time) if (end_insulin_time>min_glucose_time) else (min_glucose_time-end_insulin_time)
+                    
                     return (from_max, to_min)
                     
             else:
@@ -196,8 +207,17 @@ class Ripple_stats:
                     #it means it contains the low glucose value
                     #since the glucose interval grows it means that not sufficent insulin was provided so any value that is found between
                     # the min and tha max will affect the current ripple
-
-                    from_max=end_insulin_time-max_glucose_time
+                    
+                    short_interval=[]
+                    
+                    for i,elem in enumerate (interval_list_check):
+                        if not elem:
+                            short_interval.append(interval_list[i])
+                                        
+                    start_insulin_time=short_interval[0][0]
+                    end_insulin_time=short_interval[-1][0]
+                    
+                    from_max=(end_insulin_time-max_glucose_time) if (end_insulin_time>max_glucose_time) else (max_glucose_time-end_insulin_time)
                     to_min="NEXT"
                     return (from_max, to_min)
 
