@@ -40,3 +40,13 @@ def convert_from_tuple_list_to_dict(input_list: t.List[t.Tuple], key_list: t.Lis
 
     # Return the resulting dictionary
     return result_dict
+
+def convert_list_of_tuples_to_string(sequence:t.List[tuple]) -> str:
+    
+    text_list=[]
+    for elem in sequence:
+        text_list.append(str(elem))
+    
+    final_text='\n'.join(text_list)
+    return final_text
+    

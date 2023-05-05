@@ -292,7 +292,10 @@ class Divide:
 
         return ripple_stats_list
 
-    def _create_ripple_stats(self, index: int, ripple_list: t.List[Ripple], ripple_connections: t.List[t.List[t.Tuple[float, int, int]]], time_list:t.List[float], insulin_list:t.List[t.List[t.Tuple[datetime, str, float]]]) -> Ripple_stats:
+    def _create_ripple_stats(self, index: int, ripple_list: t.List[Ripple], 
+                             ripple_connections: t.List[t.List[t.Tuple[float, int, int]]], 
+                             time_list:t.List[float], insulin_list:t.List[t.List[t.Tuple[datetime, str, float]]]) -> Ripple_stats:
+        
         r_stat_temp= Ripple_stats(ripple_list[index])
 
         slow_insulin_seq, fast_insulin_seq=self._divide_by_fast_or_slow_insulin(insulin_list[index])

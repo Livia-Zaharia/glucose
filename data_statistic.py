@@ -4,6 +4,7 @@ Module to record connections/ripple
 import typing as t
 from ripple import Ripple
 from data_analysis import round_to_multiple as rm
+from data_reconfig import convert_list_of_tuples_to_string as cts
 import datetime
 
 class Ripple_stats:
@@ -32,28 +33,29 @@ class Ripple_stats:
         # self.duration_similarity=[]
         
         #about the long acting insulin
-        self.slow_insulin_seq=[]
-        self.slow_time_vs_max=0
-        self.slow_time_vs_min=0
+        self.slow_insulin_seq=""
+        self.slow_time_vs_max=datetime.timedelta(0)
+        self.slow_time_vs_min=datetime.timedelta(0)
                 
         #about the fast acting insulin
-        self.fast_insulin_seq=[]
-        self.fast_time_vs_max=0
-        self.fast_time_vs_min=0
+        self.fast_insulin_seq=""
+        self.fast_time_vs_max=datetime.timedelta(0)
+        self.fast_time_vs_min=datetime.timedelta(0)
         
-    def add_values(self, index:int, slow_insulin_seq, fast_insulin_seq,ripple_list:t.List[Ripple], ripple_connections:t.List[t.List[t.Tuple[float, int, int]]], time_list:t.List[float]):
+    def add_values(self, index:int, slow_insulin_seq, fast_insulin_seq,ripple_list:t.List[Ripple], 
+                   ripple_connections:t.List[t.List[t.Tuple[float, int, int]]], time_list:t.List[float]):
         
         percent, position_from, position_to =ripple_connections[index][-1]
         self.max_graph_similarity=f"{percent*100}% -from {position_from}-to {position_to}"
 
-        self.slow_insulin_seq=slow_insulin_seq
-        if self.slow_insulin_seq:
+        self.slow_insulin_seq=cts(slow_insulin_seq)
+        if slow_insulin_seq:
             slow_insulin_exists=True
         else:
             slow_insulin_exists=False
 
-        self.fast_insulin_seq=fast_insulin_seq
-        if self.fast_insulin_seq:
+        self.fast_insulin_seq=cts(fast_insulin_seq)
+        if fast_insulin_seq:
             fast_insulin_exists=True
         else:
             fast_insulin_exists=False
@@ -62,7 +64,7 @@ class Ripple_stats:
             self.is_ascending=False
 
         # self._check_duration_category(time_list)
-        self._check_insulin_positioning(slow_insulin_exists,fast_insulin_exists)
+        self._check_insulin_positioning(slow_insulin_exists,fast_insulin_exists, slow_insulin_seq,fast_insulin_seq)
 
     def _check_duration_category(self, time_list:t.List[float]) -> t.List[int]:
         """
@@ -80,12 +82,12 @@ class Ripple_stats:
         else:
             return start <= x or x <= end
 
-    def _check_insulin_positioning(self,slow_insulin_exists,fast_insulin_exists):
+    def _check_insulin_positioning(self,slow_insulin_exists,fast_insulin_exists, slow_insulin_seq, fast_insulin_seq):
         if slow_insulin_exists:
-            self.slow_time_vs_max,self.slow_time_vs_min = self.analize_positions(self.slow_insulin_seq)
+            self.slow_time_vs_max,self.slow_time_vs_min = self.analize_positions(slow_insulin_seq)
         
         if fast_insulin_exists:
-            self.fast_time_vs_max,self.fast_time_vs_min = self.analize_positions(self.fast_insulin_seq)            
+            self.fast_time_vs_max,self.fast_time_vs_min = self.analize_positions(fast_insulin_seq)            
 
     def analize_positions(self,interval_list:list) -> t.Tuple[datetime.timedelta,datetime.timedelta]:
         """
@@ -102,18 +104,24 @@ class Ripple_stats:
         #list that will be used to check the position of insulin events
         interval_list_check=[]
         sum=0
+        switch=-1
+        prev_value=2
 
         for elem in interval_list:
             value=self.time_in_range(max_glucose_time,min_glucose_time,elem[0])
             interval_list_check.append(value)
             sum+=int(value)
+            if prev_value != int(value):
+                switch+=1
+            prev_value=int(value)
 
         start_insulin_time=interval_list[0][0]
         end_insulin_time=interval_list[-1][0]
 
         if sum == len(interval_list_check):
-            #it means the insulin events are grouped and can be considered as one, individual shot. 
-            #this shot will be positioned in between the values of glucose interval (first case)
+            #Case 1
+            # it means the insulin events are grouped and can be considered as one, individual shot. 
+            #this shot will be positioned in between the values of glucose interval
             
             from_max=(start_insulin_time-max_glucose_time) if (start_insulin_time>max_glucose_time) else (max_glucose_time-start_insulin_time)
             to_min=(end_insulin_time-min_glucose_time) if (end_insulin_time>min_glucose_time) else (min_glucose_time-end_insulin_time)
@@ -121,13 +129,15 @@ class Ripple_stats:
         
         elif sum == 0 :
             #it means the insulin events are grouped and can be considered as one, individual shot. 
-            #this shot will be positioned outside the glucose interval (second case)
+            #case 2
+            #this shot will be positioned outside the glucose interval
             
             if self.is_ascending:
                 #when the glucose interval is ascending
                 if(start_insulin_time >= max_glucose_time):
 
-                    #the case in which the insulin interval is outside at the end of the glucose interval
+                    #case 2.1.1
+                    # the case in which the insulin interval is outside at the end of the glucose interval
                     # meaning that the glucose has risen and action was needed to take it down
                     # to_min is not of importance since it will affect the min in the next ripple, not this one
 
@@ -136,7 +146,8 @@ class Ripple_stats:
                     return (from_max, to_min)
                 else:
 
-                    #the case in which the insulin interval is outside at the begining of the glucose interval
+                    #case 2.2.1
+                    # the case in which the insulin interval is outside at the begining of the glucose interval
                     #is_ascending is true and that means it referenced the previous ripple
                     return("PREV","PREV")
            
@@ -144,7 +155,8 @@ class Ripple_stats:
                 #when the glucose interval is descending
 
                 if(end_insulin_time <= max_glucose_time):
-                    #the case where the insulin interval is positioned outside at the begining of the glucose interval
+                    #case 2.2.2
+                    # the case where the insulin interval is positioned outside at the begining of the glucose interval
                     #is_ascending false shows that it starts of in high value
 
                     from_max=(start_insulin_time-max_glucose_time) if (start_insulin_time>max_glucose_time) else (max_glucose_time-start_insulin_time)
@@ -152,7 +164,8 @@ class Ripple_stats:
                    
                     return (from_max, to_min)
                 else:
-                    #the case in which the insulin interval is after the end of a decreasing interval
+                    #case 2.1.2
+                    # the case in which the insulin interval is after the end of a decreasing interval
                     #as a usecase it can mean the folowing- had a low value, ate, and then because it started to rise 
                     #extra insulin was needed
 
@@ -160,20 +173,24 @@ class Ripple_stats:
 
 
         else:
-            #these are the casese that insulin interval contains one of the ends of the glucose interval
+            #these are the cases that insulin interval contains one of the ends of the glucose interval or contains the glucose interval itself
 
             if interval_list_check[0]:
-                #it means it starts of in the glucose interval only to leave it after a while
+                #case 3
+                # it means it starts of in the glucose interval only to leave it after a while.
+                #it will always contain the end
 
                 if self.is_ascending:
-                    #it means it contains the max glucose value of this ripple
+                    #case 3.2
+                    # it means it contains the max glucose value of this ripple
                     # and the min value will be found in the next ripple
 
                     from_max=end_insulin_time-max_glucose_time
                     to_min="NEXT"
                     return (from_max, to_min)
                 else:
-                    #it means it contains the min glucose value of this ripple
+                    #case 3.1
+                    # it means it contains the min glucose value of this ripple
                     #basically it means you are having shots while in low, so the only normal case it could apply
                     # it would mean that a ceratin part of insulin was made before the low- and that will affect this ripple 
                     # while the rest is for the next. so we will use a shortenend version of the interval
@@ -193,9 +210,18 @@ class Ripple_stats:
                     return (from_max, to_min)
                     
             else:
-                #it starts of outside the glucose interval and enters it later
+                #case4
+                # it starts of outside the glucose interval and enters it later
+                #or it can start outside- go in - and after go out
+                #it will always contain the start of the glucose interval
+                if switch == 2:
+                    #case4.3
+                    # it contains the whole glucose interval
+                    return("PREV","NEXT")
+                
                 if not self.is_ascending:
-                    #it means it contians the max glucose value
+                    #case 4.2
+                    # it means it contians the max glucose value
                     #it uses the last value of the interval because given as it was a composed shot 
                     #the complete duration of injection has to be after the last value because previous shots did not work
 
@@ -204,6 +230,7 @@ class Ripple_stats:
                     return (from_max, to_min)
                 else:
 
+                    #case 4.1
                     #it means it contains the low glucose value
                     #since the glucose interval grows it means that not sufficent insulin was provided so any value that is found between
                     # the min and tha max will affect the current ripple

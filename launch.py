@@ -45,10 +45,13 @@ def main():
 
     ripple_stat_list=d.generate_ripple_statistics(ripple_list,ripple_connections,time_list)
 
-    for elem in ripple_stat_list[:10]:
-        item=vars(elem)
-        print (item)
-        print("*"*50)
+    # for elem in ripple_stat_list:
+    #     item=vars(elem)
+    #     for item0 in item:
+    #         print (item0)
+    #         print("-----------")
+    #         print (type(item0))
+    #     print("*"*50)
     
 
     db_a = _create_analysis_database(ripple_connections=ripple_connections, path=CURRENT_PATH_CWD)
@@ -56,6 +59,9 @@ def main():
 
     db_a_summary = _extract_summary_of_analysis(ripple_connections=ripple_connections)
     write_a_message("SUMMARY OF ANALYSIS CREATED")
+
+    db_s=_create_stat_database(ripple_stat_list=ripple_stat_list, path=CURRENT_PATH_CWD)
+    write_a_message("STATISTIC DATABASE CREATED")
 
     create_viewer(ripple_list, db, ripple_stat_list)
 
@@ -140,6 +146,29 @@ def _extract_summary_of_analysis(ripple_connections: t.List[t.List[t.Tuple[float
         summary_list.append(f"from {position_from} to {position_to} there is a {round((percent) * 100)}% match")
 
     data_display.write_analysis_to_xls_file(summary_list=summary_list, sheet_name=sheet_name)
+
+def _create_stat_database(ripple_stat_list, path):
+    
+    
+    if path / "glucose_statistic.db" not in path.glob("*"):
+
+        db = DatabaseManager("glucose_statistic.db")
+
+        data =vars(ripple_stat_list[0])
+        db.create_table_if_not_exists("_GLUCOSE_STATS", data)
+
+
+        for no,item in enumerate(ripple_stat_list):
+            data_noniter = vars(item)
+            # print(no)
+            # print(data_noniter)
+            _id = db.add("_GLUCOSE_STATS", data_noniter)
+
+        return db
+
+    else:
+        db = DatabaseManager("glucose_statistic.db")
+        return db
 
 
 if __name__ == "__main__":
