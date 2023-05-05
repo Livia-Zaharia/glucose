@@ -33,12 +33,12 @@ class Ripple_stats:
         # self.duration_similarity=[]
         
         #about the long acting insulin
-        self.slow_insulin_seq=""
+        self.slow_insulin_seq=[]
         self.slow_time_vs_max=datetime.timedelta(0)
         self.slow_time_vs_min=datetime.timedelta(0)
                 
         #about the fast acting insulin
-        self.fast_insulin_seq=""
+        self.fast_insulin_seq=[]
         self.fast_time_vs_max=datetime.timedelta(0)
         self.fast_time_vs_min=datetime.timedelta(0)
         
@@ -48,13 +48,13 @@ class Ripple_stats:
         percent, position_from, position_to =ripple_connections[index][-1]
         self.max_graph_similarity=f"{percent*100}% -from {position_from}-to {position_to}"
 
-        self.slow_insulin_seq=cts(slow_insulin_seq)
+        self.slow_insulin_seq=slow_insulin_seq
         if slow_insulin_seq:
             slow_insulin_exists=True
         else:
             slow_insulin_exists=False
 
-        self.fast_insulin_seq=cts(fast_insulin_seq)
+        self.fast_insulin_seq=fast_insulin_seq
         if fast_insulin_seq:
             fast_insulin_exists=True
         else:
@@ -64,7 +64,7 @@ class Ripple_stats:
             self.is_ascending=False
 
         # self._check_duration_category(time_list)
-        self._check_insulin_positioning(slow_insulin_exists,fast_insulin_exists, slow_insulin_seq,fast_insulin_seq)
+        self._check_insulin_positioning(slow_insulin_exists,fast_insulin_exists)
 
     def _check_duration_category(self, time_list:t.List[float]) -> t.List[int]:
         """
@@ -82,12 +82,12 @@ class Ripple_stats:
         else:
             return start <= x or x <= end
 
-    def _check_insulin_positioning(self,slow_insulin_exists,fast_insulin_exists, slow_insulin_seq, fast_insulin_seq):
+    def _check_insulin_positioning(self,slow_insulin_exists,fast_insulin_exists):
         if slow_insulin_exists:
-            self.slow_time_vs_max,self.slow_time_vs_min = self.analize_positions(slow_insulin_seq)
+            self.slow_time_vs_max,self.slow_time_vs_min = self.analize_positions(self.slow_insulin_seq)
         
         if fast_insulin_exists:
-            self.fast_time_vs_max,self.fast_time_vs_min = self.analize_positions(fast_insulin_seq)            
+            self.fast_time_vs_max,self.fast_time_vs_min = self.analize_positions(self.fast_insulin_seq)            
 
     def analize_positions(self,interval_list:list) -> t.Tuple[datetime.timedelta,datetime.timedelta]:
         """

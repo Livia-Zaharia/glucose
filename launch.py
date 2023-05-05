@@ -5,6 +5,7 @@ and then generates the summary and the analysis
 """
 import typing as t
 from pathlib import Path
+from copy import deepcopy
 
 import data_acquisition
 import data_display
@@ -154,12 +155,16 @@ def _create_stat_database(ripple_stat_list, path):
 
         db = DatabaseManager("glucose_statistic.db")
 
-        data =vars(ripple_stat_list[0])
+        data = deepcopy(dict(vars(ripple_stat_list[0])))
+        data["slow_insulin_seq"]=data_reconfig.convert_list_of_tuples_to_string(data["slow_insulin_seq"])
+        data["fast_insulin_seq"]=data_reconfig.convert_list_of_tuples_to_string(data["fast_insulin_seq"])
         db.create_table_if_not_exists("_GLUCOSE_STATS", data)
 
 
         for no,item in enumerate(ripple_stat_list):
-            data_noniter = vars(item)
+            data_noniter = deepcopy(dict(vars(item)))
+            data_noniter["slow_insulin_seq"]=data_reconfig.convert_list_of_tuples_to_string(data_noniter["slow_insulin_seq"])
+            data_noniter["fast_insulin_seq"]=data_reconfig.convert_list_of_tuples_to_string(data_noniter["fast_insulin_seq"])
             # print(no)
             # print(data_noniter)
             _id = db.add("_GLUCOSE_STATS", data_noniter)
