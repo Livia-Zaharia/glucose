@@ -42,9 +42,8 @@ def main():
     a = Analyze(ripple_list=ripple_list)
     
     ripple_connections = a.compare_graphs()
-    time_list = a.compare_duration()
 
-    ripple_stat_list=d.generate_ripple_statistics(ripple_list,ripple_connections,time_list)
+    ripple_stat_list=d.generate_ripple_statistics(ripple_list,ripple_connections)
 
     # for elem in ripple_stat_list:
     #     item=vars(elem)

@@ -277,7 +277,7 @@ class Divide:
 
             return  slow_insulin_seq, fast_insulin_seq
     
-    def generate_ripple_statistics(self, ripple_list: t.List[Ripple], ripple_connections: t.List[t.List[t.Tuple[float, int, int]]], time_list:t.List[float]) -> t.List[Ripple_stats]:
+    def generate_ripple_statistics(self, ripple_list: t.List[Ripple], ripple_connections: t.List[t.List[t.Tuple[float, int, int]]]) -> t.List[Ripple_stats]:
         """
         Method that generates the ripple statistic list- a list where, for each ripple element
         you have the statistics related to it in relation to other ripples and itself
@@ -286,7 +286,7 @@ class Divide:
         insulin_list=self._split_insulin_by_ripple(ripple_list)
 
         ripple_stats_list=[
-            self._create_ripple_stats(i,ripple_list, ripple_connections, time_list,insulin_list)
+            self._create_ripple_stats(i,ripple_list, ripple_connections,insulin_list)
             for i in range(len(ripple_list)) 
         ]
 
@@ -294,13 +294,13 @@ class Divide:
 
     def _create_ripple_stats(self, index: int, ripple_list: t.List[Ripple], 
                              ripple_connections: t.List[t.List[t.Tuple[float, int, int]]], 
-                             time_list:t.List[float], insulin_list:t.List[t.List[t.Tuple[datetime, str, float]]]) -> Ripple_stats:
+                             insulin_list:t.List[t.List[t.Tuple[datetime, str, float]]]) -> Ripple_stats:
         
         r_stat_temp= Ripple_stats(ripple_list[index])
 
         slow_insulin_seq, fast_insulin_seq=self._divide_by_fast_or_slow_insulin(insulin_list[index])
     
-        r_stat_temp.add_values(index, slow_insulin_seq, fast_insulin_seq, ripple_list,ripple_connections, time_list)
+        r_stat_temp.add_values(index, slow_insulin_seq, fast_insulin_seq,ripple_connections)
 
         return r_stat_temp
         
