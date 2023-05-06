@@ -1,6 +1,5 @@
 """
 Data acquisition module that imports the data from the csv
-
 """
 
 from pathlib import Path

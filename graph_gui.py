@@ -1,3 +1,7 @@
+"""
+Module for a graphical use interface- it allows to generate html files outside the command line
+"""
+
 from pathlib import Path
 from typing import List
 
@@ -12,13 +16,15 @@ CURRENT_PATH_CWD = Path.cwd()
 # Set the image's path inside the current working directory
 IMAGES_PATH = CURRENT_PATH_CWD / "images_and_graphs"
 
-"""
-Module for a graphical use interface- it allows to generate html files outside the command line
-"""
 
+def write_a_message(text: str) ->None:
+    """
+    Function to display a message on the GUI
 
-# Function to display a message on the GUI
-def write_a_message(text: str):
+    Args:
+        text:str value to show
+    """
+    
     # Define the layout for the message window
     layout = [[sg.Text(text, font=('Arial Bold', 20), expand_x=True, justification='center')], ]
     # Create a window with the defined layout and size
@@ -38,9 +44,18 @@ def write_a_message(text: str):
     # Close the window
     window.close()
 
+def create_viewer(ripple_list: List[Ripple], db: DatabaseManager, ripple_stat_list:List[Ripple_stats]) -> None:
+    """
+    Function to create a viewer for selecting a Ripple and displaying its graph
 
-# Function to create a viewer for selecting a Ripple and displaying its graph
-def create_viewer(ripple_list: List[Ripple], db: DatabaseManager, ripple_stat_list:List[Ripple_stats]):
+    Args:
+        ripple_list: the ripple list that contains all the Ripple objects in the sequence
+                    it will be used to extract the html version of the graph
+        db:the DatabaseManager object that contains the glucose basic raw data
+                    it will be used to extract the xls version of the data summary
+        ripple_stat_list: the list that contains the Ripple_Stats objects for each Ripple in part
+                    it will be used to extract the insulin data position
+    """
     # Define the layout for the viewer window
     layout = [
         [
@@ -80,8 +95,9 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager, ripple_stat_li
 
 
             window.perform_long_operation(
-                lambda: current_ripple.create_graphic(index=index, should_write_html=True,data_path=data_path, slow_insulin=slow_insulin_seq, fast_insulin=fast_insulin_seq),
-                '-OPERATION1 DONE-')
+                lambda: current_ripple.create_graphic(index=index, should_write_html=True,data_path=data_path, 
+                                                      slow_insulin=slow_insulin_seq, fast_insulin=fast_insulin_seq),
+                                        '-OPERATION1 DONE-')
 
             
             window["-OUT-"].update(f"{index} was written")
@@ -89,11 +105,8 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager, ripple_stat_li
             name = data_path / f"_BASIC_RAW_DATA_{index}.xlsx"
 
             window.perform_long_operation(
-                lambda: (
-                    db.select_and_write_to_xls_file(str(name), "_BASIC_RAW_DATA", {"ID_ripple": str(index)})
-                ),
-                '-OPERATION2 DONE-'
-            )
+                lambda: (db.select_and_write_to_xls_file(name=str(name), table_name="_BASIC_RAW_DATA", criteria={"ID_ripple": str(index)})),
+                                        '-OPERATION2 DONE-')
 
         # If the event is "-CREATE ALL-", create the graphic and the excel for ALL the Ripples
         #use perform_long_operation rather than start thread since perform long operation also closes the thread
@@ -110,30 +123,27 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager, ripple_stat_li
                 data_path.mkdir(parents=True, exist_ok=True)
 
                 window.perform_long_operation(
-                    lambda: current_ripple.create_graphic(index=index, should_write_html=True,data_path=data_path, slow_insulin=slow_insulin_seq, fast_insulin=fast_insulin_seq),
-                    '-OPERATION3 DONE-'
-                    )
+                    lambda: current_ripple.create_graphic(index=index, should_write_html=True,data_path=data_path, 
+                                                          slow_insulin=slow_insulin_seq, fast_insulin=fast_insulin_seq),
+                                            '-OPERATION3 DONE-')
                 event,values=window.read()
 
                 name = data_path / f"_BASIC_RAW_DATA_{index}.xlsx"
 
                 window.perform_long_operation(
-                    lambda: (
-                           db.select_and_write_to_xls_file(str(name), "_BASIC_RAW_DATA", {"ID_ripple": str(index)})
-                           ),
-                    '-OPERATION4 DONE-'
-                    )
+                    lambda: (db.select_and_write_to_xls_file(name=str(name), table_name="_BASIC_RAW_DATA",criteria={"ID_ripple": str(index)})),
+                                            '-OPERATION4 DONE-')
 
-                             
             break
 
 
     # Close the window
     window.close()
 
-
-# Function to select a file and return its file path
 def select_file() -> str:
+    """
+    Function to select a file and return its file path    
+    """
     # Define the layout for the file selection window
     layout = [
         [sg.Text('Select a csv file', font=('Arial Bold', 20), expand_x=True, justification='center')],

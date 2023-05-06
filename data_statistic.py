@@ -29,18 +29,19 @@ class Ripple_stats:
     """
     Object that stores statistic attributes of a ripple, that is why it is instanced with a ripple object
 
-    base_max_t/base.min_t= the original ripple max/min value time- taken from the original ripple at the given index
-    is_ascending= boolean value showing if the graph is ascending or not (which comes first- the min or the max in the glucose interval)
+    Args:
+        base_max_t/base.min_t: the original ripple max/min value time- taken from the original ripple at the given index
+        is_ascending: boolean value showing if the graph is ascending or not (which comes first- the min or the max in the glucose interval)
 
-    max_graph_similarity= string converted from tuple using the construction f"{round((percent) * 100)}% -from {position_from}-to {position_to}"
-    showing the best similarity of the graph
+        max_graph_similarity: string converted from tuple using the construction f"{round((percent) * 100)}% -from {position_from}-to {position_to}"
+                            showing the best similarity of the graph
 
-    duration_category= float value that gives the round number in hour in which that ripple falls into
+        duration_category: float value that gives the round number in hour in which that ripple falls into
     
-    slow_insulin_seq/fast_insulin= lists of tuple (datetime, str,float) where there are only values of slow/fast acting insulin
-    slow/fast_ insulin_exists= bool flag to check or not tests for these parameters 
-    slow/fast_time vs max= timedelta values of the interval between the closest insulin time and the max value 
-    slow?fast_time vs min= time delta values of the interval between the closest insulin time and the min value
+        slow_insulin_seq/fast_insulin: lists of tuple (datetime, str,float) where there are only values of slow/fast acting insulin
+        slow/fast_ insulin_exists: bool flag to check or not tests for these parameters 
+        slow/fast_time vs max: timedelta values of the interval between the closest insulin time and the max value 
+        slow/fast_time vs min: time delta values of the interval between the closest insulin time and the min value
      
     """
 

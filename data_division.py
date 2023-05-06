@@ -4,9 +4,9 @@ Data division method- it takes the raw values from the Dataframe and splits it i
 
 import copy
 import typing as t
-from datetime import datetime
-
 import pandas as pd
+
+from datetime import datetime
 
 from ripple import Ripple
 from data_statistic import Ripple_stats
@@ -58,8 +58,16 @@ class Divide:
         Method that divides the values based on trend that changes sign- 
         after we have the trend list we can easily break the whole data into sequences.
         It has an input of trend list- a list of trends (deltas between the current value and the next, 
-        with sign to know if it increasease ore decreases) and a threshold, a limit of variation to consider as a change. Basically 
+        with sign to know if it increases or decreases) and a threshold, a limit of variation to consider as a change. Basically 
         the minimum value increment for a change min values to consider a change.
+
+        Args:
+            trend_list: the list with trends for every value
+            threshold: value that is the min difference to be considered a different value
+
+        Returns:
+            trend_list_count: a list that has at every index the number of elements 
+                            to be included in the future iterables in Ripples
         
         """
         #the list that is going to be an output- list of items that represent the number of elements in a ripple
@@ -131,7 +139,7 @@ class Divide:
                 negative_trend = negative_trend * (-1)
                 switch += 1
             
-            #check if we had two changes of signs and at least 50 items
+            #check if (1) we had two changes of signs and at least 50 items
             #then we can partition, else do all of the above again until
             #  you fulfill these first criterias
             if switch >= 2 and count > 50:
@@ -140,7 +148,7 @@ class Divide:
                 count_positive = 0
                 count_negative = 0
 
-                #checks the second criterion, that the curves are not too flat
+                #checks the second criterion, (2)that the curves are not too flat
                 #because since threshold is 1, not to pass this condition means that the variation was so low
                 # (under 1), that it can be considered a flat liner. It checks positive trend and negative 
                 # trend for the case where switch is 2 and the rest is for the cases where extra switches are needed to meet the first criteria
@@ -168,12 +176,19 @@ class Divide:
         """
         Method that creates a list of Ripple instances and loads all the data into each element.
         Uses the method add_values() from class Ripple.
+
+        Args:
+            trend_list:the list with trends for each value
+            trend_list_count:the list with number of elements per index
+        
+        Returns:
+            ripple_list: a list of Ripple objects
         """
         
         #here it is necessary to have that temp list because
         # we are going incrementing by the elements we extract from trend list count
         # so we have pairs of j,x (0,54)(54,56)(110,49) where trend list count was [54,56,49] that are going to slice as follows
-        #[0:54][54:110][110:160] and it works because the slicing doesn't take the last value inclusevly
+        #[0:54][54:110][110:160] and it works because the slicing doesn't take the last value also
         
         temp_list=[]
         sum=0
@@ -190,6 +205,7 @@ class Divide:
         return ripple_list
 
     def _create_ripple(self, j: int, x: int, trend_list: t.List[int]) -> Ripple:
+
         r_temp = Ripple()
 
         # Extract relevant data slices
@@ -207,6 +223,12 @@ class Divide:
         """
         Method that splits any given ripple into dictionaries of iterable and
         non-iterable elements.
+
+        Args:
+            data:Ripple object
+
+        Returns:
+            (data_iter, data_noniter): tuple of iterable data dict and noniterable data dict
         """
 
         # Create a deep copy of the original data dictionary to preserve input data.
@@ -234,6 +256,12 @@ class Divide:
         """
         Method that splits the insulin dataframe stored into a list of n lists (the length of the ripple list received) with tuples
         structured as (timestamp, type of insulin, dosage).
+
+        Args:
+            ripple_list: the list of ripple objects
+        
+        Return:
+            insulin_storage= list of list of tuple containing the timestamp, type(str) and dosage(float) of insulin
         """
         insulin_storage = []
         i = 0
@@ -262,6 +290,12 @@ class Divide:
             Method that splits any given single ripple insulin list
             into separate list for Fast-Acting and Long-Acting insulin
 
+            Args:
+                single_ripple_insulin= list of tuples of single ripple
+            
+            Returns:
+                (slow_insulin_seq,fast_insulin_seq): tuple of lists containing the previous list split into fast and slow acting insulin
+
             """
 
             # Initialize lists to store fast acting and slow acting items.
@@ -277,16 +311,25 @@ class Divide:
 
             return  slow_insulin_seq, fast_insulin_seq
     
-    def generate_ripple_statistics(self, ripple_list: t.List[Ripple], ripple_connections: t.List[t.List[t.Tuple[float, int, int]]]) -> t.List[Ripple_stats]:
+    def generate_ripple_statistics(self, ripple_list: t.List[Ripple], 
+                                   ripple_connections: t.List[t.List[t.Tuple[float, int, int]]]) -> t.List[Ripple_stats]:
         """
         Method that generates the ripple statistic list- a list where, for each ripple element
         you have the statistics related to it in relation to other ripples and itself
+
+        Args:
+            ripple_list:list of ripples
+            ripple_connections:list of list of tuples having percentage of similarity(float), 
+                                from index value(int) and to index value(index)
+        
+        Returns:
+            ripple_stat_list: list of ripple_stats object
         """
 
         insulin_list=self._split_insulin_by_ripple(ripple_list)
 
         ripple_stats_list=[
-            self._create_ripple_stats(i,ripple_list, ripple_connections,insulin_list)
+            self._create_ripple_stats(index=i,ripple_list=ripple_list, ripple_connections=ripple_connections,insulin_list=insulin_list)
             for i in range(len(ripple_list)) 
         ]
 
@@ -300,7 +343,8 @@ class Divide:
 
         slow_insulin_seq, fast_insulin_seq=self._divide_by_fast_or_slow_insulin(insulin_list[index])
     
-        r_stat_temp.add_values(index, slow_insulin_seq, fast_insulin_seq,ripple_connections)
+        r_stat_temp.add_values(index=index, slow_insulin_seq=slow_insulin_seq, 
+                               fast_insulin_stat=fast_insulin_seq,ripple_connections=ripple_connections)
 
         return r_stat_temp
         
