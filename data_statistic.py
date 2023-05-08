@@ -68,7 +68,7 @@ class Ripple_stats:
         self.fast_time_vs_max=datetime.timedelta(0)
         self.fast_time_vs_min=datetime.timedelta(0)
         
-    def add_values(self, index:int, slow_insulin_seq:t.List[t.Tuple[datetime.time, str,float]], 
+    def add_values(self, index:int, slow_insulin_seq:t.List[t.Tuple[datetime.time, str,float]],
                    fast_insulin_seq:t.List[t.Tuple[datetime.time, str,float]], 
                    ripple_connections:t.List[t.List[t.Tuple[float, int, int]]]) -> None:
         """

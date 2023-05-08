@@ -14,6 +14,10 @@ def get_name_and_type(data_dict: t.Dict[str, t.List]) -> t.Dict[str, str]:
     iterable
 
     Args:
+        data_dict: a dict that contains the key as string and the values as iterable values of only immutable values and Equal length
+    
+    Returns:
+        dict that has the same keys and values of str type containing the type of elements in the values of the recieved dict
     """
     return {key: value[0] for key, value in data_dict.items()}
 
@@ -22,6 +26,13 @@ def get_name_and_value(data_iter: t.Dict[str, t.List], index: int) -> t.Dict[str
     """
     Method that receives a Dict with iterable values of EQUAL length, that contain immutable values, which in turn
     are not iterable, AND an index and returns a Dict containing the same keys with the value at the given position
+
+    Args:
+        data_iter:a dict that contains the key as string and the values as iterable values of only immutable values and EQUAL length 
+        index: the position of the element in the iterable list we want to access
+
+    Returns:
+        dict having the same keys but as values a single element from the iterable index position
     """
     return {key: value[index] for key, value in data_iter.items()}
 

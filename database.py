@@ -189,8 +189,9 @@ class DatabaseManager:
         It passes through a pandas Dataframe and it is written
         Called by select_and_write_to_xls_file
         """
-        with pd.ExcelWriter(name, engine="xlsxwriter") as writer:
-            df.to_excel(writer, header=True, engine="xlsxwriter", index=True)
+
+        with pd.ExcelWriter(name, engine="openpyxl") as writer:
+            df.to_excel(writer, header=True, engine="openpyxl", index=True)
     
     def select_and_write_to_xls_file(
         self,

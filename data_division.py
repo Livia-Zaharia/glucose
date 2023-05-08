@@ -344,7 +344,7 @@ class Divide:
         slow_insulin_seq, fast_insulin_seq=self._divide_by_fast_or_slow_insulin(insulin_list[index])
     
         r_stat_temp.add_values(index=index, slow_insulin_seq=slow_insulin_seq, 
-                               fast_insulin_stat=fast_insulin_seq,ripple_connections=ripple_connections)
+                               fast_insulin_seq=fast_insulin_seq,ripple_connections=ripple_connections)
 
         return r_stat_temp
         
