@@ -1,5 +1,9 @@
+"""
+Module for graphical analysis of the ripple
+"""
 import math
 import typing as t
+
 from ripple import Ripple
 
 
@@ -14,6 +18,14 @@ class Analyze:
     def _compare_ripple_items(self, ripple1: Ripple, ripple2: Ripple) -> t.Tuple[float, float]:
         """
         Compare two Ripple items and return their percentages of close values.
+
+        Args:
+            ripple1/ripple2: Ripple objects
+        
+        Returns:
+            tuple:
+            percent_ripple1,percent_ripple2: float representing the percent value of the number of values 
+                                            extracted in comparison and the total length of the graph
         """
         common_interval, close_value_count = self._compare_two_graphs(ripple1, ripple2)
 
@@ -23,10 +35,16 @@ class Analyze:
             return percent_ripple1, percent_ripple2
         return 0, 0
 
-    def _compare_ripple_pairs(self, index1: int, ripple1: Ripple, index2: int, ripple2: Ripple,
+    def _create_list_ripple_pairs(self, index1: int, ripple1: Ripple, index2: int, ripple2: Ripple,
                               connections: t.List[t.List[t.Tuple[float, int, int]]]) -> None:
         """
         Compare a pair of Ripple items and update the connections list accordingly.
+
+        Args:
+            index1/index2:int, position of ripple in the ripple list
+            ripple1/ripple2: ripple objects
+            connections: a list of lists with tuples that gets updated by using the same address.
+                it starts off as an empty list and then it grows into the list that is modified at each run
         """
         percent_ripple1, percent_ripple2 = self._compare_ripple_items(ripple1, ripple2)
 
@@ -39,6 +57,9 @@ class Analyze:
         Method that compares two graphs by taking each graph and comparing it to all the other graphs in the
         ripple_list. It returns a list [with as many lists as there are elements in ripple_list[each of which contain
         a list of tuples(percentage, origin and comparison) that have not null values]]
+
+        Returns:
+            connections: the list of lists of tuples(float, int, int)
         """
         # Initialize connections list with empty lists.
         connections = [[] for _ in self.ripple_list]
@@ -48,7 +69,7 @@ class Analyze:
 
         # Iterate through each unique pair of indices and compare the corresponding Ripple items.
         for index1, index2 in pairs:
-            self._compare_ripple_pairs(index1, self.ripple_list[index1], index2, self.ripple_list[index2], connections)
+            self._create_list_ripple_pairs(index1, self.ripple_list[index1], index2, self.ripple_list[index2], connections)
 
         # Sort each list of tuples in connections.
         for item in connections:
@@ -62,6 +83,15 @@ class Analyze:
         Method that returns comparison of two graphs going by value. It determines the common interval between the
         graphs starting from the max in normalized form. Then it returns a tuple having (total length compared,
         number of items in that comparison that are relatively close in value to each other)
+
+        Args:
+            ripple_a/ripple_b: Ripple objects to be compared
+        
+        Returns:
+            a tuple composed of:
+            len(compare_a): number of elements that were compared out of the length of the ripple
+            sum_of_elements: sum of true values- basically how many elements out of those in 
+                            len(compare_a) were a close enough match
         """
 
         #start indexes of ripple A and ripple B- index- as in list[index]

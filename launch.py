@@ -1,7 +1,6 @@
 """
 The main program where everything happens-it obtains the data from a csv imported by the user
 and then generates the summary and the analysis
-
 """
 import typing as t
 from pathlib import Path
@@ -28,7 +27,7 @@ def main():
     insulin = data_acquisition.get_insulin_data(file_name=file_location)
     write_a_message("FILE ACQUIRED")
 
-    d = Divide(glucose, insulin)
+    d = Divide(glucose=glucose, insulin=insulin)
     trend_list = d.trend_setting()
 
     threshold = 1
@@ -65,34 +64,49 @@ def main():
 
     create_viewer(ripple_list, db, ripple_stat_list)
 
-    # data_display.batch_write_graphs_to_disk(ripple_list=ripple_list, base_path=IMAGES_PATH)
 
 
 def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], path: Path) -> DatabaseManager:
     """
     Creates a database of ripples
 
-    """
+    Args:
+        divide: A Divide object containing methods for division
+        ripple_list: a list of ripple objects
+        path: the path where to save the database
 
+    Returns:
+        db:DatabaseManager object containing the glucose data
+
+    """
+    #check if there is a database in that location already
     if path / "glucose.db" not in path.glob("*"):
 
         db = DatabaseManager("glucose.db")
 
+        #split the ripple into iterable and not iterable dictionaries 
         data_dict, data_noniter = divide.divide_by_iterable(data=ripple_list[0])
+        #creates the table of non iterable items
         db.create_table_if_not_exists("BASIC_DATA_SUMMARY", data_noniter)
 
+        #creates a new dict containing the same key but with values that are the 
+        # type of each list's composing items
         simplified_data_iter = data_reconfig.get_name_and_type(data_dict=data_dict)
         simplified_data_iter.setdefault("ID_ripple", 0)
 
+        #creates the table for iterable items
         name_of_individual = "_BASIC_RAW_DATA"
         db.create_table_if_not_exists(name_of_individual, simplified_data_iter)
 
+        #takes each item in ripple list, divides it into iterable and not iterable
         for item in ripple_list:
-            data_dict, data_noniter = divide.divide_by_iterable(data=item)
+            data_iter, data_noniter = divide.divide_by_iterable(data=item)
+            #extracts position of ripple in list (index from list)
             _id = db.add("BASIC_DATA_SUMMARY", data_noniter)
 
-            for index in range(len(list(data_dict.values())[0])):
-                simplified_data_iter_row = data_reconfig.get_name_and_value(data_iter=data_dict, index=index)
+            #writes line per line the iterable values found in the ripple element at given index
+            for index in range(len(list(data_iter.values())[0])):
+                simplified_data_iter_row = data_reconfig.get_name_and_value(data_iter=data_iter, index=index)
                 simplified_data_iter_row.setdefault("ID_ripple", _id)
                 db.add(name_of_individual, simplified_data_iter_row)
 
@@ -164,8 +178,6 @@ def _create_stat_database(ripple_stat_list, path):
             data_noniter = deepcopy(dict(vars(item)))
             data_noniter["slow_insulin_seq"]=data_reconfig.convert_list_of_tuples_to_string(data_noniter["slow_insulin_seq"])
             data_noniter["fast_insulin_seq"]=data_reconfig.convert_list_of_tuples_to_string(data_noniter["fast_insulin_seq"])
-            # print(no)
-            # print(data_noniter)
             _id = db.add("_GLUCOSE_STATS", data_noniter)
 
         return db

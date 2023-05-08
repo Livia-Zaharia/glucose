@@ -218,6 +218,9 @@ class DatabaseManager:
         Takes in a table name to INSERT data INTO and a data dictionary with columns
         as keys and values as multiple rows and column values.
         It returns the last used id
+
+        Args:
+        
         """
         keys = data.keys()
         

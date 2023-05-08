@@ -9,6 +9,7 @@ import datetime
 def round_to_multiple(number: float, multiple: float) -> float:
         """
         Simple method of rounding up to a set value
+        Args:
         
         """
         return multiple * round(number / multiple)
