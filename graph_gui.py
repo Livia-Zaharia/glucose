@@ -44,7 +44,7 @@ def write_a_message(text: str) ->None:
     # Close the window
     window.close()
 
-def create_viewer(ripple_list: List[Ripple], db: DatabaseManager, ripple_stat_list:List[Ripple_stats]) -> None:
+def create_viewer(ripple_list: List[Ripple], db: DatabaseManager, ripple_stat_list:List[Ripple_stats], db_s:DatabaseManager, db_a:DatabaseManager) -> None:
     """
     Function to create a viewer for selecting a Ripple and displaying its graph
 
@@ -60,18 +60,29 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager, ripple_stat_li
     layout = [
         [
             [
-                sg.Text("Number of element", font=('Arial Bold', 20), expand_x=True, justification='center'),
+                sg.Text("Number of element", font=('Arial Bold', 20), expand_x=True, justification='center', grab= True),
                 sg.In(key="-IN-"),
-                sg.Text("                   ",key="-OUT-")
+                sg.Text("                    ",key="-OUT-")
             ],
-            [sg.Button("-CREATE ONE-"),
-             sg.Button("-CREATE ALL-")
+
+            [
+               sg.Rad(text="HTML",group_id=1,key="-HTML-"),
+               sg.Rad(text="XLS raw data",group_id=1, key="-XLS RAW-"),
+               sg.Rad(text="XLS analysis",group_id=1, key="-XLS ANALYSIS-"),
+               sg.Rad(text="ALL",group_id=1, key="-EXTRACT ALL-") 
+            ],
+            
+            [
+                sg.Button("-CREATE ONE-"),
+                sg.Button("-CREATE ALL-")
             ]
+            
         ]
     ]
 
     # Create a window with the defined layout and size
-    window = sg.Window("GRAPH_SELECTOR", layout, size=(715, 100))
+    window = sg.Window("GRAPH_SELECTOR", layout,size =(800,150))
+    
 
     while True:
         # Read events and values from the window
@@ -83,35 +94,65 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager, ripple_stat_li
 
         # If the event is "-CREATE ONE-", create the graphic and the excel for the selected Ripple
         if event == "-CREATE ONE-":
+            
             index = int(values["-IN-"])
             current_ripple = ripple_list[index]
             current_ripple_stat=ripple_stat_list[index]
             slow_insulin_seq=current_ripple_stat.slow_insulin_seq
             fast_insulin_seq=current_ripple_stat.fast_insulin_seq
 
-            
+                
             data_path = IMAGES_PATH / f"Ripple_no{index}"
             data_path.mkdir(parents=True, exist_ok=True)
 
+            if values["-EXTRACT ALL-"] or values["-HTML-"]:
 
-            window.perform_long_operation(
-                lambda: current_ripple.create_graphic(index=index, should_write_html=True,data_path=data_path, 
-                                                      slow_insulin=slow_insulin_seq, fast_insulin=fast_insulin_seq),
-                                        '-OPERATION1 DONE-')
-
+                window.perform_long_operation(
+                    lambda: current_ripple.create_graphic(index=index, should_write_html=True,data_path=data_path, 
+                                                        slow_insulin=slow_insulin_seq, fast_insulin=fast_insulin_seq),
+                                            '-ONE HTML DONE-')
             
+            if values["-EXTRACT ALL-"] or values["-XLS RAW-"]:
+
+                name = data_path / f"_01_BASIC_DATA_{index}.xlsx"
+                
+                window.perform_long_operation(
+                    lambda: (db.select_and_write_to_xls_file(name=str(name), table_name="BASIC_DATA_SUMMARY", sheet_name="BASIC DATA SUMMARY", criteria={"ID": str(index)})),
+                                            '-ONE XLS BASIC DONE-')
+                
+
+                name = data_path / f"_02_BASIC_RAW_DATA_{index}.xlsx"
+
+                window.perform_long_operation(
+                    lambda: (db.select_and_write_to_xls_file(name=str(name), table_name="_BASIC_RAW_DATA", criteria={"ID_ripple": str(index)})),
+                                            '-ONE XLS RAW DONE-')
+            
+
+            if values["-EXTRACT ALL-"] or values["-XLS ANALYSIS-"]:
+                                             
+                name = data_path / f"_03_GLUCOSE STATS_{index}.xlsx"
+
+                window.perform_long_operation(
+                            lambda: (db_s.select_and_write_to_xls_file(name=str(name), table_name="_GLUCOSE_STATS", sheet_name="GLUCOSE STATS", criteria={"ID": str(index)})),
+                                                '-ONE XLS GLUCOSE STATS DONE-')
+                
+                name = data_path / f"_04_ANALYSIS_DATA_RAW_{index}.xlsx"
+                
+                window.perform_long_operation(
+                    lambda: (db_a.select_and_write_to_xls_file(name=str(name), table_name="_PATTERN_ANALYSIS_RAW_DATA", sheet_name="PATTERN RAW DATA", criteria={"From_value": str(index)})),
+                                            '-ONE XLS ANALYSIS DONE-')
+           
+
+           
             window["-OUT-"].update(f"{index} was written")
 
-            name = data_path / f"_BASIC_RAW_DATA_{index}.xlsx"
 
-            window.perform_long_operation(
-                lambda: (db.select_and_write_to_xls_file(name=str(name), table_name="_BASIC_RAW_DATA", criteria={"ID_ripple": str(index)})),
-                                        '-OPERATION2 DONE-')
 
         # If the event is "-CREATE ALL-", create the graphic and the excel for ALL the Ripples
         #use perform_long_operation rather than start thread since perform long operation also closes the thread
        
         if event == "-CREATE ALL-":
+
             for index in range (len(ripple_list)):
                 current_ripple = ripple_list[index]
                 current_ripple_stat=ripple_stat_list[index]
@@ -122,17 +163,49 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager, ripple_stat_li
                 data_path = IMAGES_PATH / f"Ripple_no{index}"
                 data_path.mkdir(parents=True, exist_ok=True)
 
-                window.perform_long_operation(
-                    lambda: current_ripple.create_graphic(index=index, should_write_html=True,data_path=data_path, 
-                                                          slow_insulin=slow_insulin_seq, fast_insulin=fast_insulin_seq),
-                                            '-OPERATION3 DONE-')
-                event,values=window.read()
+                if values["-EXTRACT ALL-"] or values["-HTML-"]:
 
-                name = data_path / f"_BASIC_RAW_DATA_{index}.xlsx"
+                    window.perform_long_operation(
+                        lambda: current_ripple.create_graphic(index=index, should_write_html=True,data_path=data_path, 
+                                                            slow_insulin=slow_insulin_seq, fast_insulin=fast_insulin_seq),
+                                                '-ALL HTML DONE-')
+                                    
+                    event,values=window.read()
+                
+                if values["-EXTRACT ALL-"] or values["-XLS RAW-"]:
 
-                window.perform_long_operation(
-                    lambda: (db.select_and_write_to_xls_file(name=str(name), table_name="_BASIC_RAW_DATA",criteria={"ID_ripple": str(index)})),
-                                            '-OPERATION4 DONE-')
+                    name = data_path / f"_01_BASIC_DATA_{index}.xlsx"
+                
+                    window.perform_long_operation(
+                        lambda: (db.select_and_write_to_xls_file(name=str(name), table_name="BASIC_DATA_SUMMARY", sheet_name="BASIC DATA SUMMARY", criteria={"ID": str(index)})),
+                                            '-ALL XLS BASIC DONE-')
+                    
+                    event,values=window.read()
+                    name = data_path / f"_02_BASIC_RAW_DATA_{index}.xlsx"
+
+                    window.perform_long_operation(
+                        lambda: (db.select_and_write_to_xls_file(name=str(name), table_name="_BASIC_RAW_DATA", criteria={"ID_ripple": str(index)})),
+                                            '-ALL XLS RAW DONE-')
+                    event,values=window.read()
+                    
+
+                if values["-EXTRACT ALL-"] or values["-XLS ANALYSIS-"]:
+                                             
+                    name = data_path / f"_03_GLUCOSE STATS_{index}.xlsx"
+
+                    window.perform_long_operation(
+                            lambda: (db_s.select_and_write_to_xls_file(name=str(name), table_name="_GLUCOSE_STATS", sheet_name="GLUCOSE STATS", criteria={"ID": str(index)})),
+                                                '-ALL XLS GLUCOSE STATS DONE-')
+                
+                    event,values=window.read()
+                    name = data_path / f"_04_ANALYSIS_DATA_RAW_{index}.xlsx"
+                
+                    window.perform_long_operation(
+                        lambda: (db_a.select_and_write_to_xls_file(name=str(name), table_name="_PATTERN_ANALYSIS_RAW_DATA", sheet_name="PATTERN RAW DATA", criteria={"From_value": str(index)})),
+                                            '-ALL XLS ANALYSIS DONE-')
+                    event,values=window.read()
+                    
+               
 
             break
 

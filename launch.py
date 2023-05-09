@@ -62,7 +62,7 @@ def main():
     db_s=_create_stat_database(ripple_stat_list=ripple_stat_list, path=CURRENT_PATH_CWD)
     write_a_message("STATISTIC DATABASE CREATED")
 
-    create_viewer(ripple_list, db, ripple_stat_list)
+    create_viewer(ripple_list, db, ripple_stat_list, db_s, db_a)
 
 
 

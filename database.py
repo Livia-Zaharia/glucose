@@ -216,7 +216,7 @@ class DatabaseManager:
         
         return statement
     
-    def _write_to_xls_file(self, df:pd.DataFrame, name: str):
+    def _write_to_xls_file(self, df:pd.DataFrame, name: str, sheet_name:t.Optional[str]="Sheet1"):
         """
         Method for writing to xls directly from the DB manager.
         It passes through a pandas Dataframe and it is written
@@ -228,12 +228,13 @@ class DatabaseManager:
         """
 
         with pd.ExcelWriter(name, engine="openpyxl") as writer:
-            df.to_excel(writer, header=True, engine="openpyxl", index=True)
+            df.to_excel(writer, sheet_name=sheet_name, header=True, engine="openpyxl", index=True)
     
     def select_and_write_to_xls_file(
         self,
         name:str, 
         table_name: str, 
+        sheet_name:t.Optional[str]="Sheet1",
         criteria: t.Dict[str, str] = {}, 
         order_by: t.Optional[str] = None,
         ordered_descending: bool = False,
@@ -258,7 +259,7 @@ class DatabaseManager:
             new_statement=self._select_statement(table_name,criteria, order_by, ordered_descending).replace("?",str(item),1)
     
         df=pd.read_sql_query(new_statement, self.connection)
-        self._write_to_xls_file(df, name)
+        self._write_to_xls_file(df, name,sheet_name)
     
     def add_multiple_rows(self, table_name: str, data: t.Dict[str, t.List], tuple_data:t.List[t.Tuple]) -> None:
         """
