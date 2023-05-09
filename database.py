@@ -34,6 +34,13 @@ class DatabaseManager:
         """
         Takes in a SQL statement and optionally the values for placeholders
         and executes it with SQLite
+
+        Args:
+            statement:the command written in sql str format
+            values: what to replace the placeholders with, tuples of str
+        
+        Returns:
+            a cursor, sqlite3 cursor
         """
         try:
             with self.connection:
@@ -49,8 +56,14 @@ class DatabaseManager:
     
     def _type_for_columns(self,columns_specs:dict)->dict:
         """
-        Module that recieves a dict of column names and sample of column data in python and returns a dict with the ID key inserted
+        Module that receives a dict of column names and sample of column data in python and returns a dict with the ID key inserted
         plus the same keys as before which have been converted to SQL data types
+
+        Args:
+            columns_specs: dict with key as column names and values as sample of column data
+        
+        Returns:
+            new_columns:a dict with the same key as in input but the values contain the converted type of the value in sql equivalent
         """
         new_columns={}
         new_columns.setdefault("ID",'INTEGER PRIMARY KEY AUTOINCREMENT')
@@ -74,6 +87,10 @@ class DatabaseManager:
         """
         Takes in a table name and the columns with names as keys and types as values and then creates
         the CREATE TABLE statement to be executed with SQLite
+
+        Args:
+            table_name: string with name of the table
+            columns: dict with column names as keys and the data type in sql format for values
         """
         columns=self._type_for_columns(columns)
         columns_with_types = []
@@ -106,6 +123,13 @@ class DatabaseManager:
         as keys and values as values.
         It returns the last used id
         And it works row by row
+
+        Args:
+            table_name: str -the name of the table where to add
+            data:dict, the data to be added organized with keys as column names and values as actual data to be added
+        
+        Returns:
+            last row added id
         """
         keys = data.keys()
 
@@ -130,7 +154,7 @@ class DatabaseManager:
         """
 
         result = self._execute(statement, column_values)
-        #because the lastrow id will literally return the last- that means not 0 if it si first, but 1
+        #because the lastrow id will literally return the last- that means not 0 if it is first, but 1
         return (result.lastrowid-1)
 
     def delete(self, table_name: str, criteria: t.Dict[str, str]) -> None:
@@ -157,11 +181,20 @@ class DatabaseManager:
         criteria: t.Dict[str, str] = {}, 
         order_by: t.Optional[str] = None,
         ordered_descending: bool = False,
-        ) -> pd.DataFrame:
+        ) -> str:
         """
         Takes in a table name and optionally a criteria as a dictionary, a column to order by
         and a boolean flag to order it by that column descending or not
         returns the select statement construction
+
+        Args:
+            table_name:str, the table name
+            criteria: dict where keys are column name, value are values that meet the criteria of equality
+            order_by: optional value to sort by
+            ordered_descending:optional value to change the way it is sorted
+
+        Returns:
+            statement: the string that is searches for
         """
         
         select_criteria_values = tuple(criteria.values())
@@ -188,6 +221,10 @@ class DatabaseManager:
         Method for writing to xls directly from the DB manager.
         It passes through a pandas Dataframe and it is written
         Called by select_and_write_to_xls_file
+
+        Args:
+            df: a dataframe whill a values take with a fetchall in previous calls
+            name: str a name of the xls
         """
 
         with pd.ExcelWriter(name, engine="openpyxl") as writer:
@@ -200,9 +237,18 @@ class DatabaseManager:
         criteria: t.Dict[str, str] = {}, 
         order_by: t.Optional[str] = None,
         ordered_descending: bool = False,
-        ) -> pd.DataFrame:
+        ):
         """
         Method that recieves the imput for a querry in a DB, then generates the xls at given location
+
+        Args:
+            table_name:str, the table name
+            criteria: dict where keys are column name, value are values that meet the criteria of equality
+            order_by: optional value to sort by
+            ordered_descending:optional value to change the way it is sorted
+
+        Returns:
+            None- just creates the dataframe and the output is the xls file
         """
 
         select_criteria_values = tuple(criteria.values())

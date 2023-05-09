@@ -10,7 +10,10 @@ def round_to_multiple(number: float, multiple: float) -> float:
         """
         Simple method of rounding up to a set value
         Args:
-        
+            number:float
+            multiple:float
+        Returns:
+            a float rounded up to a certain value
         """
         return multiple * round(number / multiple)
 
@@ -73,6 +76,13 @@ class Ripple_stats:
                    ripple_connections:t.List[t.List[t.Tuple[float, int, int]]]) -> None:
         """
         Method of adding all the values into the Ripple_Stats object
+
+        Args:
+            index: int, the positon of the current ripple
+            slow_insulin_seq: list of tuples for the events of slow insulin
+            fast_insulin_seq: list of tuples for the events of fast insulin
+            ripple_connections: list of list with the connections and similarity between ripple graphs
+        
         """
         percent, position_from, position_to =ripple_connections[index][-1]
         self.max_graph_similarity=f"{round((percent) * 100)}% -from {position_from}-to {position_to}"
@@ -98,7 +108,10 @@ class Ripple_stats:
    
     def _check_insulin_positioning(self,slow_insulin_exists:bool,fast_insulin_exists:bool) ->None:
         """
-        Method that starts the checking for insulin position in relation to glucose values  
+        Method that starts the checking for insulin position in relation to glucose values 
+
+        Args:
+            slow_/fast_insulin_exists: bool value to be used in starting the time comparison 
         """
         if slow_insulin_exists:
             self.slow_time_vs_max,self.slow_time_vs_min = self.analyze_positions(self.slow_insulin_seq)
@@ -113,7 +126,14 @@ class Ripple_stats:
         and insulin interval with start and end insulin value
         it returns the tuple from_max, to_min starting from the assumption that insulin shots are made when glucose is high and as 
         a direct result it will go down. since this is so there will be cases in which the tuple returned will be ("NEXT/PREV","NEXT/PREV")
-        because that case is not feasible in the context of this ripple, meaning that the effects of the shot are influencing the other ripples, not the current one   
+        because that case is not feasible in the context of this ripple, meaning that the effects of the shot are influencing the other ripples,
+        not the current one   
+
+        Args:
+            interval_list: the list of tuples containing the date, the type and the units stored- comes from insulin sequence by type
+        
+        Returns:
+            tuple of two timedelta values describing distance from max glucose value and to min glucose value per interval
         """     
         #start of the glucose interval- note that this is not the start and end value of the interval 
         # according to time, but the max and min values- no matter the order of occurrence

@@ -40,6 +40,13 @@ def get_name_and_value(data_iter: t.Dict[str, t.List], index: int) -> t.Dict[str
 def convert_from_tuple_list_to_dict(input_list: t.List[t.Tuple], key_list: t.List[str]) -> t.Dict[str, t.List]:
     """
     Method to convert a list of x tuples of n elements into a dict with n keys with lists of x values
+
+    Args:
+        input_list: a list of tuples that have values of atributes
+        key_list: a list of strings of the same length as the length of tuples
+
+    Returns:
+        result_dict: a dict with keys from key_list and values from the elements of the tuples
     """
     # Initialize an empty list for each key in the key_list and store it in the result_dict dictionary
     result_dict = {key: [] for key in key_list}
@@ -55,7 +62,15 @@ def convert_from_tuple_list_to_dict(input_list: t.List[t.Tuple], key_list: t.Lis
     return result_dict
 
 def convert_list_of_tuples_to_string(sequence:t.List[tuple]) -> str:
-    
+    """
+    Method that joins the element of a tuple into a string for easy access
+
+    Args:
+        sequence: a list of tuples
+
+    Returns:
+        final_text: a string value with the elements in the sequence separate by newline
+    """
     text_list=[]
     for elem in sequence:
         text_list.append(str(elem))
