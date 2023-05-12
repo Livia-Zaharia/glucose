@@ -9,6 +9,7 @@ from copy import deepcopy
 import data_acquisition
 import data_display
 import data_reconfig
+import constants
 from data_analysis import Analyze
 from data_division import Divide
 from database import DatabaseManager
@@ -28,6 +29,7 @@ def main():
     write_a_message("FILE ACQUIRED")
 
     d = Divide(glucose=glucose, insulin=insulin)
+    start_end=d.interval()
     trend_list = d.trend_setting()
 
     threshold = 1
@@ -35,7 +37,7 @@ def main():
     ripple_list = d.generate_ripples(trend_list, trend_list_count)
     write_a_message("FILE DIVIDED")
 
-    db = _create_basic_database(divide=d, ripple_list=ripple_list, path=CURRENT_PATH_CWD)
+    db = _create_basic_database(divide=d, ripple_list=ripple_list, path=CURRENT_PATH_CWD, start_end=start_end)
     write_a_message("BASIC DATABASE CREATED")
 
     a = Analyze(ripple_list=ripple_list)
@@ -56,7 +58,7 @@ def main():
     db_a = _create_analysis_database(ripple_connections=ripple_connections, path=CURRENT_PATH_CWD)
     write_a_message("ANALYSIS DATABASE CREATED")
 
-    db_a_summary = _extract_summary_of_analysis(ripple_connections=ripple_connections)
+    _extract_summary_of_analysis(ripple_connections=ripple_connections)
     write_a_message("SUMMARY OF ANALYSIS CREATED")
 
     db_s=_create_stat_database(ripple_stat_list=ripple_stat_list, path=CURRENT_PATH_CWD)
@@ -66,7 +68,7 @@ def main():
 
 
 
-def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], path: Path) -> DatabaseManager:
+def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], path: Path,start_end:str) -> DatabaseManager:
     """
     Creates a database of ripples
 
@@ -74,23 +76,33 @@ def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], path: Pa
         divide: A Divide object containing methods for division
         ripple_list: a list of ripple objects
         path: the path where to save the database
+        start_end: str representing the time interval timestamp value for the file
 
     Returns:
         db:DatabaseManager object containing the glucose data
 
     """
-    #check if there is a database in that location already
-    if path / "glucose.db" not in path.glob("*"):
 
-        db = DatabaseManager("glucose.db")
+    db_new_name=constants.GLUCOSE_DB+start_end+".db"
+    print(db_new_name)
+    print (type(db_new_name))
+    #check if there is a database in that location already
+    if path / db_new_name not in path.glob("*"):
+
+        db = DatabaseManager(db_new_name)
 
         #split the ripple into iterable and not iterable dictionaries 
         data_dict, data_noniter = divide.divide_by_iterable(data=ripple_list[0])
         #creates the table of non iterable items
         db.create_table_if_not_exists("BASIC_DATA_SUMMARY", data_noniter)
+        print (data_dict)
+        print(data_noniter)
 
         #creates a new dict containing the same key but with values that are the 
         # type of each list's composing items
+
+        data_dict=data_reconfig.convert_to_list(data_dict)
+
         simplified_data_iter = data_reconfig.get_name_and_type(data_dict=data_dict)
         simplified_data_iter.setdefault("ID_ripple", 0)
 
@@ -106,6 +118,7 @@ def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], path: Pa
 
             #writes line per line the iterable values found in the ripple element at given index
             for index in range(len(list(data_iter.values())[0])):
+                data_iter=data_reconfig.convert_to_list(data_iter)
                 simplified_data_iter_row = data_reconfig.get_name_and_value(data_iter=data_iter, index=index)
                 simplified_data_iter_row.setdefault("ID_ripple", _id)
                 db.add(name_of_individual, simplified_data_iter_row)
@@ -113,7 +126,7 @@ def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], path: Pa
         return db
 
     else:
-        db = DatabaseManager("glucose.db")
+        db = DatabaseManager(db_new_name)
         return db
 
 

@@ -6,7 +6,11 @@ from __future__ import annotations
 
 import typing as t
 
-
+def convert_to_list(data:dict) -> t.Dict[str,list]:
+        for key, value in data.items():
+            if type(value)!= list:
+                data[key]=list(value)
+        return data
 def get_name_and_type(data_dict: t.Dict[str, t.List]) -> t.Dict[str, str]:
     """
     Method that receives a Dict with iterable values of EQUAL length, that contain immutable values, which in turn
@@ -19,8 +23,9 @@ def get_name_and_type(data_dict: t.Dict[str, t.List]) -> t.Dict[str, str]:
     Returns:
         dict that has the same keys and values of str type containing the type of elements in the values of the recieved dict
     """
-    return {key: value[0] for key, value in data_dict.items()}
 
+
+    return {key: value[0] for key, value in data_dict.items()}
 
 def get_name_and_value(data_iter: t.Dict[str, t.List], index: int) -> t.Dict[str, int | float | str]:
     """

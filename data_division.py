@@ -21,6 +21,10 @@ class Divide:
         self.glucose = glucose if glucose is not None else pd.DataFrame()
         self.insulin = insulin if insulin is not None else pd.DataFrame()
 
+    def interval(self) -> str:
+        """Returns the str value of the interval for which we do analysis"""
+        return ("-"+str(self.glucose.iloc[0,0].date())+"-"+str(self.glucose.iloc[-1,0].date()))
+
     def trend_setting(self) -> t.List[int]:
         """
         Method that sets the trends- basically takes the values extracted using pandas in csv_insert()
