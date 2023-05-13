@@ -55,13 +55,13 @@ def main():
     #     print("*"*50)
     
 
-    db_a = _create_analysis_database(ripple_connections=ripple_connections, path=CURRENT_PATH_CWD)
+    db_a = _create_analysis_database(ripple_connections=ripple_connections, path=CURRENT_PATH_CWD,start_end=start_end)
     write_a_message("ANALYSIS DATABASE CREATED")
 
-    _extract_summary_of_analysis(ripple_connections=ripple_connections)
+    _extract_summary_of_analysis(ripple_connections=ripple_connections,start_end=start_end)
     write_a_message("SUMMARY OF ANALYSIS CREATED")
 
-    db_s=_create_stat_database(ripple_stat_list=ripple_stat_list, path=CURRENT_PATH_CWD)
+    db_s=_create_stat_database(ripple_stat_list=ripple_stat_list, path=CURRENT_PATH_CWD, start_end=start_end)
     write_a_message("STATISTIC DATABASE CREATED")
 
     create_viewer(ripple_list, db, ripple_stat_list, db_s, db_a)
@@ -84,8 +84,6 @@ def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], path: Pa
     """
 
     db_new_name=constants.GLUCOSE_DB+start_end+".db"
-    print(db_new_name)
-    print (type(db_new_name))
     #check if there is a database in that location already
     if path / db_new_name not in path.glob("*"):
 
@@ -95,8 +93,6 @@ def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], path: Pa
         data_dict, data_noniter = divide.divide_by_iterable(data=ripple_list[0])
         #creates the table of non iterable items
         db.create_table_if_not_exists("BASIC_DATA_SUMMARY", data_noniter)
-        print (data_dict)
-        print(data_noniter)
 
         #creates a new dict containing the same key but with values that are the 
         # type of each list's composing items
@@ -130,7 +126,7 @@ def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], path: Pa
         return db
 
 
-def _create_analysis_database(ripple_connections: t.List[t.List[t.Tuple[float, int, int]]], path: Path) \
+def _create_analysis_database(ripple_connections: t.List[t.List[t.Tuple[float, int, int]]], path: Path, start_end:str) \
         -> DatabaseManager:
     """
     Creates a database of ripple analysis
@@ -147,9 +143,11 @@ def _create_analysis_database(ripple_connections: t.List[t.List[t.Tuple[float, i
     temp = data_reconfig.convert_from_tuple_list_to_dict(input_list=ripple_connections_values, key_list=key_list)
     simplified_data = data_reconfig.get_name_and_type(temp)
 
-    if path / "glucose_analysis.db" not in path.glob("*"):
+    db_new_name=constants.GLUCOSE_ANALYSIS_DB+start_end+".db"
 
-        db = DatabaseManager("glucose_analysis.db")
+    if path / db_new_name not in path.glob("*"):
+
+        db = DatabaseManager(db_new_name)
         name_of_individual = "_PATTERN_ANALYSIS_RAW_DATA"
         db.create_table_if_not_exists(name_of_individual, simplified_data)
 
@@ -160,11 +158,10 @@ def _create_analysis_database(ripple_connections: t.List[t.List[t.Tuple[float, i
         return db
 
     else:
-        db = DatabaseManager("glucose_analysis.db")
+        db = DatabaseManager(db_new_name)
         return db
 
-
-def _extract_summary_of_analysis(ripple_connections: t.List[t.List[t.Tuple[float, int, int]]]):
+def _extract_summary_of_analysis(ripple_connections: t.List[t.List[t.Tuple[float, int, int]]],start_end:str):
     summary_list = []
     sheet_name = "graph analysis"
 
@@ -172,14 +169,17 @@ def _extract_summary_of_analysis(ripple_connections: t.List[t.List[t.Tuple[float
         percent, position_from, position_to = item[-1]
         summary_list.append(f"from {position_from} to {position_to} there is a {round((percent) * 100)}% match")
 
-    data_display.write_analysis_to_xls_file(summary_list=summary_list, sheet_name=sheet_name)
+    name=constants.ANALYSIS_XLSX_FILE_NAME+start_end+".xlsx"
 
-def _create_stat_database(ripple_stat_list, path):
-    
-    
-    if path / "glucose_statistic.db" not in path.glob("*"):
+    data_display.write_list_to_xls_file(summary_list=summary_list, sheet_name=sheet_name, name=name)
 
-        db = DatabaseManager("glucose_statistic.db")
+def _create_stat_database(ripple_stat_list, path, start_end:str):
+    
+    db_new_name=constants.GLUCOSE_STATS_DB+start_end+".db"
+
+    if path / db_new_name not in path.glob("*"):
+
+        db = DatabaseManager(db_new_name)
 
         data = deepcopy(dict(vars(ripple_stat_list[0])))
         data["slow_insulin_seq"]=data_reconfig.convert_list_of_tuples_to_string(data["slow_insulin_seq"])
@@ -196,7 +196,7 @@ def _create_stat_database(ripple_stat_list, path):
         return db
 
     else:
-        db = DatabaseManager("glucose_statistic.db")
+        db = DatabaseManager(db_new_name)
         return db
 
 
