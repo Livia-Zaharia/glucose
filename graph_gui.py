@@ -13,9 +13,14 @@ from data_statistic import Ripple_stats
 
 # Set the current working directory path
 CURRENT_PATH_CWD = Path.cwd()
-# Set the image's path inside the current working directory
-IMAGES_PATH = CURRENT_PATH_CWD / "images_and_graphs"
 
+def set_directory(start_end:str):
+    """
+    Creates the folder where to store all data
+    """
+    # Set the image's path inside the current working directory
+    global IMAGES_PATH
+    IMAGES_PATH = CURRENT_PATH_CWD /"EXPORT"/ start_end/"images_and_graphs"
 
 def write_a_message(text: str) ->None:
     """
@@ -55,7 +60,9 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager, ripple_stat_li
                     it will be used to extract the xls version of the data summary
         ripple_stat_list: the list that contains the Ripple_Stats objects for each Ripple in part
                     it will be used to extract the insulin data position
+        
     """
+
     # Define the layout for the viewer window
     layout = [
         [

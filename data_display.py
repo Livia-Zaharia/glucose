@@ -12,7 +12,6 @@ import pandas as pd
 from constants import ANALYSIS_XLSX_FILE_NAME
 from ripple import Ripple
 
-CURRENT_PATH_CWD = Path.cwd()
 
 
 def create_dataframe_from_list(summary_list: t.List) -> pd.DataFrame:
@@ -46,7 +45,7 @@ def write_dataframe_to_xls_file(df: pd.DataFrame, file_path: Path, sheet_name: s
         df.to_excel(writer, sheet_name=sheet_name, index=False, header=True, engine="xlsxwriter")
 
 
-def write_list_to_xls_file(summary_list: t.List, sheet_name: str,name:str) -> None:
+def write_list_to_xls_file(summary_list: t.List, sheet_name: str,name:str, path:Path) -> None:
     """
     Write a list to an Excel file as a new sheet with the given sheet name.
 
@@ -54,9 +53,10 @@ def write_list_to_xls_file(summary_list: t.List, sheet_name: str,name:str) -> No
         summary_list: A list containing data to be written to the Excel file.
         sheet_name: The name of the sheet in the Excel file.
         name: the name of the file
+        path: the path to the folder where it will be written
     """
     # Combine the current working directory path with the file name
-    file_path = CURRENT_PATH_CWD / name
+    file_path = path / name
 
     # Create a DataFrame from the input list
     df = create_dataframe_from_list(summary_list=summary_list)

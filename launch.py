@@ -13,11 +13,10 @@ import constants
 from data_analysis import Analyze
 from data_division import Divide
 from database import DatabaseManager
-from graph_gui import select_file, write_a_message, create_viewer
+from graph_gui import select_file, write_a_message, create_viewer, set_directory
 from ripple import Ripple
 
 CURRENT_PATH_CWD = Path.cwd()
-IMAGES_PATH = CURRENT_PATH_CWD / "images_and_graphs"
 
 
 def main():
@@ -30,6 +29,11 @@ def main():
 
     d = Divide(glucose=glucose, insulin=insulin)
     start_end=d.interval()
+   
+    set_directory(start_end=start_end)
+    global DATA_PATH
+    DATA_PATH = CURRENT_PATH_CWD /"EXPORT"/ start_end
+   
     trend_list = d.trend_setting()
 
     threshold = 1
@@ -37,7 +41,7 @@ def main():
     ripple_list = d.generate_ripples(trend_list, trend_list_count)
     write_a_message("FILE DIVIDED")
 
-    db = _create_basic_database(divide=d, ripple_list=ripple_list, path=CURRENT_PATH_CWD, start_end=start_end)
+    db = _create_basic_database(divide=d, ripple_list=ripple_list, path=DATA_PATH, start_end=start_end)
     write_a_message("BASIC DATABASE CREATED")
 
     a = Analyze(ripple_list=ripple_list)
@@ -46,22 +50,13 @@ def main():
 
     ripple_stat_list=d.generate_ripple_statistics(ripple_list,ripple_connections)
 
-    # for elem in ripple_stat_list:
-    #     item=vars(elem)
-    #     for item0 in item:
-    #         print (item0)
-    #         print("-----------")
-    #         print (type(item0))
-    #     print("*"*50)
-    
-
-    db_a = _create_analysis_database(ripple_connections=ripple_connections, path=CURRENT_PATH_CWD,start_end=start_end)
+    db_a = _create_analysis_database(ripple_connections=ripple_connections, path=DATA_PATH,start_end=start_end)
     write_a_message("ANALYSIS DATABASE CREATED")
 
-    _extract_summary_of_analysis(ripple_connections=ripple_connections,start_end=start_end)
+    _extract_summary_of_analysis(ripple_connections=ripple_connections,start_end=start_end,path=DATA_PATH)
     write_a_message("SUMMARY OF ANALYSIS CREATED")
 
-    db_s=_create_stat_database(ripple_stat_list=ripple_stat_list, path=CURRENT_PATH_CWD, start_end=start_end)
+    db_s=_create_stat_database(ripple_stat_list=ripple_stat_list, path=DATA_PATH, start_end=start_end)
     write_a_message("STATISTIC DATABASE CREATED")
 
     create_viewer(ripple_list, db, ripple_stat_list, db_s, db_a)
@@ -83,9 +78,11 @@ def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], path: Pa
 
     """
 
-    db_new_name=constants.GLUCOSE_DB+start_end+".db"
+    db_new_name=path/(constants.GLUCOSE_DB+start_end+".db")
+    print(db_new_name)
+    path.mkdir(parents=True, exist_ok=True)
     #check if there is a database in that location already
-    if path / db_new_name not in path.glob("*"):
+    if db_new_name not in path.glob("*"):
 
         db = DatabaseManager(db_new_name)
 
@@ -125,7 +122,6 @@ def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], path: Pa
         db = DatabaseManager(db_new_name)
         return db
 
-
 def _create_analysis_database(ripple_connections: t.List[t.List[t.Tuple[float, int, int]]], path: Path, start_end:str) \
         -> DatabaseManager:
     """
@@ -143,9 +139,9 @@ def _create_analysis_database(ripple_connections: t.List[t.List[t.Tuple[float, i
     temp = data_reconfig.convert_from_tuple_list_to_dict(input_list=ripple_connections_values, key_list=key_list)
     simplified_data = data_reconfig.get_name_and_type(temp)
 
-    db_new_name=constants.GLUCOSE_ANALYSIS_DB+start_end+".db"
+    db_new_name=path/(constants.GLUCOSE_ANALYSIS_DB+start_end+".db")
 
-    if path / db_new_name not in path.glob("*"):
+    if db_new_name not in path.glob("*"):
 
         db = DatabaseManager(db_new_name)
         name_of_individual = "_PATTERN_ANALYSIS_RAW_DATA"
@@ -161,7 +157,7 @@ def _create_analysis_database(ripple_connections: t.List[t.List[t.Tuple[float, i
         db = DatabaseManager(db_new_name)
         return db
 
-def _extract_summary_of_analysis(ripple_connections: t.List[t.List[t.Tuple[float, int, int]]],start_end:str):
+def _extract_summary_of_analysis(ripple_connections: t.List[t.List[t.Tuple[float, int, int]]],start_end:str,path:Path):
     summary_list = []
     sheet_name = "graph analysis"
 
@@ -171,13 +167,13 @@ def _extract_summary_of_analysis(ripple_connections: t.List[t.List[t.Tuple[float
 
     name=constants.ANALYSIS_XLSX_FILE_NAME+start_end+".xlsx"
 
-    data_display.write_list_to_xls_file(summary_list=summary_list, sheet_name=sheet_name, name=name)
+    data_display.write_list_to_xls_file(summary_list=summary_list, sheet_name=sheet_name, name=name, path=path)
 
 def _create_stat_database(ripple_stat_list, path, start_end:str):
     
-    db_new_name=constants.GLUCOSE_STATS_DB+start_end+".db"
+    db_new_name=path/(constants.GLUCOSE_STATS_DB+start_end+".db")
 
-    if path / db_new_name not in path.glob("*"):
+    if db_new_name not in path.glob("*"):
 
         db = DatabaseManager(db_new_name)
 
