@@ -19,6 +19,7 @@ As output it has a database containg the values divided according to the inheren
 
 ## Dependencies
 #
+Can be installed individually or done by the requirements.txt file extracted from the tested version
 ### 1.Kaleido
 
 `pip install kaleido`
@@ -37,8 +38,8 @@ As output it has a database containg the values divided according to the inheren
 `pip install plotly`
 
 #
-### 4.Xlswritter
-`pip install xlswritter`
+### 4.Openpyxl
+`pip install openpyxl`
 
 #
 ### 5.PySimpleGui
