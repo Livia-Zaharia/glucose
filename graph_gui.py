@@ -184,7 +184,7 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager, ripple_stat_li
                     name = data_path / f"_01_BASIC_DATA_{index}.xlsx"
                 
                     window.perform_long_operation(
-                        lambda: (db.select_and_write_to_xls_file(name=str(name), table_name="BASIC_DATA_SUMMARY", sheet_name="BASIC DATA SUMMARY", criteria={"ID": str(index)})),
+                        lambda: (db.select_and_write_to_xls_file(name=str(name), table_name="BASIC_DATA_SUMMARY", sheet_name="BASIC DATA SUMMARY", criteria={"ID": str(index+1)})),
                                             '-ALL XLS BASIC DONE-')
                     
                     event,values=window.read()
@@ -201,7 +201,7 @@ def create_viewer(ripple_list: List[Ripple], db: DatabaseManager, ripple_stat_li
                     name = data_path / f"_03_GLUCOSE STATS_{index}.xlsx"
 
                     window.perform_long_operation(
-                            lambda: (db_s.select_and_write_to_xls_file(name=str(name), table_name="_GLUCOSE_STATS", sheet_name="GLUCOSE STATS", criteria={"ID": str(index)})),
+                            lambda: (db_s.select_and_write_to_xls_file(name=str(name), table_name="_GLUCOSE_STATS", sheet_name="GLUCOSE STATS", criteria={"ID": str(index+1)})),
                                                 '-ALL XLS GLUCOSE STATS DONE-')
                 
                     event,values=window.read()
