@@ -61,4 +61,9 @@ Can be installed individually or done by the requirements.txt file extracted fro
 ### 5.PySimpleGui
 `python pip -m install pysimplegui`
 
+#
+### 6.SciPy
+`python -m pip install scipy`
+
+
 

@@ -6,6 +6,11 @@ import copy
 from pathlib import Path
 import pandas as pd
 import plotly.express as px
+import typing as t
+
+import numpy as np
+from scipy.optimize import curve_fit
+
 CURRENT_PATH_CWD = Path.cwd()
 IMAGES_PATH = CURRENT_PATH_CWD / "images_and_graphs"
 
@@ -36,6 +41,9 @@ class Ripple:
         self.max_v = 0.0
         self.max_t = 0.0
         self.max_index = 0
+        self.a=0.0
+        self.b=0.0
+        self.c=0.0
 
     def add_values(self, bg_value: pd.DataFrame, time_value: pd.DataFrame, trend_value: list) -> None:
         """
@@ -57,6 +65,7 @@ class Ripple:
         self._make_average_glucose()
         self._get_min_max_value_time()
         self._normalize_graph()
+        self._get_eccuation()
 
     def _make_duration(self) -> None:
         """
@@ -112,6 +121,38 @@ class Ripple:
 
         self.normalized_graph = copy.deepcopy(temp_normalized_graph)
 
+    def _reposition_axis(self) -> t.List[int] :
+        """
+        Method for sliding the axis value on x
+        """
+        count = len(self.normalized_graph)
+        slided_x = []
+
+        for i in range(count):
+            slided_x.append(i-self.max_index)
+        
+        return slided_x
+
+    def _get_eccuation(self) ->None:
+        """
+        Method for obtaining the eccuation parameters of the graph.
+        x,y array like structure- the coordinates of the points
+        """
+        print ("+++++++++++++++++++++++++")
+        print (self.max_t)
+        y=self.normalized_graph
+        #y=self.bg.to_numpy()
+        x=self._reposition_axis()
+
+        def test(x,a,b,c):
+            """
+            Method for calculating the eccuation
+            """
+            #return 1/(a * np.sqrt(2 * np.pi)) * np.exp( - (x - b)**2 / (2 * a**2))
+            return a* np.exp( - (x - b)**2 / c)
+        
+        self.a,self.b=curve_fit(test,x,y,p0=[1,1,1])
+        
     def _compile_legend(self) -> str:
         """
         Method for compiling a basic str for legend display.

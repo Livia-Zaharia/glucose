@@ -44,6 +44,11 @@ def main():
     ripple_list = d.generate_ripples(trend_list, trend_list_count)
     write_a_message("FILE DIVIDED")
 
+    """
+    around here is the time consuming part
+    """
+
+"""
     db = _create_basic_database(divide=d, ripple_list=ripple_list, path=DATA_PATH, start_end=start_end)
     write_a_message("BASIC DATABASE CREATED")
 
@@ -63,7 +68,7 @@ def main():
     write_a_message("STATISTIC DATABASE CREATED")
 
     create_viewer(ripple_list, db, ripple_stat_list, db_s, db_a)
-
+"""
 
 
 def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], path: Path,start_end:str) -> DatabaseManager:
