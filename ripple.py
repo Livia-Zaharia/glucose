@@ -140,7 +140,10 @@ class Ripple:
         """
         print ("+++++++++++++++++++++++++")
         print (self.max_t)
-        y=self.normalized_graph
+        if ((self.min_index>0.3*len(self.normalized_graph)) and (self.min_index<0.6*len(self.normalized_graph))):
+            y=[1-item for item in self.normalized_graph]
+        else:
+            y=self.normalized_graph
         #y=self.bg.to_numpy()
         x=self._reposition_axis()
 
@@ -151,7 +154,7 @@ class Ripple:
             #return 1/(a * np.sqrt(2 * np.pi)) * np.exp( - (x - b)**2 / (2 * a**2))
             return a* np.exp( - (x - b)**2 / c)
         
-        self.a,self.b=curve_fit(test,x,y,p0=[1,1,1])
+        [self.a,self.b,self.c],covar=curve_fit(test,x,y) if curve_fit(test,x,y) is not RuntimeError else ([0,0,0],0)
         
     def _compile_legend(self) -> str:
         """
