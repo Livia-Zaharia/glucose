@@ -44,6 +44,7 @@ class Ripple:
         self.a=0.0
         self.b=0.0
         self.c=0.0
+        self.d=0.0
 
     def add_values(self, bg_value: pd.DataFrame, time_value: pd.DataFrame, trend_value: list) -> None:
         """
@@ -140,21 +141,28 @@ class Ripple:
         """
         print ("+++++++++++++++++++++++++")
         print (self.max_t)
-        if ((self.min_index>0.3*len(self.normalized_graph)) and (self.min_index<0.6*len(self.normalized_graph))):
-            y=[1-item for item in self.normalized_graph]
-        else:
-            y=self.normalized_graph
-        #y=self.bg.to_numpy()
+        #y=self.normalized_graph
+        y=self.bg.to_numpy()
         x=self._reposition_axis()
 
-        def test(x,a,b,c):
+        def test(x,a,b,c,d):
             """
             Method for calculating the eccuation
             """
             #return 1/(a * np.sqrt(2 * np.pi)) * np.exp( - (x - b)**2 / (2 * a**2))
-            return a* np.exp( - (x - b)**2 / c)
+            #return a* np.exp( - (x - b)**2 / c)
+            return a*x**3+b*x**2+c*x+d
         
-        [self.a,self.b,self.c],covar=curve_fit(test,x,y) if curve_fit(test,x,y) is not RuntimeError else ([0,0,0],0)
+        [self.a,self.b,self.c,self.d],covar=curve_fit(test,x,y)
+        print (self.a)
+        print ("+")
+        print (self.b)
+        print ("+")
+        print (self.c)
+        print ("+")
+        print (self.d)
+        print ("+")
+
         
     def _compile_legend(self) -> str:
         """
