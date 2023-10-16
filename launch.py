@@ -44,9 +44,10 @@ def main():
     ripple_list = d.generate_ripples(trend_list, trend_list_count)
     write_a_message("FILE DIVIDED")
 
-    """
-    around here is the time consuming part
-    """
+    for no, elem in enumerate( ripple_list):
+        elem.create_graphic_new(no)
+        if no> 5:
+            break 
 
 """
     db = _create_basic_database(divide=d, ripple_list=ripple_list, path=DATA_PATH, start_end=start_end)
