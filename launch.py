@@ -10,6 +10,7 @@ import data_acquisition
 import data_display
 import data_reconfig
 import constants
+import pandas as pd
 from data_analysis import Analyze
 from data_division import Divide
 from database import DatabaseManager
@@ -44,15 +45,21 @@ def main():
     ripple_list = d.generate_ripples(trend_list, trend_list_count)
     write_a_message("FILE DIVIDED")
 
-    for no, elem in enumerate( ripple_list):
-        elem.create_graphic_new(no)
-        if no> 5:
-            break 
+    # for no, elem in enumerate( ripple_list):
+    #     elem.create_graphic_new(no)
+    #     if no> 5:
+    #         break 
 
-"""
+    """
+    before going into database building we are going to ask if we want just syntetization of ecuation in an excel through a split choice screen
+    1- in create basic db -> from data reconfig convert ripple to df ->write data frame to xls from data display
+    2- see how the gui was written
+    3- rewrite analysis the methods there are too time and memory consuming
+    """
+    _create_dataset_xls(divide=d, ripple_list=ripple_list)
     db = _create_basic_database(divide=d, ripple_list=ripple_list, path=DATA_PATH, start_end=start_end)
     write_a_message("BASIC DATABASE CREATED")
-
+""""
     a = Analyze(ripple_list=ripple_list)
     
     ripple_connections = a.compare_graphs()
@@ -70,7 +77,27 @@ def main():
 
     create_viewer(ripple_list, db, ripple_stat_list, db_s, db_a)
 """
+def _create_dataset_xls(divide: Divide, ripple_list: t.List[Ripple]):
+   
+    df=pd.DataFrame()
+    non_iter_complete={}
 
+    data_iter, data_noniter = divide.divide_by_iterable(data=ripple_list[0])
+    print(data_noniter.keys())
+    for key, value in data_noniter.items():
+        y=[]
+        non_iter_complete.setdefault(key,y)
+  
+   
+    for item in ripple_list:
+        data_iter, data_noniter = divide.divide_by_iterable(data=item)
+        for key, value in data_noniter.items():
+            non_iter_complete[key].append(value)
+
+    df=df.from_dict(non_iter_complete)
+           
+    
+    data_display.write_dataframe_to_xls_file(df,"dataset.xls","1")
 
 def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], path: Path,start_end:str) -> DatabaseManager:
     """
@@ -88,7 +115,6 @@ def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], path: Pa
     """
 
     db_new_name=path/(constants.GLUCOSE_DB+start_end+".db")
-    print(db_new_name)
     path.mkdir(parents=True, exist_ok=True)
     #check if there is a database in that location already
     if db_new_name not in path.glob("*"):
