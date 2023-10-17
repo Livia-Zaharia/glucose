@@ -42,11 +42,18 @@ class Ripple:
         self.max_v = 0.0
         self.max_t = 0.0
         self.max_index = 0
+
         self.a=0.0
         self.b=0.0
         self.c=0.0
         self.d=0.0
-        self.check_curve=[]
+        self.e=0.0
+        self.f=0.0
+
+        self.check_curve=[] # data of calculated curve
+
+        self.domain_start=0.0
+        self.domain_end=0.0
 
     def add_values(self, bg_value: pd.DataFrame, time_value: pd.DataFrame, trend_value: list) -> None:
         """
@@ -68,7 +75,7 @@ class Ripple:
         self._make_average_glucose()
         self._get_min_max_value_time()
         self._normalize_graph()
-        self._get_ecuation()
+        self._get_equation()
 
     def _make_duration(self) -> None:
         """
@@ -134,43 +141,41 @@ class Ripple:
         for i in range(count):
             slided_x.append(i-self.max_index)
         
+        self.domain_start=slided_x[0]
+        self.domain_end=slided_x[-1]
+        
         return slided_x
 
-    def _get_ecuation(self) ->None:
+    def _get_equation(self) ->None:
         """
-        Method for obtaining the ecuation parameters of the graph.
+        Method for obtaining the equation parameters of the graph.
         x,y array like structure- the coordinates of the points
+        the basic ideea is as follows- we have a distribution of glucose/time- since time is standardized we can say we have a 
+        distribution over a constant interval spread
+        we want the equation parameters to compare later with others- so assume we have f(x) where x is included in domain that 
+        varies from -len(self.bg) to +len(self.bg)- because it was shifted in reposition axis
+        the function should return something in the domain of (0,1]- that is why in the test and in the self.check-curve everything 
+        is multiplied by self.max value- to have comparable parameters 
         """
-        ''''
-        print ("+++++++++++++++++++++++++")
-        print (self.max_t)
-        '''
-
-        #y=self.normalized_graph
         y=self.bg.to_numpy()
+        #y=self.normalized_graph
         x=self._reposition_axis()
 
-        def test(x,a,b,c,d):
+        def test(x,a,b,c,d,e,f):
             """
-            Method for calculating the ecuation
+            Method for calculating the equation- or where the basic structure of the graph is standardized
             """
-            #return 1/(a * np.sqrt(2 * np.pi)) * np.exp( - (x - b)**2 / (2 * a**2))
-            #return a* np.exp( - (x - b)**2 / c)
-            return a*x**3+b*x**2+c*x+d
+            return self.max_v*(a*x**5+b*x**4+c*x**3+d*x**2+e*x+f)
         
-        [self.a,self.b,self.c,self.d],covar=curve_fit(test,x,y)
-        self.check_curve=[self.a*item**3+self.b*item**2+self.c*item+self.d for item in x]
-        ''''
-        print (self.a)
-        print ("+")
-        print (self.b)
-        print ("+")
-        print (self.c)
-        print ("+")
-        print (self.d)
-        print ("+")
-        '''
-
+        (self.a, self.b, self.c, self.d, self.e, self.f),covar=curve_fit(test,x,y)
+        self.check_curve=[self.max_v*(self.a*item**5+
+                          self.b*item**4+
+                          self.c*item**3+
+                          self.d*item**2+
+                          self.e*item+
+                          self.f)
+                            for item in x]
+        
         
     def _compile_legend(self) -> str:
         """
@@ -262,25 +267,15 @@ class Ripple:
     
     def create_graphic_new(self, index: int) -> None:
         """
-        Method of Ripple class to produce a graphic in a browser and then save as an HTML or PNG of the
-        ripple with the legend. Made using Plotly Express.
-        index value is the position, flag value- True outputs HTML, False -outputs PNG directly.
-
-        Args:
-            index: The index of the ripple used for naming the directory.
-
+        Method of checking the overlapping of the estimated graph vs the recorded one
         """
         # Create the ripple graph using the class instance's data
         legend_values = self._compile_legend()
-
             
         fig=go.Figure()
 
         fig.add_trace(go.Scatter( x=self.time_v, y=self.bg, line=dict(color='firebrick', width=4)))
         fig.add_trace(go.Scatter( x=self.time_v, y=self.check_curve, line=dict(color='royalblue', width=4, dash="dash")))
-        #fig1 = px.line(self.bg, x=self.time_v, y=self.bg, range_y=[40, 400])
-        #fig2 = px.line(self.check_curve, x=self.time_v, y=self.check_curve, range_y=[40, 400])
-
         
         # Add the graph elements and annotations
         #fig.add_scatter(x=[item for item in range (len(self.bg))],y=self.check_curve)
@@ -301,13 +296,3 @@ class Ripple:
 
         # Write the graph to the specified data path in either HTML or PNG format
         fig.show()
-        '''
-        if should_write_html:
-            ending_text = data_path / f"images{index}.html"
-            fig.write_html(str(ending_text))
-
-        else:
-            ending_text = data_path / f"images{index}.png"
-            fig.write_image(str(ending_text))'
-            '''
-
