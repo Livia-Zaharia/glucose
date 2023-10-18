@@ -52,11 +52,10 @@ def main():
 
     """
     before going into database building we are going to ask if we want just syntetization of ecuation in an excel through a split choice screen
-    1- in create basic db -> from data reconfig convert ripple to df ->write data frame to xls from data display
-    2- see how the gui was written
     3- rewrite analysis the methods there are too time and memory consuming
     """
-    _create_dataset_xls(divide=d, ripple_list=ripple_list)
+    _create_dataset_xls(divide=d, ripple_list=ripple_list, path=DATA_PATH, start_end=start_end)
+
     db = _create_basic_database(divide=d, ripple_list=ripple_list, path=DATA_PATH, start_end=start_end)
     write_a_message("BASIC DATABASE CREATED")
 """"
@@ -77,27 +76,47 @@ def main():
 
     create_viewer(ripple_list, db, ripple_stat_list, db_s, db_a)
 """
-def _create_dataset_xls(divide: Divide, ripple_list: t.List[Ripple]):
-   
-    df=pd.DataFrame()
-    non_iter_complete={}
 
-    data_iter, data_noniter = divide.divide_by_iterable(data=ripple_list[0])
-    print(data_noniter.keys())
-    for key, value in data_noniter.items():
-        y=[]
-        non_iter_complete.setdefault(key,y)
-  
-   
-    for item in ripple_list:
-        data_iter, data_noniter = divide.divide_by_iterable(data=item)
+
+def _create_dataset_xls(divide: Divide, ripple_list: t.List[Ripple], path: Path,start_end:str) -> None:
+    """
+    Function to export the dataset to be used further in training
+    Takes same arg to create database but returns through a secondary call an xls
+    """
+    new_name=path/f'dataset{start_end}.xls'
+
+    if new_name not in path.glob("*"):
+        #create dictionary to send to xls
+        df=pd.DataFrame()
+        non_iter_complete={}
+
+        data_iter, data_noniter = divide.divide_by_iterable(data=ripple_list[0])       
+        
+        #creating key-value pairs with empty slots
         for key, value in data_noniter.items():
-            non_iter_complete[key].append(value)
+            y=[]
+            non_iter_complete.setdefault(key,y)
 
-    df=df.from_dict(non_iter_complete)
-           
+        #taking each ripple
+        for item in ripple_list:
+            #extracting each ripple's non iterable elements
+            data_iter, data_noniter = divide.divide_by_iterable(data=item)
+            #for each non iterable elemnt in class, put it in the right container
+            for key, value in data_noniter.items():                
+                non_iter_complete[key].append(value)
+
+        #redefining y[] because it keeps previous transformations  
+        y=[]
+        #adding the id column to know where to search for
+        for item in (ripple_list):
+             y.append(count)
+             count=count+1
+        non_iter_complete.setdefault("ID",y)
     
-    data_display.write_dataframe_to_xls_file(df,"dataset.xls","1")
+        df=df.from_dict(non_iter_complete)
+        
+        data_display.write_dataframe_to_xls_file(df,new_name,"1")
+
 
 def _create_basic_database(divide: Divide, ripple_list: t.List[Ripple], path: Path,start_end:str) -> DatabaseManager:
     """
