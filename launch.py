@@ -46,24 +46,20 @@ def main():
     write_a_message("FILE DIVIDED")
 
     # for no, elem in enumerate( ripple_list):
-    #     elem.create_graphic_new(no)
+    #     elem._create_graphic_new(no)
     #     if no> 5:
     #         break 
 
-    """
-    before going into database building we are going to ask if we want just syntetization of ecuation in an excel through a split choice screen
-    3- rewrite analysis the methods there are too time and memory consuming
-    """
     _create_dataset_xls(divide=d, ripple_list=ripple_list, path=DATA_PATH, start_end=start_end)
 
     db = _create_basic_database(divide=d, ripple_list=ripple_list, path=DATA_PATH, start_end=start_end)
     write_a_message("BASIC DATABASE CREATED")
-""""
+
     a = Analyze(ripple_list=ripple_list)
     
     ripple_connections = a.compare_graphs()
 
-    ripple_stat_list=d.generate_ripple_statistics(ripple_list,ripple_connections)
+    
 
     db_a = _create_analysis_database(ripple_connections=ripple_connections, path=DATA_PATH,start_end=start_end)
     write_a_message("ANALYSIS DATABASE CREATED")
@@ -71,11 +67,13 @@ def main():
     _extract_summary_of_analysis(ripple_connections=ripple_connections,start_end=start_end,path=DATA_PATH)
     write_a_message("SUMMARY OF ANALYSIS CREATED")
 
-    db_s=_create_stat_database(ripple_stat_list=ripple_stat_list, path=DATA_PATH, start_end=start_end)
-    write_a_message("STATISTIC DATABASE CREATED")
+    # ripple_stat_list=d.generate_ripple_statistics(ripple_list,ripple_connections)
+    
+    # db_s=_create_stat_database(ripple_stat_list=ripple_stat_list, path=DATA_PATH, start_end=start_end)
+    # write_a_message("STATISTIC DATABASE CREATED")
 
-    create_viewer(ripple_list, db, ripple_stat_list, db_s, db_a)
-"""
+    # create_viewer(ripple_list, db, ripple_stat_list, db_s, db_a)
+
 
 
 def _create_dataset_xls(divide: Divide, ripple_list: t.List[Ripple], path: Path,start_end:str) -> None:
@@ -107,6 +105,7 @@ def _create_dataset_xls(divide: Divide, ripple_list: t.List[Ripple], path: Path,
 
         #redefining y[] because it keeps previous transformations  
         y=[]
+        count=0
         #adding the id column to know where to search for
         for item in (ripple_list):
              y.append(count)

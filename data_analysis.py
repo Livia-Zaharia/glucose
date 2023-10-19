@@ -32,6 +32,7 @@ class Analyze:
         if close_value_count != 0:
             percent_ripple1 = round(close_value_count / len(ripple1.normalized_graph), 2)
             percent_ripple2 = round(close_value_count / len(ripple2.normalized_graph), 2)
+            #so here we need to return just the percentage ripple1 is similar to ripple2 and viceversa
             return percent_ripple1, percent_ripple2
         return 0, 0
 
@@ -93,7 +94,7 @@ class Analyze:
             sum_of_elements: sum of true values- basically how many elements out of those in 
                             len(compare_a) were a close enough match
         """
-
+        
         #start indexes of ripple A and ripple B- index- as in list[index]
         #we are going to use list positioning to go through the values
         start_a_index = 0
@@ -177,7 +178,29 @@ class Analyze:
         
         #value that counts how many elements are similar
         sum_of_elements = 0
+
+        # ###############################################################
+        ## the following part was made to check how aproximate the equation factor gets to the actual comparison of values
+        ## it keeps the generalposion for the first 20 so that is good
+        ## it is recommended to pe kept like this for obtaining datasets
+        # domain_a=[x_a for x_a in range(len(ripple_a.normalized_graph))]
+        # domain_b=[x_b for x_b in range(len(ripple_b.normalized_graph))]
+
         
+        # #the actual splicing
+        # compare_a = domain_a[start_a_index:end_a_index]
+        # compare_b = domain_b[start_b_index:end_b_index]
+        
+        # def eq (rip,no):
+        #     return (rip.a*no**5 + rip.b*no**4 + rip.c*no**3 + rip.d*no**2 +rip.e*no + rip.f)
+
+    
+        # #the comparison element by element
+        # for x in range(len(compare_a)):
+        #     ta=compare_a[x]+ripple_a.domain_start
+        #     tb=compare_b[x]+ripple_b.domain_start
+        #     sum_of_elements += int(math.isclose(eq(ripple_a,ta), eq(ripple_b,tb), rel_tol=0.05))
+        # ####################################################################
         #the actual splicing
         compare_a = ripple_a.normalized_graph[start_a_index:end_a_index]
         compare_b = ripple_b.normalized_graph[start_b_index:end_b_index]

@@ -161,11 +161,11 @@ class Ripple:
         #y=self.normalized_graph
         x=self._reposition_axis()
 
-        def test(x,a,b,c,d,e,f):
+        def test(x_t,a,b,c,d,e,f):
             """
             Method for calculating the equation- or where the basic structure of the graph is standardized
             """
-            return self.max_v*(a*x**5+b*x**4+c*x**3+d*x**2+e*x+f)
+            return self.max_v*(a*x_t**5+b*x_t**4+c*x_t**3+d*x_t**2+e*x_t+f)
         
         (self.a, self.b, self.c, self.d, self.e, self.f),covar=curve_fit(test,x,y)
         self.check_curve=[self.max_v*(self.a*item**5+
@@ -264,10 +264,10 @@ class Ripple:
             ending_text = data_path / f"images{index}.png"
             fig.write_image(str(ending_text))
 
-    
-    def create_graphic_new(self, index: int) -> None:
+    def _create_graphic_new(self, index: int) -> None:
         """
         Method of checking the overlapping of the estimated graph vs the recorded one
+        USED IN CHECKING THE ALIGNMENT- SO NOT CALLED IN COMMON PRACTICE
         """
         # Create the ripple graph using the class instance's data
         legend_values = self._compile_legend()
@@ -277,8 +277,7 @@ class Ripple:
         fig.add_trace(go.Scatter( x=self.time_v, y=self.bg, line=dict(color='firebrick', width=4)))
         fig.add_trace(go.Scatter( x=self.time_v, y=self.check_curve, line=dict(color='royalblue', width=4, dash="dash")))
         
-        # Add the graph elements and annotations
-        #fig.add_scatter(x=[item for item in range (len(self.bg))],y=self.check_curve)
+
         fig.add_hline(max(self.bg), line_width=1, line_dash="dash")
         fig.add_hline(min(self.bg), line_width=1, line_dash="dash")
         fig.add_annotation(text="MIN", x=self.min_t, y=self.min_v)
@@ -294,5 +293,4 @@ class Ripple:
         fig.update_layout(margin=dict(l=0, r=0, b=0, t=0), xaxis=dict(title="Time", visible=True, showgrid=True),
                           yaxis=dict(title="Glucose", ticks="", showticklabels=True, showgrid=True))
 
-        # Write the graph to the specified data path in either HTML or PNG format
         fig.show()
