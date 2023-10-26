@@ -45,27 +45,27 @@ def main():
     ripple_list = d.generate_ripples(trend_list, trend_list_count)
     write_a_message("FILE DIVIDED")
 
-    # for no, elem in enumerate( ripple_list):
-    #     elem._create_graphic_new(no)
-    #     if no> 5:
-    #         break 
+    for no, elem in enumerate( ripple_list):
+        elem._create_graphic_blank(no,DATA_PATH, start_end)
+        # if no> 5:
+        #     break 
 
-    _create_dataset_xls(divide=d, ripple_list=ripple_list, path=DATA_PATH, start_end=start_end)
+    # _create_dataset_xls(divide=d, ripple_list=ripple_list, path=DATA_PATH, start_end=start_end)
 
-    db = _create_basic_database(divide=d, ripple_list=ripple_list, path=DATA_PATH, start_end=start_end)
-    write_a_message("BASIC DATABASE CREATED")
+    # db = _create_basic_database(divide=d, ripple_list=ripple_list, path=DATA_PATH, start_end=start_end)
+    # write_a_message("BASIC DATABASE CREATED")
 
-    a = Analyze(ripple_list=ripple_list)
+    # a = Analyze(ripple_list=ripple_list)
     
-    ripple_connections = a.compare_graphs()
+    # ripple_connections = a.compare_graphs()
 
     
 
-    db_a = _create_analysis_database(ripple_connections=ripple_connections, path=DATA_PATH,start_end=start_end)
-    write_a_message("ANALYSIS DATABASE CREATED")
+    # db_a = _create_analysis_database(ripple_connections=ripple_connections, path=DATA_PATH,start_end=start_end)
+    # write_a_message("ANALYSIS DATABASE CREATED")
 
-    _extract_summary_of_analysis(ripple_connections=ripple_connections,start_end=start_end,path=DATA_PATH)
-    write_a_message("SUMMARY OF ANALYSIS CREATED")
+    # _extract_summary_of_analysis(ripple_connections=ripple_connections,start_end=start_end,path=DATA_PATH)
+    # write_a_message("SUMMARY OF ANALYSIS CREATED")
 
     # ripple_stat_list=d.generate_ripple_statistics(ripple_list,ripple_connections)
     

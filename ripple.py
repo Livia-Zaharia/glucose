@@ -10,6 +10,7 @@ import plotly.graph_objects as go
 import typing as t
 
 import numpy as np
+import os
 from scipy.optimize import curve_fit
 
 CURRENT_PATH_CWD = Path.cwd()
@@ -294,3 +295,28 @@ class Ripple:
                           yaxis=dict(title="Glucose", ticks="", showticklabels=True, showgrid=True))
 
         fig.show()
+
+
+    def _create_graphic_blank(self, index: int, data_path:Path, start_end:str) -> None:
+        """
+        Method of checking the overlapping of the estimated graph vs the recorded one
+        USED IN CHECKING THE ALIGNMENT- SO NOT CALLED IN COMMON PRACTICE
+        """
+            
+        fig=go.Figure()
+
+        fig.add_trace(go.Scatter( x=self.time_v, y=self.bg, line=dict(color='black', width=4)))
+
+        
+        # Update the graph layout
+        
+        fig.update_layout(margin=dict(l=0, r=0, b=0, t=0), xaxis=dict( visible=False, showgrid=False),
+                          yaxis=dict( ticks="", showticklabels=False, showgrid=False), paper_bgcolor='white', width=1000, height=500)
+
+        new_path=data_path/"dataset_images"
+        if new_path not in data_path.glob("*"):
+            os.mkdir(new_path)
+            
+        name=f"{start_end}-{index}.png"
+        ending_text = new_path/name
+        fig.write_image(str(ending_text))
